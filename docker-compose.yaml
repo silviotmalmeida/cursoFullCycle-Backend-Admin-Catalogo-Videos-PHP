@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+
+    app:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: backend-admin-video-catalog-app
+        volumes:
+            - ./app:/var/www
+        networks:
+            - backend-admin-video-catalog-network
+
+    nginx:
+        image: nginx:latest
+        container_name: backend-admin-video-catalog-nginx
+        ports:
+            - "8000:80"
+        volumes:
+            - ./app:/var/www
+            - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+        networks:
+            - backend-admin-video-catalog-network
+
+networks:
+    backend-admin-video-catalog-network:
+        driver: bridge

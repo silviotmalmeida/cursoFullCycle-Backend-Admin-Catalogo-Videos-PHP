@@ -6,4 +6,7 @@
 - comandos do composer
     para iniciar um projeto: composer init
     para gerar o arquivo de autoload: composer dump-autoload
+    para atualizar todas as dependências: composer update
+    para instalar o phpunit: composer require --dev phpunit/phpunit ^9.5
+    para instalar o mockery: composer require --dev mockery/mockery
 

@@ -1,0 +1,16 @@
+{
+  "name": "silviotmalmeida/cursofullcycle-backend-admin-catalogo-videos-php",
+  "description": "Backend Catálogo Vídeos - PHP",
+  "authors": [
+    {
+      "name": "Sílvio Almeida",
+      "email": "silviotmalmeida@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Core\\": "src/Core"
+    }
+  },
+  "require": {}
+}

@@ -9,16 +9,16 @@ use Exception;
 // definindo a trait que vai possibilitar a utilização dos métodos mágicos
 trait MagicMethodsTrait
 {
-    // implementando o get das propriedades das classes
+    // implementando o get dos atributos das classes
     public function __get($property)
     {
-        // se a propriedade existir, retorna o valor associado
-        if ($this->{$property})
+        // se o atributo existir, retorna o valor associado
+        if (isset($this->{$property}))
             return $this->{$property};
 
         // obtendo o nome da classe
         $className = get_class($this);
-        // caso a propriedade não exista na classe, lança uma exceção
+        // caso o atributo não exista na classe, lança uma exceção
         throw new Exception("Property {$property} not found in {$className}");
     }
 }

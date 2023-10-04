@@ -115,12 +115,12 @@ class CategoryUnitTest extends TestCase
             $this->assertInstanceOf(EntityValidationException::class, $th);
         }
 
-        // validando description não vazia com tamanho < 3
+        // validando name longo
         try {
             // criando a category
             $category = new Category(
-                name: 'name 1',
-                description: 'ab',
+                name: random_bytes(256),
+                description: 'desc 1',
             );
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);
@@ -129,8 +129,48 @@ class CategoryUnitTest extends TestCase
             $this->assertInstanceOf(EntityValidationException::class, $th);
         }
 
-        // validando description não vazia com tamanho > 50
-        $descriptionMock = random_bytes(51);
+        // validando name curto
+        try {
+            // criando a category
+            $category = new Category(
+                name: random_bytes(2),
+                description: 'desc 1',
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando name válido
+        try {
+            // criando a category
+            $category = new Category(
+                name: 'name 1',
+                description: 'desc 1',
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        }
+
+        // validando description não vazia com tamanho longo
+        try {
+            // criando a category
+            $category = new Category(
+                name: 'name 1',
+                description: random_bytes(256),
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando description não vazia com tamanho curto
+        $descriptionMock = random_bytes(2);
         try {
             // criando a category
             $category = new Category(
@@ -142,6 +182,18 @@ class CategoryUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando o tipo da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando description vazia
+        try {
+            // criando a category
+            $category = new Category(
+                name: 'name 1',
+                description: '',
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
         }
     }
 }

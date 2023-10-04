@@ -5,7 +5,7 @@ namespace Core\Domain\Entity;
 
 // importações
 use Core\Domain\Entity\Traits\MagicMethodsTrait;
-use Core\Domain\Exception\EntityValidationException;
+use Core\Domain\Validation\DomainValidation;
 
 // definindo a classe
 class Category
@@ -52,11 +52,11 @@ class Category
     // função de validação dos atributos
     private function validate(): void
     {
-        if (empty($this->name)) throw new EntityValidationException("Name cannot be empty");
-        if (
-            !empty($this->description) and
-            (strlen($this->description) < 3 or
-                strlen($this->description) > 50)
-        ) throw new EntityValidationException("Description must be empty or have lenght between 3 and 50");
+        DomainValidation::notNullOrEmpty($this->name);
+        DomainValidation::strMaxLenght($this->name);
+        DomainValidation::strMinLenght($this->name);
+
+        DomainValidation::strNullOrMaxLength($this->description);
+        DomainValidation::strNullOrMixLength($this->description);
     }
 }

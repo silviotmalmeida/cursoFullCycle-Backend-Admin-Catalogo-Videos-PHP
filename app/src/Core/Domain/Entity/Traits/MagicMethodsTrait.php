@@ -21,4 +21,10 @@ trait MagicMethodsTrait
         // caso o atributo não exista na classe, lança uma exceção
         throw new Exception("Property {$property} not found in {$className}");
     }
+
+    // função que retorna o valor do uuid como string
+    public function id(): string
+    {
+        return (string) $this->id;
+    }
 }

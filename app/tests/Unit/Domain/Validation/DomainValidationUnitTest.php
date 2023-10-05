@@ -24,7 +24,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals('Value must not be null or empty', $th->getMessage());
+            $this->assertSame('Value must not be null or empty', $th->getMessage());
         }
 
         // validando valor vazio e mensagem default
@@ -37,7 +37,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals('Value must not be null or empty', $th->getMessage());
+            $this->assertSame('Value must not be null or empty', $th->getMessage());
         }
 
         // validando valor nulo e mensagem customizada
@@ -51,7 +51,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals($message, $th->getMessage());
+            $this->assertSame($message, $th->getMessage());
         }
 
         // validando valor vazio e mensagem customizada
@@ -65,7 +65,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals($message, $th->getMessage());
+            $this->assertSame($message, $th->getMessage());
         }
 
         // validando valor não nulo
@@ -93,7 +93,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals('Value must not be greater than 255 characters', $th->getMessage());
+            $this->assertSame('Value must not be greater than 255 characters', $th->getMessage());
         }
 
         // validando valor maior customizado e mensagem default
@@ -107,7 +107,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals("Value must not be greater than {$lenght} characters", $th->getMessage());
+            $this->assertSame("Value must not be greater than {$lenght} characters", $th->getMessage());
         }
 
         // validando valor maior customizado e mensagem customizada
@@ -122,7 +122,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals($message, $th->getMessage());
+            $this->assertSame($message, $th->getMessage());
         }
 
         // validando valor válido default
@@ -160,7 +160,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals('Value must not be smaller than 3 characters', $th->getMessage());
+            $this->assertSame('Value must not be smaller than 3 characters', $th->getMessage());
         }
 
         // validando valor menor customizado e mensagem default
@@ -174,7 +174,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals("Value must not be smaller than {$lenght} characters", $th->getMessage());
+            $this->assertSame("Value must not be smaller than {$lenght} characters", $th->getMessage());
         }
 
         // validando valor menor customizado e mensagem customizada
@@ -189,7 +189,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals($message, $th->getMessage());
+            $this->assertSame($message, $th->getMessage());
         }
 
         // validando valor válido default
@@ -227,7 +227,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals('Value must not be greater than 255 characters', $th->getMessage());
+            $this->assertSame('Value must not be greater than 255 characters', $th->getMessage());
         }
 
         // validando valor maior customizado e mensagem default
@@ -241,7 +241,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals("Value must not be greater than {$lenght} characters", $th->getMessage());
+            $this->assertSame("Value must not be greater than {$lenght} characters", $th->getMessage());
         }
 
         // validando valor maior customizado e mensagem customizada
@@ -256,7 +256,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals($message, $th->getMessage());
+            $this->assertSame($message, $th->getMessage());
         }
 
         // validando valor válido default
@@ -316,7 +316,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals('Value must not be smaller than 3 characters', $th->getMessage());
+            $this->assertSame('Value must not be smaller than 3 characters', $th->getMessage());
         }
 
         // validando valor menor customizado e mensagem default
@@ -330,7 +330,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals("Value must not be smaller than {$lenght} characters", $th->getMessage());
+            $this->assertSame("Value must not be smaller than {$lenght} characters", $th->getMessage());
         }
 
         // validando valor menor customizado e mensagem customizada
@@ -345,7 +345,7 @@ class DomainValidationUnitTest extends TestCase
         } catch (\Throwable $th) {
             // verificando os dados da exceção
             $this->assertInstanceOf(EntityValidationException::class, $th);
-            $this->assertEquals($message, $th->getMessage());
+            $this->assertSame($message, $th->getMessage());
         }
 
         // validando valor válido default

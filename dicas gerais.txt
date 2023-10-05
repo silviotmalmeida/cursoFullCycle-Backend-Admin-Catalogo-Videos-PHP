@@ -9,4 +9,5 @@
     para atualizar todas as dependências: composer update
     para instalar o phpunit: composer require --dev phpunit/phpunit ^9.5
     para instalar o mockery: composer require --dev mockery/mockery
+    para instalar o ramsey-uuid: composer require ramsey/uuid
 

@@ -6,8 +6,9 @@ namespace Core\Domain\Entity;
 // importações
 use Core\Domain\Entity\Traits\MagicMethodsTrait;
 use Core\Domain\Validation\DomainValidation;
+use Core\Domain\ValueObject\Uuid;
 
-// definindo a classe
+// definindo a entidade
 class Category
 {
     // incluindo a trait que ativa os métodos mágicos
@@ -15,11 +16,20 @@ class Category
 
     // construtor e atributos
     public function __construct(
-        protected string $id = '',
+        protected Uuid|string $id = '',
         protected string $name = '',
         protected string $description = '',
         protected bool $isActive = true,
     ) {
+        // se o id for vazio, atribui um uuid randomicamente
+        if ($this->id == '') {
+            $this->id = Uuid::random();
+        }
+        // senão, converte a string recebida para um objeto de valor uuid
+        else {
+            $this->id = new Uuid($this->id);
+        }
+
         // validando os atributos
         $this->validate();
     }

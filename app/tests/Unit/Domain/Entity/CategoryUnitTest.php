@@ -7,6 +7,7 @@ namespace Tests\Unit\Domain\Entity;
 use Core\Domain\Entity\Category;
 use Core\Domain\Exception\EntityValidationException;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid as RamseyUuid;
 
 // definindo a classe de teste, que estende a TestCase do PHPUnit
 class CategoryUnitTest extends TestCase
@@ -22,9 +23,9 @@ class CategoryUnitTest extends TestCase
         );
 
         // verificando os atributos
-        $this->assertIsString($category->id);
-        $this->assertEquals('New Cat', $category->name);
-        $this->assertEquals('New Desc', $category->description);
+        $this->assertNotEmpty($category->id());
+        $this->assertSame('New Cat', $category->name);
+        $this->assertSame('New Desc', $category->description);
         $this->assertTrue($category->isActive);
     }
 
@@ -66,7 +67,7 @@ class CategoryUnitTest extends TestCase
     public function testUpdate()
     {
         // mock de uuid
-        $uuid = 'uuid.value';
+        $uuid = RamseyUuid::uuid4()->toString();
 
         // criando a category
         $category = new Category(
@@ -83,18 +84,18 @@ class CategoryUnitTest extends TestCase
         );
 
         // verificando os atributos
-        $this->assertEquals($uuid, $category->id);
-        $this->assertEquals('name 2', $category->name);
-        $this->assertEquals('desc 2', $category->description);
+        $this->assertSame($uuid, $category->id());
+        $this->assertSame('name 2', $category->name);
+        $this->assertSame('desc 2', $category->description);
         $this->assertTrue($category->isActive);
 
         // atualizando sem valores
         $category->update();
 
         // verificando os atributos
-        $this->assertEquals($uuid, $category->id);
-        $this->assertEquals('name 2', $category->name);
-        $this->assertEquals('desc 2', $category->description);
+        $this->assertSame($uuid, $category->id());
+        $this->assertSame('name 2', $category->name);
+        $this->assertSame('desc 2', $category->description);
         $this->assertTrue($category->isActive);
     }
 

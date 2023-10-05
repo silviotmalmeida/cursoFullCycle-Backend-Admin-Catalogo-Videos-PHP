@@ -44,7 +44,7 @@ class DomainValidation
     }
 
     // valida se o valor é nulo ou vazio e se possui quantidade de caracteres maior ou igual ao número mínimo permitido
-    public static function strNullOrMixLength(mixed $value, int $lenght = 3, string $exceptMessage = null): void
+    public static function strNullOrMinLength(mixed $value, int $lenght = 3, string $exceptMessage = null): void
     {
         // se não for vazio ou nulo e possuir quantidade de caracteres menor do que o número mínimo permitido, lança exceção
         // envia a mensagem recebida caso seja válida, senão envia mensagem padrão

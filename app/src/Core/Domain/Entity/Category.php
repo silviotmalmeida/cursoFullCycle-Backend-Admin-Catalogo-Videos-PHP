@@ -67,6 +67,6 @@ class Category
         DomainValidation::strMinLenght($this->name);
 
         DomainValidation::strNullOrMaxLength($this->description);
-        DomainValidation::strNullOrMixLength($this->description);
+        DomainValidation::strNullOrMinLength($this->description);
     }
 }

@@ -303,14 +303,14 @@ class DomainValidationUnitTest extends TestCase
         }
     }
 
-    // função que testa a função de validação strNullOrMixLength
-    public function testStrNullOrMixLength()
+    // função que testa a função de validação strNullOrMinLength
+    public function testStrNullOrMinLength()
     {
         // validando valor menor default e mensagem default
         try {
             $value = random_bytes(2);
             // executando o método
-            DomainValidation::strNullOrMixLength($value);
+            DomainValidation::strNullOrMinLength($value);
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);
         } catch (\Throwable $th) {
@@ -324,7 +324,7 @@ class DomainValidationUnitTest extends TestCase
             $value = random_bytes(4);
             $lenght = 5;
             // executando o método
-            DomainValidation::strNullOrMixLength($value, $lenght);
+            DomainValidation::strNullOrMinLength($value, $lenght);
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);
         } catch (\Throwable $th) {
@@ -339,7 +339,7 @@ class DomainValidationUnitTest extends TestCase
             $lenght = 5;
             $message = 'custom message';
             // executando o método
-            DomainValidation::strNullOrMixLength($value, $lenght, $message);
+            DomainValidation::strNullOrMinLength($value, $lenght, $message);
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);
         } catch (\Throwable $th) {
@@ -352,7 +352,7 @@ class DomainValidationUnitTest extends TestCase
         try {
             $value = random_bytes(3);
             // executando o método
-            DomainValidation::strNullOrMixLength($value);
+            DomainValidation::strNullOrMinLength($value);
         } catch (\Throwable $th) {
             // se lançar exceção o teste deve falhar
             $this->assertTrue(false);
@@ -363,7 +363,7 @@ class DomainValidationUnitTest extends TestCase
             $value = random_bytes(5);
             $lenght = 5;
             // executando o método
-            DomainValidation::strNullOrMixLength($value, $lenght);
+            DomainValidation::strNullOrMinLength($value, $lenght);
         } catch (\Throwable $th) {
             // se lançar exceção o teste deve falhar
             $this->assertTrue(false);
@@ -374,7 +374,7 @@ class DomainValidationUnitTest extends TestCase
             $value = null;
             $lenght = 5;
             // executando o método
-            DomainValidation::strNullOrMixLength($value, $lenght);
+            DomainValidation::strNullOrMinLength($value, $lenght);
         } catch (\Throwable $th) {
             // se lançar exceção o teste deve falhar
             $this->assertTrue(false);
@@ -385,7 +385,7 @@ class DomainValidationUnitTest extends TestCase
             $value = '';
             $lenght = 5;
             // executando o método
-            DomainValidation::strNullOrMixLength($value, $lenght);
+            DomainValidation::strNullOrMinLength($value, $lenght);
         } catch (\Throwable $th) {
             // se lançar exceção o teste deve falhar
             $this->assertTrue(false);

@@ -31,7 +31,7 @@ class Uuid
     }
 
     // função de validação dos atributos
-    private function validate(string $id)
+    private function validate(string $id): void
     {
         if (!RamseyUuid::isValid($id)) {
             $classname = static::class;

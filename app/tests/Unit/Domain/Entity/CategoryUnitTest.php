@@ -27,6 +27,9 @@ class CategoryUnitTest extends TestCase
         $this->assertSame('New Cat', $category->name);
         $this->assertSame('New Desc', $category->description);
         $this->assertTrue($category->isActive);
+        $this->assertNotEmpty($category->createdAt());
+        $this->assertNotEmpty($category->updatedAt());
+        $this->assertSame($category->createdAt(), $category->updatedAt());
     }
 
     // função que testa a função de ativação
@@ -77,19 +80,26 @@ class CategoryUnitTest extends TestCase
             isActive: true
         );
 
+        // retardo na execução para permitir diferenciação do updatedAt
+        sleep(1);
+
         // atualizando com valores
         $category->update(
             name: 'name 2',
             description: 'desc 2',
         );
 
+        // memorizando a data da primeira atualização para comparar com a segunda
+        $firstUpdateDate = $category->updatedAt();
+
         // verificando os atributos
         $this->assertSame($uuid, $category->id());
         $this->assertSame('name 2', $category->name);
         $this->assertSame('desc 2', $category->description);
         $this->assertTrue($category->isActive);
+        $this->assertNotSame($category->createdAt(), $category->updatedAt());
 
-        // atualizando sem valores
+        // atualizando sem valores, o updatedAt não deve ser modificado
         $category->update();
 
         // verificando os atributos
@@ -97,6 +107,7 @@ class CategoryUnitTest extends TestCase
         $this->assertSame('name 2', $category->name);
         $this->assertSame('desc 2', $category->description);
         $this->assertTrue($category->isActive);
+        $this->assertSame($firstUpdateDate, $category->updatedAt());
     }
 
     // função que testa a função de validação

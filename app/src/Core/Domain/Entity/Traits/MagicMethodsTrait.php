@@ -27,4 +27,16 @@ trait MagicMethodsTrait
     {
         return (string) $this->id;
     }
+
+    // função que retorna o valor do createdAt como string
+    public function createdAt(): string
+    {
+        return $this->createdAt->format('Y-m-d H:i:s');
+    }
+
+    // função que retorna o valor do updatedAt como string
+    public function updatedAt(): string
+    {
+        return $this->updatedAt->format('Y-m-d H:i:s');
+    }
 }

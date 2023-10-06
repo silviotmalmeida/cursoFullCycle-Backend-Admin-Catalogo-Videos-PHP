@@ -7,6 +7,7 @@ namespace Core\Domain\Entity;
 use Core\Domain\Entity\Traits\MagicMethodsTrait;
 use Core\Domain\Validation\DomainValidation;
 use Core\Domain\ValueObject\Uuid;
+use DateTime;
 
 // definindo a entidade
 class Category
@@ -20,7 +21,10 @@ class Category
         protected string $name = '',
         protected string $description = '',
         protected bool $isActive = true,
+        protected DateTime|string $createdAt = '',
+        protected DateTime|string $updatedAt = '',
     ) {
+        // processamento do id
         // se o id for vazio, atribui um uuid randomicamente
         if ($this->id == '') {
             $this->id = Uuid::random();
@@ -28,6 +32,26 @@ class Category
         // senão, converte a string recebida para um objeto de valor uuid
         else {
             $this->id = new Uuid($this->id);
+        }
+
+        // processamento do createdAt
+        // se o createdAt for vazio, atribui a data atual
+        if ($this->createdAt == '') {
+            $this->createdAt = new DateTime();
+        }
+        // senão, converte a string recebida para um Datetime
+        else {
+            $this->createdAt = new DateTime($this->createdAt);
+        }
+
+        // processamento do updatedAt
+        // se o updatedAt for vazio, atribui a data atual
+        if ($this->updatedAt == '') {
+            $this->updatedAt = new DateTime();
+        }
+        // senão, converte a string recebida para um Datetime
+        else {
+            $this->updatedAt = new DateTime($this->updatedAt);
         }
 
         // validando os atributos
@@ -55,6 +79,9 @@ class Category
         if ($name) $this->name = $name;
         if ($description) $this->description = $description;
 
+        // atualiza o updatedAt com a data atual
+        if ($name or $description) $this->updatedAt = new DateTime();
+
         // validando os atributos
         $this->validate();
     }
@@ -62,10 +89,11 @@ class Category
     // função de validação dos atributos
     private function validate(): void
     {
+        // validação do name
         DomainValidation::notNullOrEmpty($this->name);
         DomainValidation::strMaxLenght($this->name);
         DomainValidation::strMinLenght($this->name);
-
+        // validação do description
         DomainValidation::strNullOrMaxLength($this->description);
         DomainValidation::strNullOrMinLength($this->description);
     }

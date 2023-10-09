@@ -6,8 +6,8 @@ namespace Core\UseCase\Category;
 // importações
 use Core\Domain\Entity\Category;
 use Core\Domain\Repository\CategoryRepositoryInterface;
-use Core\UseCase\DTO\Category\CreateCategory\CategoryCreateInputDto;
-use Core\UseCase\DTO\Category\CreateCategory\CategoryCreateOutputDto;
+use Core\UseCase\DTO\Category\InsertCategory\InsertCategoryInputDto;
+use Core\UseCase\DTO\Category\InsertCategory\InsertCategoryOutputDto;
 
 // definindo o usecase
 class InsertCategoryUseCase
@@ -18,22 +18,28 @@ class InsertCategoryUseCase
     ) {
     }
 
-    public function execute(CategoryCreateInputDto $input): CategoryCreateOutputDto
+    // método de execução do usecase
+    // recebe um inputDto e retorna um outputDto
+    public function execute(InsertCategoryInputDto $input): InsertCategoryOutputDto
     {
+        // criando a entidade com os dados do input
         $category = new Category(
             name: $input->name,
             description: $input->description,
             isActive: $input->isActive,
         );
 
+        // inserindo a entidade no BD utilizando o repository
         $newCategory = $this->repository->insert($category);
 
-        return new CategoryCreateOutputDto(
+        // retornando os dados
+        return new InsertCategoryOutputDto(
             id: $newCategory->id(),
             name: $newCategory->name,
-            description: $category->description,
-            is_active: $category->isActive,
-            created_at: $category->createdAt(),
+            description: $newCategory->description,
+            is_active: $newCategory->isActive,
+            created_at: $newCategory->createdAt(),
+            updated_at: $newCategory->updatedAt(),
         );
     }
 }

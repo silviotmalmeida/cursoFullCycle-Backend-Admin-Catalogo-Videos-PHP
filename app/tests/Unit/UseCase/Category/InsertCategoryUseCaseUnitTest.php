@@ -6,9 +6,10 @@ namespace Tests\Unit\UseCase\Category;
 // importações
 use Core\Domain\Entity\Category;
 use Core\Domain\Repository\CategoryRepositoryInterface;
-use Core\UseCase\Category\CreateCategoryUseCase;
-use Core\UseCase\DTO\Category\CreateCategory\CategoryCreateInputDto;
-use Core\UseCase\DTO\Category\CreateCategory\CategoryCreateOutputDto;
+use Core\UseCase\Category\InsertCategoryUseCase;
+use Core\UseCase\DTO\Category\InsertCategory\InsertCategoryInputDto;
+use Core\UseCase\DTO\Category\InsertCategory\InsertCategoryOutputDto;
+use DateTime;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -20,40 +21,62 @@ class InsertCategoryUseCaseUnitTest extends TestCase
     // função que testa o método de execução
     public function testExecute()
     {
-        // criando o mock da entidade
-        $uuid = (string) Uuid::uuid4()->toString();
-        $categoryName = 'name cat';
-        $this->mockEntity = Mockery::mock(Category::class, [
-            $uuid,
-            $categoryName,
-        ]);
-        $this->mockEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
-
-        // criando o mock do repository
-        $this->mockRepo = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $this->mockRepo->shouldReceive('insert')->andReturn($this->mockEntity); //definindo o retorno do insert()
+        // definindo os atributos a serem utilizados nos mocks
+        $uuid = Uuid::uuid4()->toString();
+        $name = 'name cat';
+        $description = 'description cat';
+        $isActive = false;
+        $now = (new DateTime())->format('Y-m-d H:i:s');
 
         // criando o mock do inputDto
-        $this->mockInputDto = Mockery::mock(CategoryCreateInputDto::class, [
-            $categoryName,
+        $mockInputDto = Mockery::mock(InsertCategoryInputDto::class, [
+            $name,
+            $description,
+            $isActive,
         ]);
 
-        $useCase = new CreateCategoryUseCase($this->mockRepo);
-        $responseUseCase = $useCase->execute($this->mockInputDto);
+        // criando o mock da entidade
+        $mockEntity = Mockery::mock(Category::class, [
+            $uuid,
+            $name,
+            $description,
+            $isActive,
+        ]);
+        $mockEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
+        $mockEntity->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
 
-        $this->assertInstanceOf(CategoryCreateOutputDto::class, $responseUseCase);
-        $this->assertEquals($categoryName, $responseUseCase->name);
-        $this->assertEquals('', $responseUseCase->description);
+        // criando o mock do repository
+        $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
+        $mockRepository->shouldReceive('insert')->andReturn($mockEntity); //definindo o retorno do insert()
 
-        /**
-         * Spies
-         */
-        $this->spy = Mockery::spy(stdClass::class, CategoryRepositoryInterface::class);
-        $this->spy->shouldReceive('insert')->andReturn($this->mockEntity);
-        $useCase = new CreateCategoryUseCase($this->spy);
-        $responseUseCase = $useCase->execute($this->mockInputDto);
-        $this->spy->shouldHaveReceived('insert');
+        // criando o usecase
+        $useCase = new InsertCategoryUseCase($mockRepository);
+        // executando o usecase
+        $responseUseCase = $useCase->execute($mockInputDto);
 
+        // verificando os dados
+        $this->assertInstanceOf(InsertCategoryOutputDto::class, $responseUseCase);
+        $this->assertSame($uuid, $responseUseCase->id);
+        $this->assertSame($name, $responseUseCase->name);
+        $this->assertSame($description, $responseUseCase->description);
+        $this->assertSame($isActive, $responseUseCase->is_active);
+        $this->assertNotEmpty($responseUseCase->created_at);
+        $this->assertNotEmpty($responseUseCase->updated_at);
+        
+        // criando o spy do repository
+        $spy = Mockery::spy(stdClass::class, CategoryRepositoryInterface::class);
+        $spy->shouldReceive('insert')->andReturn($mockEntity); //definindo o retorno do insert()
+
+        // criando o usecase
+        $useCase = new InsertCategoryUseCase($spy);
+        // executando o usecase
+        $responseUseCase = $useCase->execute($mockInputDto);
+
+        // verificando a utilização dos métodos
+        $spy->shouldHaveReceived('insert');
+
+        // encerrando os mocks
         Mockery::close();
     }
 }

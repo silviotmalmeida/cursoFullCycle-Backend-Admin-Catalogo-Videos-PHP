@@ -30,16 +30,16 @@ class InsertCategoryUseCase
         );
 
         // inserindo a entidade no BD utilizando o repository
-        $newCategory = $this->repository->insert($category);
+        $insertedCategory = $this->repository->insert($category);
 
         // retornando os dados
         return new InsertCategoryOutputDto(
-            id: $newCategory->id(),
-            name: $newCategory->name,
-            description: $newCategory->description,
-            is_active: $newCategory->isActive,
-            created_at: $newCategory->createdAt(),
-            updated_at: $newCategory->updatedAt(),
+            id: $insertedCategory->id(),
+            name: $insertedCategory->name,
+            description: $insertedCategory->description,
+            is_active: $insertedCategory->isActive,
+            created_at: $insertedCategory->createdAt(),
+            updated_at: $insertedCategory->updatedAt(),
         );
     }
 }

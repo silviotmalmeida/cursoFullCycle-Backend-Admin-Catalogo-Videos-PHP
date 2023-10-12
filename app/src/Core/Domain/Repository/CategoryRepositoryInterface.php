@@ -16,9 +16,9 @@ interface CategoryRepositoryInterface
 
     public function getIdsListIds(array $categoriesId = []): array;
 
-    public function findAll(string $filter = '', $order = 'DESC'): array;
+    public function findAll(string $filter = '', string $order = 'DESC'): array;
 
-    public function paginate(string $filter = '', $order = 'DESC', int $page = 1, int $itemsForPage = 15): PaginationInterface;
+    public function paginate(string $filter = '', string $order = 'DESC', int $page = 1, int $itemsForPage = 15): PaginationInterface;
 
     public function update(Category $category): Category;
 

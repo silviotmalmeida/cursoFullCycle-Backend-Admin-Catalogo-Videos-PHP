@@ -48,7 +48,7 @@ class InsertCategoryUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('insert')->andReturn($mockEntity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('insert')->times(1)->andReturn($mockEntity); //definindo o retorno do insert()
 
         // criando o usecase
         $useCase = new InsertCategoryUseCase($mockRepository);
@@ -63,18 +63,6 @@ class InsertCategoryUseCaseUnitTest extends TestCase
         $this->assertSame($isActive, $responseUseCase->is_active);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
-        
-        // criando o spy do repository
-        $spy = Mockery::spy(stdClass::class, CategoryRepositoryInterface::class);
-        $spy->shouldReceive('insert')->andReturn($mockEntity); //definindo o retorno do insert()
-
-        // criando o usecase
-        $useCase = new InsertCategoryUseCase($spy);
-        // executando o usecase
-        $responseUseCase = $useCase->execute($mockInputDto);
-
-        // verificando a utilização dos métodos
-        $spy->shouldHaveReceived('insert');
 
         // encerrando os mocks
         Mockery::close();

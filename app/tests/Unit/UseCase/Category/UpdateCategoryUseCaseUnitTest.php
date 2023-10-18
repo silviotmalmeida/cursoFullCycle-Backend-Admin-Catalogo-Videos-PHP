@@ -47,7 +47,7 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         $mockEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
         $mockEntity->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
         $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
-        $mockEntity->shouldReceive('update')->andReturn(); //definindo o retorno do update()
+        $mockEntity->shouldReceive('update')->times(1)->with($name, $description)->andReturn(); //definindo o retorno do update()
 
         // criando o mock da entidade atualizada
         $mockEntityUpdated = Mockery::mock(Category::class, [
@@ -61,12 +61,12 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         $mockEntityUpdated->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
         $mockEntityUpdated->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
         $mockEntityUpdated->shouldReceive('updatedAt')->andReturn($nowUpdated); //definindo o retorno do updatedAt()
-        $mockEntity->shouldReceive('update')->andReturn(); //definindo o retorno do update()
+        $mockEntity->shouldReceive('update')->times(0)->with($updatedName, $updatedDescription)->andReturn(); //definindo o retorno do update()
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('findById')->andReturn($mockEntity); //definindo o retorno do findById()
-        $mockRepository->shouldReceive('update')->andReturn($mockEntityUpdated); //definindo o retorno do update()
+        $mockRepository->shouldReceive('findById')->times(1)->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
+        $mockRepository->shouldReceive('update')->times(1)->andReturn($mockEntityUpdated); //definindo o retorno do update()
 
         // criando o usecase
         $useCase = new UpdateCategoryUseCase($mockRepository);
@@ -82,34 +82,6 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
         $this->assertNotSame($responseUseCase->created_at, $responseUseCase->updated_at);
-
-        // criando o spy da entidade
-        $spyEntity = Mockery::spy(Category::class, [
-            $uuid,
-            $name,
-            $description,
-            $isActive,
-        ]);
-        $spyEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
-        $spyEntity->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
-        $spyEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
-        $spyEntity->shouldReceive('update')->andReturn(); //definindo o retorno do update()
-
-
-        // criando o spy do repository
-        $spyRepository = Mockery::spy(stdClass::class, CategoryRepositoryInterface::class);
-        $spyRepository->shouldReceive('findById')->andReturn($spyEntity); //definindo o retorno do findById()
-        $spyRepository->shouldReceive('update')->andReturn($mockEntityUpdated); //definindo o retorno do update()
-
-        // criando o usecase
-        $useCase = new UpdateCategoryUseCase($spyRepository);
-        // executando o usecase
-        $responseUseCase = $useCase->execute($mockInputDto);
-
-        // verificando a utilização dos métodos
-        $spyEntity->shouldHaveReceived('update');
-        $spyRepository->shouldHaveReceived('findById');
-        $spyRepository->shouldHaveReceived('update');
 
         // encerrando os mocks
         Mockery::close();

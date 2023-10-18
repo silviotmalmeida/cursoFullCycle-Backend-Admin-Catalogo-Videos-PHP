@@ -43,11 +43,11 @@ class DeleteCategoryUseCaseUnitTest extends TestCase
         $mockEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
         $mockEntity->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
         $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
-        
+
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('findById')->andReturn($mockEntity); //definindo o retorno do findById()
-        $mockRepository->shouldReceive('delete')->andReturn(true); //definindo o retorno do delete()
+        $mockRepository->shouldReceive('findById')->times(1)->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
+        $mockRepository->shouldReceive('delete')->times(1)->with($uuid)->andReturn(true); //definindo o retorno do delete()
 
         // criando o usecase
         $useCase = new DeleteCategoryUseCase($mockRepository);
@@ -57,20 +57,6 @@ class DeleteCategoryUseCaseUnitTest extends TestCase
         // verificando os dados
         $this->assertInstanceOf(DeleteCategoryOutputDto::class, $responseUseCase);
         $this->assertSame(true, $responseUseCase->sucess);
-
-        // criando o spy do repository
-        $spyRepository = Mockery::spy(stdClass::class, CategoryRepositoryInterface::class);
-        $spyRepository->shouldReceive('findById')->andReturn($mockEntity); //definindo o retorno do findById()
-        $spyRepository->shouldReceive('delete')->andReturn(true); //definindo o retorno do delete()
-
-        // criando o usecase
-        $useCase = new DeleteCategoryUseCase($spyRepository);
-        // executando o usecase
-        $responseUseCase = $useCase->execute($mockInputDto);
-
-        // verificando a utilização dos métodos
-        $spyRepository->shouldHaveReceived('findById');
-        $spyRepository->shouldHaveReceived('delete');
 
         // encerrando os mocks
         Mockery::close();
@@ -101,11 +87,11 @@ class DeleteCategoryUseCaseUnitTest extends TestCase
         $mockEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
         $mockEntity->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
         $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
-        
+
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('findById')->andReturn($mockEntity); //definindo o retorno do findById()
-        $mockRepository->shouldReceive('delete')->andReturn(false); //definindo o retorno do delete()
+        $mockRepository->shouldReceive('findById')->times(1)->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
+        $mockRepository->shouldReceive('delete')->times(1)->with($uuid)->andReturn(false); //definindo o retorno do delete()
 
         // criando o usecase
         $useCase = new DeleteCategoryUseCase($mockRepository);
@@ -115,20 +101,6 @@ class DeleteCategoryUseCaseUnitTest extends TestCase
         // verificando os dados
         $this->assertInstanceOf(DeleteCategoryOutputDto::class, $responseUseCase);
         $this->assertSame(false, $responseUseCase->sucess);
-
-        // criando o spy do repository
-        $spyRepository = Mockery::spy(stdClass::class, CategoryRepositoryInterface::class);
-        $spyRepository->shouldReceive('findById')->andReturn($mockEntity); //definindo o retorno do findById()
-        $spyRepository->shouldReceive('delete')->andReturn(false); //definindo o retorno do delete()
-
-        // criando o usecase
-        $useCase = new DeleteCategoryUseCase($spyRepository);
-        // executando o usecase
-        $responseUseCase = $useCase->execute($mockInputDto);
-
-        // verificando a utilização dos métodos
-        $spyRepository->shouldHaveReceived('findById');
-        $spyRepository->shouldHaveReceived('delete');
 
         // encerrando os mocks
         Mockery::close();

@@ -57,7 +57,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('paginate')->andReturn($mockPagination); //definindo o retorno do paginate()
+        $mockRepository->shouldReceive('paginate')->times(1)->with($filter, $order, $page, $itemsForPage)->andReturn($mockPagination); //definindo o retorno do paginate()
 
         // criando o usecase
         $useCase = new PaginateCategoryUseCase($mockRepository);
@@ -75,18 +75,6 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
         $this->assertSame($perPage, $responseUseCase->per_page);
         $this->assertSame($to, $responseUseCase->to);
         $this->assertSame($from, $responseUseCase->from);
-
-        // criando o spy do repository
-        $spy = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $spy->shouldReceive('paginate')->andReturn($mockPagination); //definindo o retorno do paginate()
-
-        // criando o usecase
-        $useCase = new PaginateCategoryUseCase($spy);
-        // executando o usecase
-        $responseUseCase = $useCase->execute($mockInputDto);
-
-        // verificando a utilização dos métodos
-        $spy->shouldHaveReceived('paginate');
 
         // encerrando os mocks
         Mockery::close();
@@ -148,7 +136,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('paginate')->andReturn($mockPagination); //definindo o retorno do paginate()
+        $mockRepository->shouldReceive('paginate')->times(1)->with($filter, $order, $page, $itemsForPage)->andReturn($mockPagination); //definindo o retorno do paginate()
 
         // criando o usecase
         $useCase = new PaginateCategoryUseCase($mockRepository);
@@ -167,18 +155,6 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
         $this->assertSame($perPage, $responseUseCase->per_page);
         $this->assertSame($to, $responseUseCase->to);
         $this->assertSame($from, $responseUseCase->from);
-
-        // criando o spy do repository
-        $spy = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $spy->shouldReceive('paginate')->andReturn($mockPagination); //definindo o retorno do paginate()
-
-        // criando o usecase
-        $useCase = new PaginateCategoryUseCase($spy);
-        // executando o usecase
-        $responseUseCase = $useCase->execute($mockInputDto);
-
-        // verificando a utilização dos métodos
-        $spy->shouldHaveReceived('paginate');
 
         // encerrando os mocks
         Mockery::close();

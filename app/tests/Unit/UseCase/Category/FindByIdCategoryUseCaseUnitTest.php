@@ -46,7 +46,7 @@ class FindByIdCategoryUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('findById')->andReturn($mockEntity); //definindo o retorno do findById()
+        $mockRepository->shouldReceive('findById')->times(1)->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
 
         // criando o usecase
         $useCase = new FindByIdCategoryUseCase($mockRepository);
@@ -61,18 +61,6 @@ class FindByIdCategoryUseCaseUnitTest extends TestCase
         $this->assertSame($isActive, $responseUseCase->is_active);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
-
-        // criando o spy do repository
-        $spy = Mockery::spy(stdClass::class, CategoryRepositoryInterface::class);
-        $spy->shouldReceive('findById')->andReturn($mockEntity); //definindo o retorno do findById()
-
-        // criando o usecase
-        $useCase = new FindByIdCategoryUseCase($spy);
-        // executando o usecase
-        $responseUseCase = $useCase->execute($mockInputDto);
-
-        // verificando a utilização dos métodos
-        $spy->shouldHaveReceived('findById');
 
         // encerrando os mocks
         Mockery::close();

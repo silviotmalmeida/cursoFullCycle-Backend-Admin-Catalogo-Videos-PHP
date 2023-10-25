@@ -11,3 +11,6 @@
     para instalar o mockery: composer require --dev mockery/mockery
     para instalar o ramsey-uuid: composer require ramsey/uuid
 
+- comandos do laravel
+    para criar uma key: php artisan key:generate
+

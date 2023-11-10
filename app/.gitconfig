@@ -1,0 +1,5 @@
+[user]
+	email = silviotmalmeida@gmail.com
+	name = Silvio Almeida
+[credential]
+	helper = "!f() { /var/www/.vscode-server/bin/f1b07bd25dfad64b0167beb15359ae573aecd2cc/node /tmp/vscode-remote-containers-e7b6cfd9-3f5b-4992-93cc-c810f3b0c60f.js git-credential-helper $*; }; f"

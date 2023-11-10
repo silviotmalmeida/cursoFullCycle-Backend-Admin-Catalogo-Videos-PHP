@@ -1,4 +1,5 @@
 {
     "intelephense.environment.phpVersion": "8.1.1",
-    "php.suggest.basic": false
+    "php.suggest.basic": false,
+    "intelephense.diagnostics.typeErrors": true
 }

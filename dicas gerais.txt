@@ -14,4 +14,5 @@
 - comandos do laravel
     para criar uma key: php artisan key:generate
     para criar uma model com a migration e factory: php artisan make:model <nome-da-model> -mf
+    para criar um teste unitário: php artisan make:test <namespace (App\\Models\\CategoryUnitTest)> --unit
 

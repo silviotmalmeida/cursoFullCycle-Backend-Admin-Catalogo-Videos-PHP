@@ -6,13 +6,15 @@ namespace App\Models;
 // importações
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 // definindo a model
 class Category extends Model
 {
-    use HasFactory;
+    // traits a serem utilizadas
+    use HasFactory, SoftDeletes;
 
-    ///definindo o nome da tabela no BD
+    // definindo o nome da tabela no BD
     protected $table = 'categories';
 
     // definindo os atributos a serem informados
@@ -27,6 +29,9 @@ class Category extends Model
     protected $casts = [
         'id' => 'string',
         'is_active' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+        'deleted_at' => 'datetime'
     ];
 
     // desativando o autoincremento

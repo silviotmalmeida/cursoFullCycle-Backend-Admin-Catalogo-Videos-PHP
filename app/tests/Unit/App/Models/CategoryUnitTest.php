@@ -19,7 +19,6 @@ class CategoryUnitTest extends ModelTestCase
         return [
             HasFactory::class,
             SoftDeletes::class
-
         ];
     }
 

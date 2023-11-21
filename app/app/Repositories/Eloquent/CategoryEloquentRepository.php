@@ -8,6 +8,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Category as CategoryModel;
 use App\Repositories\Presenters\PaginationPresenter;
 use Core\Domain\Entity\Category as CategoryEntity;
+use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\CategoryRepositoryInterface;
 use Core\Domain\Repository\PaginationInterface;
 
@@ -47,13 +48,19 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
                 'updated_at' => $category->updatedAt(),
             ]
         );
-        // refornando a entidade populada com os dados inseridos
+        // retornando a entidade populada com os dados inseridos
         return $this->toCategory($response);
     }
 
+    // função de busca por id
     public function findById(string $categoryId): CategoryEntity
     {
-        return new CategoryEntity();
+        // buscando no bd
+        $response = $this->model->find($categoryId);
+        // se não houver retorno, lança exceção
+        if (!$response) throw new NotFoundException('ID not found');
+        // retornando a entidade
+        return $this->toCategory($response);
     }
 
     public function getIdsListIds(array $categoriesId = []): array

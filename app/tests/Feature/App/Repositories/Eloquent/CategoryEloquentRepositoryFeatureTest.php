@@ -69,4 +69,18 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
             $this->assertSame($th->getMessage(), 'ID not found');
         }
     }
+
+    // testando a função de busca geral no bd, com sucesso na busca
+    public function testFindAll()
+    {
+        // definindo a quantidade de registros a serem criados
+        $qtd = 50;
+        // inserindo múltiplos registros no bd
+        CategoryModel::factory()->count($qtd)->create();
+        // buscando no bd
+        $response = $this->repository->findAll();
+        // verificando
+        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
+        $this->assertCount($qtd, $response);
+    }
 }

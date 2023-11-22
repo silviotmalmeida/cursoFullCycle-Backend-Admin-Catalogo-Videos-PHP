@@ -68,9 +68,19 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
         return [];
     }
 
+    // função de busca por id
     public function findAll(string $filter = '', string $order = 'DESC'): array
     {
-        return [];
+        // buscando no bd
+        $response = $this->model
+            ->where(function ($query) use ($filter) {
+                if ($filter) $query->where('name', 'LIKE', "%{$filter}%");
+            })
+            ->orderBy('id', $order)
+            ->get();
+
+
+        return $response->toArray();
     }
 
     public function paginate(string $filter = '', string $order = 'DESC', int $page = 1, int $itemsForPage = 15): PaginationInterface

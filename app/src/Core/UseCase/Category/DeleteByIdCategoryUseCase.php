@@ -5,11 +5,11 @@ namespace Core\UseCase\Category;
 
 // importações
 use Core\Domain\Repository\CategoryRepositoryInterface;
-use Core\UseCase\DTO\Category\DeleteCategory\DeleteCategoryInputDto;
-use Core\UseCase\DTO\Category\DeleteCategory\DeleteCategoryOutputDto;
+use Core\UseCase\DTO\Category\DeleteByIdCategory\DeleteByIdCategoryInputDto;
+use Core\UseCase\DTO\Category\DeleteByIdCategory\DeleteByIdCategoryOutputDto;
 
 // definindo o usecase
-class DeleteCategoryUseCase
+class DeleteByIdCategoryUseCase
 {
     // construtor e atributos
     public function __construct(
@@ -19,17 +19,17 @@ class DeleteCategoryUseCase
 
     // método de execução do usecase
     // recebe um inputDto e retorna um outputDto
-    public function execute(DeleteCategoryInputDto $input): DeleteCategoryOutputDto
+    public function execute(DeleteByIdCategoryInputDto $input): DeleteByIdCategoryOutputDto
     {
         // buscando a entidade no BD com os dados do input
         $category = $this->repository->findById($input->id);
 
         // deletando a entidade no BD utilizando o repository
         $sucess = false;
-        if ($category->id()) $sucess = $this->repository->delete($input->id);
+        if ($category->id()) $sucess = $this->repository->deleteById($input->id);
 
         // retornando os dados
-        return new DeleteCategoryOutputDto(
+        return new DeleteByIdCategoryOutputDto(
             sucess: $sucess,
         );
     }

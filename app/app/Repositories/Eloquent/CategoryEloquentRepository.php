@@ -4,13 +4,13 @@
 namespace App\Repositories\Eloquent;
 
 // importações
-
 use App\Models\Category as CategoryModel;
 use App\Repositories\Presenters\PaginationPresenter;
 use Core\Domain\Entity\Category as CategoryEntity;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\CategoryRepositoryInterface;
 use Core\Domain\Repository\PaginationInterface;
+use DateTime;
 
 // definindo o repository, que implementa a interface CategoryRepositoryInterface
 class CategoryEloquentRepository implements CategoryRepositoryInterface
@@ -24,14 +24,17 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
     private function toCategory(object $object): CategoryEntity
     {
-        return new CategoryEntity(
+        $category = new CategoryEntity(
             id: $object->id,
             name: $object->name,
             description: $object->description,
-            isActive: $object->is_active,
             createdAt: $object->created_at,
             updatedAt: $object->updated_at
         );
+
+        ((bool) $object->is_active) ? $category->activate() : $category->deactivate();
+
+        return $category;
     }
 
     // função de inserção no bd
@@ -56,11 +59,11 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     public function findById(string $categoryId): CategoryEntity
     {
         // buscando no bd
-        $response = $this->model->find($categoryId);
+        $categoryDb = $this->model->find($categoryId);
         // se não houver retorno, lança exceção
-        if (!$response) throw new NotFoundException('ID not found');
+        if (!$categoryDb) throw new NotFoundException('ID not found');
         // retornando a entidade
-        return $this->toCategory($response);
+        return $this->toCategory($categoryDb);
     }
 
     public function getIdsListIds(array $categoriesId = []): array
@@ -68,33 +71,67 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
         return [];
     }
 
-    // função de busca por id
+    // função de busca geral
     public function findAll(string $filter = '', string $order = 'DESC'): array
     {
-        // buscando no bd
-        $response = $this->model
-            ->where(function ($query) use ($filter) {
-                if ($filter) $query->where('name', 'LIKE', "%{$filter}%");
-            })
-            ->orderBy('id', $order)
-            ->get();
-
-
+        // iniciando a busca
+        $query = $this->model;
+        // aplicando o filtro, se existir
+        if ($filter) $query->where('name', 'LIKE', "%{$filter}%");
+        // ordenando
+        $query->orderBy('id', $order);
+        // executando a busca
+        $response = $query->get();
+        // retornando os dados
         return $response->toArray();
     }
 
-    public function paginate(string $filter = '', string $order = 'DESC', int $page = 1, int $itemsForPage = 15): PaginationInterface
+    // função de busca paginada
+    public function paginate(string $filter = '', string $order = 'DESC', int $startPage = 1, int $itemsForPage = 15): PaginationInterface
     {
-        return new PaginationPresenter();
+        // iniciando a busca
+        $query = $this->model;
+        // aplicando o filtro, se existir
+        if ($filter) $query->where('name', 'LIKE', "%{$filter}%");
+        // ordenando
+        $query->orderBy('id', $order);
+        // executando a busca paginada
+        $paginator = $query->paginate($itemsForPage);
+
+        // organizando os dados no formato estabelecido pela interface
+        return new PaginationPresenter($paginator);
     }
 
+    // função de atualização
     public function update(CategoryEntity $category): CategoryEntity
     {
-        return new CategoryEntity();
+        // buscando no bd
+        $categoryDb = $this->model->find($category->id());
+        // se não houver retorno, lança exceção
+        if (!$categoryDb) throw new NotFoundException('ID not found');
+        // executando a atualização
+        $categoryDb->update([
+            'id' => $category->id(),
+            'name' => $category->name,
+            'description' => $category->description,
+            'is_active' => $category->isActive,
+            'updated_at' => new DateTime()
+        ]);
+        // forçando a atualização do registro
+        $categoryDb->refresh();
+        // retornando a entidade populada com os dados inseridos
+        return $this->toCategory($categoryDb);
     }
 
-    public function delete(string $categoryId): bool
+    // função de remoção
+    public function deleteById(string $categoryId): bool
     {
+        // buscando no bd
+        $categoryDb = $this->model->find($categoryId);
+        // se não houver retorno, lança exceção
+        if (!$categoryDb) throw new NotFoundException('ID not found');
+        // removendo o registro
+        $categoryDb->delete();
         return true;
     }
 }

@@ -25,7 +25,7 @@ class PaginateCategoryUseCase
         $pagination = $this->repository->paginate(
             filter: $input->filter,
             order: $input->order,
-            page: $input->page,
+            startPage: $input->startPage,
             itemsForPage: $input->itemsForPage
         );
 

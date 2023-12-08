@@ -18,9 +18,9 @@ interface CategoryRepositoryInterface
 
     public function findAll(string $filter = '', string $order = 'DESC'): array;
 
-    public function paginate(string $filter = '', string $order = 'DESC', int $page = 1, int $itemsForPage = 15): PaginationInterface;
+    public function paginate(string $filter = '', string $order = 'DESC', int $startPage = 1, int $itemsForPage = 15): PaginationInterface;
 
     public function update(Category $category): Category;
 
-    public function delete(string $categoryId): bool;
+    public function deleteById(string $categoryId): bool;
 }

@@ -6,9 +6,9 @@ namespace Tests\Unit\UseCase\Category;
 // importações
 use Core\Domain\Entity\Category;
 use Core\Domain\Repository\CategoryRepositoryInterface;
-use Core\UseCase\Category\DeleteCategoryUseCase;
-use Core\UseCase\DTO\Category\DeleteCategory\DeleteCategoryInputDto;
-use Core\UseCase\DTO\Category\DeleteCategory\DeleteCategoryOutputDto;
+use Core\UseCase\Category\DeleteByIdCategoryUseCase;
+use Core\UseCase\DTO\Category\DeleteByIdCategory\DeleteByIdCategoryInputDto;
+use Core\UseCase\DTO\Category\DeleteByIdCategory\DeleteByIdCategoryOutputDto;
 use DateTime;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +16,7 @@ use Ramsey\Uuid\Uuid;
 use stdClass;
 
 // definindo a classe de teste, que estende a TestCase do PHPUnit
-class DeleteCategoryUseCaseUnitTest extends TestCase
+class DeleteByIdCategoryUseCaseUnitTest extends TestCase
 {
     // função que testa o método de execução com sucesso
     public function testExecuteTrue()
@@ -29,7 +29,7 @@ class DeleteCategoryUseCaseUnitTest extends TestCase
         $now = (new DateTime())->format('Y-m-d H:i:s');
 
         // criando o mock do inputDto
-        $mockInputDto = Mockery::mock(DeleteCategoryInputDto::class, [
+        $mockInputDto = Mockery::mock(DeleteByIdCategoryInputDto::class, [
             $uuid,
         ]);
 
@@ -47,15 +47,15 @@ class DeleteCategoryUseCaseUnitTest extends TestCase
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
         $mockRepository->shouldReceive('findById')->times(1)->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
-        $mockRepository->shouldReceive('delete')->times(1)->with($uuid)->andReturn(true); //definindo o retorno do delete()
+        $mockRepository->shouldReceive('deleteById')->times(1)->with($uuid)->andReturn(true); //definindo o retorno do deleteById()
 
         // criando o usecase
-        $useCase = new DeleteCategoryUseCase($mockRepository);
+        $useCase = new DeleteByIdCategoryUseCase($mockRepository);
         // executando o usecase
         $responseUseCase = $useCase->execute($mockInputDto);
 
         // verificando os dados
-        $this->assertInstanceOf(DeleteCategoryOutputDto::class, $responseUseCase);
+        $this->assertInstanceOf(DeleteByIdCategoryOutputDto::class, $responseUseCase);
         $this->assertSame(true, $responseUseCase->sucess);
 
         // encerrando os mocks
@@ -73,7 +73,7 @@ class DeleteCategoryUseCaseUnitTest extends TestCase
         $now = (new DateTime())->format('Y-m-d H:i:s');
 
         // criando o mock do inputDto
-        $mockInputDto = Mockery::mock(DeleteCategoryInputDto::class, [
+        $mockInputDto = Mockery::mock(DeleteByIdCategoryInputDto::class, [
             $uuid,
         ]);
 
@@ -91,15 +91,15 @@ class DeleteCategoryUseCaseUnitTest extends TestCase
         // criando o mock do repository
         $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
         $mockRepository->shouldReceive('findById')->times(1)->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
-        $mockRepository->shouldReceive('delete')->times(1)->with($uuid)->andReturn(false); //definindo o retorno do delete()
+        $mockRepository->shouldReceive('deleteById')->times(1)->with($uuid)->andReturn(false); //definindo o retorno do deleteById()
 
         // criando o usecase
-        $useCase = new DeleteCategoryUseCase($mockRepository);
+        $useCase = new DeleteByIdCategoryUseCase($mockRepository);
         // executando o usecase
         $responseUseCase = $useCase->execute($mockInputDto);
 
         // verificando os dados
-        $this->assertInstanceOf(DeleteCategoryOutputDto::class, $responseUseCase);
+        $this->assertInstanceOf(DeleteByIdCategoryOutputDto::class, $responseUseCase);
         $this->assertSame(false, $responseUseCase->sucess);
 
         // encerrando os mocks

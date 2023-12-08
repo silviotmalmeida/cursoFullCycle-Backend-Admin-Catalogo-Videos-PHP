@@ -10,7 +10,7 @@ class PaginateCategoryInputDto
     public function __construct(
         public string $filter = '',
         public string $order = 'DESC',
-        public int $page = 1,
+        public int $startPage = 1,
         public int $itemsForPage = 15,
     ) {
     }

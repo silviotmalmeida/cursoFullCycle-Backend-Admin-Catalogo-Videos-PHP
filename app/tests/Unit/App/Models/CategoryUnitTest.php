@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+// testando a model Category
+// funções a serem utilizadas nos testes da ModelTestCase
 class CategoryUnitTest extends ModelTestCase
 {
     protected function model(): Model

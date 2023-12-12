@@ -64,7 +64,7 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         $mockEntity->shouldReceive('update')->times(0)->with($updatedName, $updatedDescription)->andReturn(); //definindo o retorno do update()
 
         // criando o mock do repository
-        $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
+        $mockRepository = Mockery::mock(CategoryRepositoryInterface::class);
         $mockRepository->shouldReceive('findById')->times(1)->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
         $mockRepository->shouldReceive('update')->times(1)->andReturn($mockEntityUpdated); //definindo o retorno do update()
 

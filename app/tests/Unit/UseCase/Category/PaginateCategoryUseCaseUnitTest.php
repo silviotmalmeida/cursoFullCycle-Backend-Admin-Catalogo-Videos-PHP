@@ -45,7 +45,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
         ]);
 
         // criando o mock do Pagination
-        $mockPagination = Mockery::mock(stdClass::class, PaginationInterface::class);
+        $mockPagination = Mockery::mock(PaginationInterface::class);
         $mockPagination->shouldReceive('items')->andReturn($items); //definindo o retorno do items()
         $mockPagination->shouldReceive('total')->andReturn($total); //definindo o retorno do total()
         $mockPagination->shouldReceive('lastPage')->andReturn($lastPage); //definindo o retorno do lastPage()
@@ -56,7 +56,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
         $mockPagination->shouldReceive('from')->andReturn($from); //definindo o retorno do from()
 
         // criando o mock do repository
-        $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
+        $mockRepository = Mockery::mock(CategoryRepositoryInterface::class);
         $mockRepository->shouldReceive('paginate')->times(1)->with($filter, $order, $startPage, $itemsForPage)->andReturn($mockPagination); //definindo o retorno do paginate()
 
         // criando o usecase
@@ -125,7 +125,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
         ]);
 
         // criando o mock do Pagination
-        $mockPagination = Mockery::mock(stdClass::class, PaginationInterface::class);
+        $mockPagination = Mockery::mock(PaginationInterface::class);
         $mockPagination->shouldReceive('items')->andReturn($items); //definindo o retorno do items()
         $mockPagination->shouldReceive('total')->andReturn($total); //definindo o retorno do total()
         $mockPagination->shouldReceive('lastPage')->andReturn($lastPage); //definindo o retorno do lastPage()
@@ -136,7 +136,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
         $mockPagination->shouldReceive('from')->andReturn($from); //definindo o retorno do from()
 
         // criando o mock do repository
-        $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
+        $mockRepository = Mockery::mock(CategoryRepositoryInterface::class);
         $mockRepository->shouldReceive('paginate')->times(1)->with($filter, $order, $startPage, $itemsForPage)->andReturn($mockPagination); //definindo o retorno do paginate()
 
         // criando o usecase

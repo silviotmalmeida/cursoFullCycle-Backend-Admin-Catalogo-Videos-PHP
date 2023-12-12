@@ -45,7 +45,7 @@ class FindByIdCategoryUseCaseUnitTest extends TestCase
         $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
 
         // criando o mock do repository
-        $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
+        $mockRepository = Mockery::mock(CategoryRepositoryInterface::class);
         $mockRepository->shouldReceive('findById')->times(1)->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
 
         // criando o usecase

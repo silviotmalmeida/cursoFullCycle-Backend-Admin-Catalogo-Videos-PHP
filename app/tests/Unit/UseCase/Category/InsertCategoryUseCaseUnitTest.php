@@ -47,7 +47,7 @@ class InsertCategoryUseCaseUnitTest extends TestCase
         $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
 
         // criando o mock do repository
-        $mockRepository = Mockery::mock(stdClass::class, CategoryRepositoryInterface::class);
+        $mockRepository = Mockery::mock(CategoryRepositoryInterface::class);
         $mockRepository->shouldReceive('insert')->times(1)->andReturn($mockEntity); //definindo o retorno do insert()
 
         // criando o usecase

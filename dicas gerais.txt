@@ -16,4 +16,7 @@
     para criar uma model com a migration e factory: php artisan make:model <nome-da-model> -mf
     para criar um teste unitário: php artisan make:test <namespace (App\\Models\\CategoryUnitTest)> --unit
     para criar um teste de feature: php artisan make:test <namespace (App\\Repositories\\Eloquent\\CategoryEloquentRepositoryFeatureTest)>
+    para criar um controller: php artisan make:controller <namespace (Api\\CategoryController)>
+    para criar um api resource: php artisan make:resource <namespace (CategoryResource)>
+    para criar um api request: php artisan make:request <namespace (StoreCategoryRequest)>
 

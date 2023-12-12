@@ -87,6 +87,7 @@ class CategoryUnitTest extends TestCase
         $category->update(
             name: 'name 2',
             description: 'desc 2',
+            isActive: false,
         );
 
         // memorizando a data da primeira atualização para comparar com a segunda
@@ -96,7 +97,7 @@ class CategoryUnitTest extends TestCase
         $this->assertSame($uuid, $category->id());
         $this->assertSame('name 2', $category->name);
         $this->assertSame('desc 2', $category->description);
-        $this->assertTrue($category->isActive);
+        $this->assertFalse($category->isActive);
         $this->assertNotSame($category->createdAt(), $category->updatedAt());
 
         // atualizando sem valores, o updatedAt não deve ser modificado
@@ -106,7 +107,7 @@ class CategoryUnitTest extends TestCase
         $this->assertSame($uuid, $category->id());
         $this->assertSame('name 2', $category->name);
         $this->assertSame('desc 2', $category->description);
-        $this->assertTrue($category->isActive);
+        $this->assertFalse($category->isActive);
         $this->assertSame($firstUpdateDate, $category->updatedAt());
     }
 

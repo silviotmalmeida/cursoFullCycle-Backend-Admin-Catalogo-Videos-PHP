@@ -19,7 +19,9 @@ class CategoryControllerUnitTest extends TestCase
     {
         // definindo o mock do request
         $mockRequest = Mockery::mock(Request::class);
-        $mockRequest->shouldReceive('get')->andReturn('test');
+        $mockRequest->shouldReceive('get')->andReturn('');
+        $mockRequest->shouldReceive('all')->andReturn('');
+        $mockRequest->shouldReceive('route')->andReturn('');
 
         // definindo o mock do outputDTO
         $mockOutputDto = Mockery::mock(PaginateCategoryOutputDto::class, [

@@ -18,11 +18,15 @@ class UpdateCategoryUseCaseFeatureTest extends TestCase
         $model = CategoryModel::factory()->create();
         sleep(1);
 
+        // alterando o valor do isActive
+        $isActiveAlternate = ($model->is_active) ? false : true;
+
         // criando o inputDto
         $inputDto =  new UpdateCategoryInputDto(
             id: $model->id,
             name: "updated name",
-            description: "updated description"
+            description: "updated description",
+            isActive: $isActiveAlternate
         );
 
         // criando o repository
@@ -41,7 +45,7 @@ class UpdateCategoryUseCaseFeatureTest extends TestCase
         $this->assertNotSame($model->description, $responseUseCase->description);
         $this->assertSame($inputDto->name, $responseUseCase->name);
         $this->assertSame($inputDto->description, $responseUseCase->description);
-        $this->assertSame($model->is_active, $responseUseCase->is_active);
+        $this->assertSame($inputDto->isActive, $responseUseCase->is_active);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
         $this->assertNotSame($responseUseCase->created_at, $responseUseCase->updated_at);
@@ -50,7 +54,7 @@ class UpdateCategoryUseCaseFeatureTest extends TestCase
             'id' => $model->id,
             'name' => $inputDto->name,
             'description' => $inputDto->description,
-            'is_active' => $model->is_active
+            'is_active' => $inputDto->isActive
         ]);
     }
 }

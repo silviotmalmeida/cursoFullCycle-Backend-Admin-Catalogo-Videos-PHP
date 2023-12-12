@@ -9,6 +9,8 @@ use Core\Domain\Validation\DomainValidation;
 use Core\Domain\ValueObject\Uuid;
 use DateTime;
 
+use function PHPUnit\Framework\isNull;
+
 // definindo a entidade
 class Category
 {
@@ -72,15 +74,23 @@ class Category
 
     // função de atualização dos atributos possíveis
     public function update(
-        string $name = '',
-        string $description = '',
+        ?string $name = null,
+        ?string $description = null,
+        ?bool $isActive = null
     ): void {
         // atualiza somente os atributos com valores recebidos
-        if ($name) $this->name = $name;
-        if ($description) $this->description = $description;
+        if (isset($name)) $this->name = $name;
+        if (isset($description)) $this->description = $description;
+        if (isset($isActive)) {
+            if ($isActive === true) {
+                $this->activate();
+            } else if ($isActive === false) {
+                $this->deactivate();
+            }
+        }
 
         // atualiza o updatedAt com a data atual
-        if ($name or $description) $this->updatedAt = new DateTime();
+        if (isset($name) or isset($description) or isset($isActive)) $this->updatedAt = new DateTime();
 
         // validando os atributos
         $this->validate();

@@ -28,6 +28,7 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         $description = 'description cat';
         $updatedDescription = 'updated description cat';
         $isActive = false;
+        $updatedIsActive = true;
         $now = (new DateTime())->format('Y-m-d H:i:s');
 
         // criando o mock do inputDto
@@ -35,6 +36,7 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
             $uuid,
             $name,
             $description,
+            $isActive,
         ]);
 
         // criando o mock da entidade
@@ -47,21 +49,21 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         $mockEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
         $mockEntity->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
         $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
-        $mockEntity->shouldReceive('update')->times(1)->with($name, $description)->andReturn(); //definindo o retorno do update()
+        $mockEntity->shouldReceive('update')->times(1)->with($name, $description, $isActive)->andReturn(); //definindo o retorno do update()
 
         // criando o mock da entidade atualizada
         $mockEntityUpdated = Mockery::mock(Category::class, [
             $uuid,
             $updatedName,
             $updatedDescription,
-            $isActive,
+            $updatedIsActive,
         ]);
         sleep(1);
         $nowUpdated = (new DateTime())->format('Y-m-d H:i:s');
         $mockEntityUpdated->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
         $mockEntityUpdated->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
         $mockEntityUpdated->shouldReceive('updatedAt')->andReturn($nowUpdated); //definindo o retorno do updatedAt()
-        $mockEntity->shouldReceive('update')->times(0)->with($updatedName, $updatedDescription)->andReturn(); //definindo o retorno do update()
+        $mockEntity->shouldReceive('update')->times(0)->with($updatedName, $updatedDescription, $updatedIsActive)->andReturn(); //definindo o retorno do update()
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(CategoryRepositoryInterface::class);
@@ -78,7 +80,7 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         $this->assertSame($uuid, $responseUseCase->id);
         $this->assertSame($updatedName, $responseUseCase->name);
         $this->assertSame($updatedDescription, $responseUseCase->description);
-        $this->assertSame($isActive, $responseUseCase->is_active);
+        $this->assertSame($updatedIsActive, $responseUseCase->is_active);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
         $this->assertNotSame($responseUseCase->created_at, $responseUseCase->updated_at);

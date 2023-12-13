@@ -29,12 +29,12 @@ class CategoryController extends Controller
     // função responsável pela listagem das categorias
     public function index(Request $request, PaginateCategoryUseCase $usecase): AnonymousResourceCollection
     {
-        // definindo o inputDto
+        // definindo o inputDto com os dados a partir da url de request
         $inputDto = new PaginateCategoryInputDto(
-            filter: $request->filter ?? '',
-            order: $request->order ?? 'DESC',
-            startPage: (int) $request->start_page ?? 1,
-            itemsForPage: (int) $request->items_for_page ?? 15,
+            filter: $request->get('filter', ''),
+            order: $request->get('order', 'DESC'),
+            page: (int) $request->get('page', 1),
+            perPage: (int) $request->get('per_page', 15),
         );
 
         // executando o usecase
@@ -69,7 +69,7 @@ class CategoryController extends Controller
         $outputDto = $usecase->execute($inputDto);
 
         // organizando a response
-        $response = (new CategoryResource(collect($outputDto)))
+        $response = (new CategoryResource($outputDto))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
 
@@ -77,18 +77,18 @@ class CategoryController extends Controller
     }
 
     // função responsável pela exibição das categorias
-    public function show(Request $request, FindByIdCategoryUseCase $usecase): JsonResponse
+    public function show(string $id, FindByIdCategoryUseCase $usecase): JsonResponse
     {
         // definindo o inputDto
         $inputDto = new FindByIdCategoryInputDto(
-            id: $request->id ?? '',
+            id: $id,
         );
 
         // executando o usecase
         $outputDto = $usecase->execute($inputDto);
 
         // organizando a response
-        $response = (new CategoryResource(collect($outputDto)))
+        $response = (new CategoryResource($outputDto))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
 
@@ -96,11 +96,11 @@ class CategoryController extends Controller
     }
 
     // função responsável pela atualização das categorias
-    public function update(UpdateCategoryRequest $request, UpdateCategoryUseCase $usecase): JsonResponse
+    public function update(string $id, UpdateCategoryRequest $request, UpdateCategoryUseCase $usecase): JsonResponse
     {
         // definindo o inputDto
         $inputDto = new UpdateCategoryInputDto(
-            id: $request->id,
+            id: $id,
             name: $request->name ?? '',
             description: $request->description ?? '',
             isActive: $request->is_active ?? '',
@@ -110,7 +110,7 @@ class CategoryController extends Controller
         $outputDto = $usecase->execute($inputDto);
 
         // organizando a response
-        $response = (new CategoryResource(collect($outputDto)))
+        $response = (new CategoryResource($outputDto))
             ->response()
             ->setStatusCode(Response::HTTP_OK);
 
@@ -118,11 +118,11 @@ class CategoryController extends Controller
     }
 
     // função responsável pela exclusão das categorias
-    public function destroy(Request $request, DeleteByIdCategoryUseCase $usecase): Response
+    public function destroy(string $id, DeleteByIdCategoryUseCase $usecase): Response
     {
         // definindo o inputDto
         $inputDto = new DeleteByIdCategoryInputDto(
-            id: $request->id ?? '',
+            id: $id,
         );
 
         // executando o usecase

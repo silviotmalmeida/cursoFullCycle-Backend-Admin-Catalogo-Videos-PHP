@@ -26,13 +26,13 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
         $filter = '';
         $order = 'DESC';
         $startPage = 1;
-        $itemsForPage = 10;
+        $perPage = 10;
         $items = [];
         $total = 0;
         $lastPage = 1;
         $firstPage = 1;
         $currentPage = $startPage;
-        $perPage = $itemsForPage;
+        $perPage = $perPage;
         $to = 1;
         $from = 1;
 
@@ -41,7 +41,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
             $filter,
             $order,
             $startPage,
-            $itemsForPage,
+            $perPage,
         ]);
 
         // criando o mock do Pagination
@@ -57,7 +57,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('paginate')->times(1)->with($filter, $order, $startPage, $itemsForPage)->andReturn($mockPagination); //definindo o retorno do paginate()
+        $mockRepository->shouldReceive('paginate')->times(1)->with($filter, $order, $startPage, $perPage)->andReturn($mockPagination); //definindo o retorno do paginate()
 
         // criando o usecase
         $useCase = new PaginateCategoryUseCase($mockRepository);
@@ -106,13 +106,13 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
         $filter = '';
         $order = 'DESC';
         $startPage = 1;
-        $itemsForPage = 10;
+        $perPage = 10;
         $items = [$mockEntity, $mockEntity];
         $total = 2;
         $lastPage = 1;
         $firstPage = 1;
         $currentPage = $startPage;
-        $perPage = $itemsForPage;
+        $perPage = $perPage;
         $to = 1;
         $from = 1;
 
@@ -121,7 +121,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
             $filter,
             $order,
             $startPage,
-            $itemsForPage,
+            $perPage,
         ]);
 
         // criando o mock do Pagination
@@ -137,7 +137,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(CategoryRepositoryInterface::class);
-        $mockRepository->shouldReceive('paginate')->times(1)->with($filter, $order, $startPage, $itemsForPage)->andReturn($mockPagination); //definindo o retorno do paginate()
+        $mockRepository->shouldReceive('paginate')->times(1)->with($filter, $order, $startPage, $perPage)->andReturn($mockPagination); //definindo o retorno do paginate()
 
         // criando o usecase
         $useCase = new PaginateCategoryUseCase($mockRepository);

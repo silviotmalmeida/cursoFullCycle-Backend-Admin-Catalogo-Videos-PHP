@@ -19,4 +19,5 @@
     para criar um controller: php artisan make:controller <namespace (Api\\CategoryController)>
     para criar um api resource: php artisan make:resource <namespace (CategoryResource)>
     para criar um api request: php artisan make:request <namespace (StoreCategoryRequest)>
+    para listar as rotas cadastradas: php artisan route:list
 

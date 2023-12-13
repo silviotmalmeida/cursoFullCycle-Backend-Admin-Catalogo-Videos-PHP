@@ -87,7 +87,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     }
 
     // função de busca paginada
-    public function paginate(string $filter = '', string $order = 'DESC', int $startPage = 1, int $itemsForPage = 15): PaginationInterface
+    public function paginate(string $filter = '', string $order = 'DESC', int $page = 1, int $perPage = 15): PaginationInterface
     {
         // iniciando a busca
         $query = $this->model;
@@ -96,12 +96,12 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
         // ordenando
         $query->orderBy('id', $order);
         // executando a busca paginada
-        $paginator = $query->paginate($itemsForPage);
+        $paginator = $query->paginate($perPage);
 
         // organizando os dados no formato estabelecido pela interface
         return new PaginationPresenter($paginator);
     }
-
+    
     // função de atualização
     public function update(CategoryEntity $category): CategoryEntity
     {

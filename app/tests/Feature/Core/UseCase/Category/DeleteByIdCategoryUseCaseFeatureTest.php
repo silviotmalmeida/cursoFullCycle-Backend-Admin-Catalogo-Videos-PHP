@@ -33,6 +33,8 @@ class DeleteByIdCategoryUseCaseFeatureTest extends TestCase
         $this->assertInstanceOf(DeleteByIdCategoryOutputDto::class, $responseUseCase);
         $this->assertSame(true, $responseUseCase->sucess);
 
-        $this->assertSoftDeleted($model);
+        $this->assertSoftDeleted('categories', [
+            'id' => $model->id
+        ]);
     }
 }

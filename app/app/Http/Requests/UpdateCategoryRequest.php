@@ -24,7 +24,21 @@ class UpdateCategoryRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            // definindo as validações dos atributos
+            'name' => [
+                'required',
+                'min:3',
+                'max:255',
+            ],
+            'description' => [
+                'nullable',
+                'min:3',
+                'max:255',
+            ],
+            'is_active' => [
+                'nullable',
+                'boolean',
+            ],
         ];
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Repositories\Eloquent\CategoryEloquentRepository;
+use Core\Domain\Repository\CategoryRepositoryInterface;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +15,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        // devem ser registrados as interfaces a serem substituídas por classes concretas
+        $this->app->singleton(CategoryRepositoryInterface::class, CategoryEloquentRepository::class);
     }
 
     /**

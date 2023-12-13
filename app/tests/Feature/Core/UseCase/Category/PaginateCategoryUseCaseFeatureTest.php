@@ -18,14 +18,14 @@ class PaginateCategoryUseCaseFeatureTest extends TestCase
         $filter = '';
         $order = 'DESC';
         $startPage = 1;
-        $itemsForPage = 10;
+        $perPage = 10;
 
         // criando o inputDto
         $inputDto =  new PaginateCategoryInputDto(
             $filter,
             $order,
             $startPage,
-            $itemsForPage,
+            $perPage,
         );
 
         // criando o repository
@@ -56,14 +56,14 @@ class PaginateCategoryUseCaseFeatureTest extends TestCase
         $filter = '';
         $order = 'DESC';
         $startPage = 1;
-        $itemsForPage = 10;
+        $perPage = 10;
 
         // criando o inputDto
         $inputDto =  new PaginateCategoryInputDto(
             $filter,
             $order,
             $startPage,
-            $itemsForPage,
+            $perPage,
         );
 
         // criando o repository
@@ -77,7 +77,7 @@ class PaginateCategoryUseCaseFeatureTest extends TestCase
 
         // verificando os dados
         $this->assertInstanceOf(PaginateCategoryOutputDto::class, $responseUseCase);
-        $this->assertCount($itemsForPage, $responseUseCase->items);
+        $this->assertCount($perPage, $responseUseCase->items);
         $this->assertSame($qtd, $responseUseCase->total);
         $this->assertSame($startPage, $responseUseCase->current_page);
     }

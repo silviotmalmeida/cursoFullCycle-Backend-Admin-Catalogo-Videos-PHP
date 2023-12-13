@@ -54,9 +54,7 @@ class CategoryControllerFeatureTest extends TestCase
         // configurando o request
         $request = new Request();
         $request->headers->set('content-type', 'application/json');
-        $request->setJson(new ParameterBag([
-            'items_for_page' => 10,
-        ]));
+        $request->request->add(['per_page' => 10]);
         // executando o index
         $response = $controller->index($request, $usecase);
 
@@ -107,15 +105,9 @@ class CategoryControllerFeatureTest extends TestCase
 
         // instanciando o controller
         $controller = new CategoryController();
-        // configurando o request
-        $request = new Request();
-        $request->headers->set('content-type', 'application/json');
-        $request->setJson(new ParameterBag([
-            'id' => $category->id,
-        ]));
 
         // executando o show
-        $response = $controller->show($request, $usecase);
+        $response = $controller->show($category->id, $usecase);
 
         // verificando os dados
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -140,14 +132,13 @@ class CategoryControllerFeatureTest extends TestCase
         $updateRequest = new UpdateCategoryRequest();
         $updateRequest->headers->set('content-type', 'application/json');
         $updateRequest->setJson(new ParameterBag([
-            'id' => $category->id,
             'name' => 'name updated',
             'description' => 'description updated',
             'is_active' => $isActiveAlternate,
         ]));
 
         // executando o update
-        $response = $controller->update($updateRequest, $usecase);
+        $response = $controller->update($category->id, $updateRequest, $usecase);
 
         // verificando os dados
         $this->assertInstanceOf(JsonResponse::class, $response);
@@ -171,20 +162,16 @@ class CategoryControllerFeatureTest extends TestCase
 
         // instanciando o controller
         $controller = new CategoryController();
-        // configurando o request
-        $request = new Request();
-        $request->headers->set('content-type', 'application/json');
-        $request->setJson(new ParameterBag([
-            'id' => $category->id,
-        ]));
 
         // executando o destroy
-        $response = $controller->destroy($request, $usecase);
+        $response = $controller->destroy($category->id, $usecase);
 
         // verificando os dados
         $this->assertInstanceOf(Response::class, $response);
         $this->assertSame(Response::HTTP_NO_CONTENT, $response->status());
 
-        $this->assertSoftDeleted($category);
+        $this->assertSoftDeleted('categories', [
+            'id' => $category->id
+        ]);
     }
 }

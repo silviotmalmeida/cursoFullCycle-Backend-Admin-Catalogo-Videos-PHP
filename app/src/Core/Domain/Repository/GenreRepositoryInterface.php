@@ -4,21 +4,21 @@
 namespace Core\Domain\Repository;
 
 // importações
-use Core\Domain\Entity\Category;
+use Core\Domain\Entity\Genre;
 
 // definindo a interface de comunicação com a entidade
 // contém a descrição dos métodos a serem implementados no repository
-interface CategoryRepositoryInterface
+interface GenreRepositoryInterface
 {
-    public function insert(Category $category): Category;
+    public function insert(Genre $genre): Genre;
 
-    public function findById(string $categoryId): Category;
+    public function findById(string $genreId): Genre;
 
     public function findAll(string $filter = '', string $order = 'DESC'): array;
 
     public function paginate(string $filter = '', string $order = 'DESC', int $page = 1, int $perPage = 15): PaginationInterface;
 
-    public function update(Category $category): Category;
+    public function update(Genre $genre): Genre;
 
-    public function deleteById(string $categoryId): bool;
+    public function deleteById(string $genreId): bool;
 }

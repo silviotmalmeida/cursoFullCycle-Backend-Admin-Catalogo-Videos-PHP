@@ -10,7 +10,7 @@ use Core\Domain\ValueObject\Uuid;
 use DateTime;
 
 // definindo a entidade
-class Category
+class Genre
 {
     // incluindo a trait que ativa os métodos mágicos
     use MagicMethodsTrait;
@@ -19,8 +19,8 @@ class Category
     public function __construct(
         protected Uuid|string $id = '',
         protected string $name = '',
-        protected string $description = '',
         protected bool $isActive = true,
+        protected array $categoriesId = [],
         protected DateTime|string $createdAt = '',
         protected DateTime|string $updatedAt = '',
     ) {
@@ -70,15 +70,35 @@ class Category
         $this->isActive = false;
     }
 
+    // função de atribuição de category
+    public function addCategory(Uuid|string $categoryId): void
+    {
+        // caso não seja uuid, valida a string informada
+        if (!($categoryId instanceof Uuid)) $categoryId = new Uuid($categoryId);
+        // adicionando no array de categories
+        if (!(in_array($categoryId, $this->categoriesId))) array_push($this->categoriesId, $categoryId);
+        // removendo duplicatas
+        $this->categoriesId = array_unique($this->categoriesId);
+    }
+
+    // função de remoção de category
+    public function removeCategory(Uuid|string $categoryId): void
+    {
+        // caso não seja uuid, valida a string informada
+        if (!($categoryId instanceof Uuid)) $categoryId = new Uuid($categoryId);
+        // removendo do array de categories
+        if (in_array($categoryId, $this->categoriesId)) $this->categoriesId = array_diff($this->categoriesId, [$categoryId]);
+        // removendo duplicatas
+        $this->categoriesId = array_unique($this->categoriesId);
+    }
+
     // função de atualização dos atributos possíveis
     public function update(
         ?string $name = null,
-        ?string $description = null,
         ?bool $isActive = null
     ): void {
         // atualiza somente os atributos com valores recebidos
         if (isset($name)) $this->name = $name;
-        if (isset($description)) $this->description = $description;
         if (isset($isActive)) {
             if ($isActive === true) {
                 $this->activate();
@@ -88,7 +108,7 @@ class Category
         }
 
         // atualiza o updatedAt com a data atual
-        if (isset($name) or isset($description) or isset($isActive)) $this->updatedAt = new DateTime();
+        if (isset($name) or isset($isActive)) $this->updatedAt = new DateTime();
 
         // validando os atributos
         $this->validate();
@@ -101,8 +121,5 @@ class Category
         DomainValidation::notNullOrEmpty($this->name);
         DomainValidation::strMaxLenght($this->name);
         DomainValidation::strMinLenght($this->name);
-        // validação do description
-        DomainValidation::strNullOrMaxLength($this->description);
-        DomainValidation::strNullOrMinLength($this->description);
     }
 }

@@ -66,11 +66,6 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
         return $this->toCategory($categoryDb);
     }
 
-    public function getIdsListIds(array $categoriesId = []): array
-    {
-        return [];
-    }
-
     // função de busca geral
     public function findAll(string $filter = '', string $order = 'DESC'): array
     {

@@ -95,7 +95,8 @@ class Genre
     // função de atualização dos atributos possíveis
     public function update(
         ?string $name = null,
-        ?bool $isActive = null
+        ?bool $isActive = null,
+        ?array $categoriesId = null
     ): void {
         // atualiza somente os atributos com valores recebidos
         if (isset($name)) $this->name = $name;
@@ -106,9 +107,19 @@ class Genre
                 $this->deactivate();
             }
         }
+        if (isset($categoriesId)) {
+            // removendo as categorias previamente cadastradas
+            foreach ($this->categoriesId as $category) {
+                $this->removeCategory($category);
+            }
+            // inserindo as novas categorias
+            foreach ($categoriesId as $category) {
+                $this->addCategory($category);
+            }
+        }
 
         // atualiza o updatedAt com a data atual
-        if (isset($name) or isset($isActive)) $this->updatedAt = new DateTime();
+        if (isset($name) or isset($isActive) or isset($categoriesId)) $this->updatedAt = new DateTime();
 
         // validando os atributos
         $this->validate();

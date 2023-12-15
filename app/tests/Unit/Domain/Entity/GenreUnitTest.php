@@ -112,12 +112,16 @@ class GenreUnitTest extends TestCase
     {
         // mock de uuid
         $uuid = RamseyUuid::uuid4()->toString();
+        $cat1 = RamseyUuid::uuid4()->toString();
+        $cat2 = RamseyUuid::uuid4()->toString();
+        $cat3 = RamseyUuid::uuid4()->toString();
 
         // criando o genre
         $genre = new Genre(
             id: $uuid,
             name: 'name 1',
-            isActive: true
+            isActive: true,
+            categoriesId: [$cat1, $cat2],
         );
 
         // retardo na execução para permitir diferenciação do updatedAt
@@ -127,6 +131,7 @@ class GenreUnitTest extends TestCase
         $genre->update(
             name: 'name 2',
             isActive: false,
+            categoriesId: [$cat3],
         );
 
         // memorizando a data da primeira atualização para comparar com a segunda
@@ -136,6 +141,7 @@ class GenreUnitTest extends TestCase
         $this->assertSame($uuid, $genre->id());
         $this->assertSame('name 2', $genre->name);
         $this->assertFalse($genre->isActive);
+        $this->assertEquals([$cat3], $genre->categoriesId);
         $this->assertNotSame($genre->createdAt(), $genre->updatedAt());
 
         // atualizando sem valores, o updatedAt não deve ser modificado
@@ -145,6 +151,7 @@ class GenreUnitTest extends TestCase
         $this->assertSame($uuid, $genre->id());
         $this->assertSame('name 2', $genre->name);
         $this->assertFalse($genre->isActive);
+        $this->assertEquals([$cat3], $genre->categoriesId);
         $this->assertSame($firstUpdateDate, $genre->updatedAt());
     }
 

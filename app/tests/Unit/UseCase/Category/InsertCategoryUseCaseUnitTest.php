@@ -13,7 +13,6 @@ use DateTime;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
-use stdClass;
 
 // definindo a classe de teste, que estende a TestCase do PHPUnit
 class InsertCategoryUseCaseUnitTest extends TestCase

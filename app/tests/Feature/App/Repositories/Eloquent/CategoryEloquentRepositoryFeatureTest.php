@@ -8,6 +8,7 @@ use Core\Domain\Entity\Category as CategoryEntity;
 use Core\Domain\Repository\CategoryRepositoryInterface;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\PaginationInterface;
+use Ramsey\Uuid\Uuid;
 use Tests\TestCase;
 
 class CategoryEloquentRepositoryFeatureTest extends TestCase
@@ -67,6 +68,88 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
             // verificando a mensagem da exceção
             $this->assertSame($th->getMessage(), 'ID not found');
         }
+    }
+
+    // testando a função de busca múltipla por id no bd, com sucesso na busca
+    public function testFindByIdArray()
+    {
+        // inserindo múlttiplos registros no bd
+        $model1 = CategoryModel::factory()->create();
+        $model2 = CategoryModel::factory()->create();
+        $model3 = CategoryModel::factory()->create();
+        $model4 = CategoryModel::factory()->create();
+        $model5 = CategoryModel::factory()->create();
+        // buscando no bd
+        $response = $this->repository->findByIdArray([
+            $model1->id,
+            $model3->id,
+            $model5->id,
+        ]);
+        // verificando
+        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
+        $this->assertInstanceOf(CategoryEntity::class, $response[0]);
+        $this->assertCount(3, $response);
+        $this->assertContains(
+            $response[0]->id(),
+            [$model1->id, $model3->id, $model5->id]
+        );
+        $this->assertContains(
+            $response[1]->id(),
+            [$model1->id, $model3->id, $model5->id]
+        );
+        $this->assertContains(
+            $response[2]->id(),
+            [$model1->id, $model3->id, $model5->id]
+        );
+    }
+
+    // testando a função de busca múltipla por id no bd, com sucesso na busca para alguns valores
+    public function testFindByIdArrayFoundSome()
+    {
+        // inserindo múlttiplos registros no bd
+        $model1 = CategoryModel::factory()->create();
+        $model2 = CategoryModel::factory()->create();
+        $model3 = CategoryModel::factory()->create();
+        $model4 = CategoryModel::factory()->create();
+        $model5 = CategoryModel::factory()->create();
+        // buscando no bd
+        $response = $this->repository->findByIdArray([
+            $model1->id,
+            $model3->id,
+            Uuid::uuid4()->toString(),
+        ]);
+        // verificando
+        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
+        $this->assertInstanceOf(CategoryEntity::class, $response[0]);
+        $this->assertCount(2, $response);
+        $this->assertContains(
+            $response[0]->id(),
+            [$model1->id, $model3->id]
+        );
+        $this->assertContains(
+            $response[1]->id(),
+            [$model1->id, $model3->id]
+        );
+    }
+
+    // testando a função de busca múltipla por id no bd, sem sucesso na busca
+    public function testFindByIdArrayFoundNone()
+    {
+        // inserindo múlttiplos registros no bd
+        $model1 = CategoryModel::factory()->create();
+        $model2 = CategoryModel::factory()->create();
+        $model3 = CategoryModel::factory()->create();
+        $model4 = CategoryModel::factory()->create();
+        $model5 = CategoryModel::factory()->create();
+        // buscando no bd
+        $response = $this->repository->findByIdArray([
+            Uuid::uuid4()->toString(),
+            Uuid::uuid4()->toString(),
+            Uuid::uuid4()->toString(),
+        ]);
+        // verificando
+        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
+        $this->assertCount(0, $response);
     }
 
     // testando a função de busca geral no bd, com sucesso na busca

@@ -66,6 +66,21 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
         return $this->toCategory($categoryDb);
     }
 
+    // função de busca múltipla, a partir de uma lista de id
+    public function findByIdArray(array $listIds): array
+    {
+        // inicializando o array de saída
+        $response = [];
+        // buscando no bd a partir da lista recebida
+        $categoriesDb = $this->model->whereIn('id', $listIds)->get();
+        // convertendo os resultados para entidade
+        foreach ($categoriesDb as $categoryDb) {
+            array_push($response, $this->toCategory($categoryDb));
+        }
+        // retornando a lista de entidades
+        return $response;
+    }
+
     // função de busca geral
     public function findAll(string $filter = '', string $order = 'DESC'): array
     {
@@ -96,7 +111,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
         // organizando os dados no formato estabelecido pela interface
         return new PaginationPresenter($paginator);
     }
-    
+
     // função de atualização
     public function update(CategoryEntity $category): CategoryEntity
     {

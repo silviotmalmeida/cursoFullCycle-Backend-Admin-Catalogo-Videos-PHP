@@ -25,7 +25,11 @@ class UpdateCategoryUseCase
         $category = $this->repository->findById($input->id);
 
         // atualizando os dados da category
-        $category->update($input->name, $input->description, $input->isActive);
+        $category->update(
+            name: $input->name,
+            description: $input->description,
+            isActive: $input->isActive
+        );
 
         // atualizando a entidade no BD utilizando o repository
         $updatedCategory = $this->repository->update($category);

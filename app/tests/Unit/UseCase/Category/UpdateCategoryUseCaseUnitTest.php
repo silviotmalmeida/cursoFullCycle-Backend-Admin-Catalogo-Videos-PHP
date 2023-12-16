@@ -33,9 +33,9 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         // criando o mock do inputDto
         $mockInputDto = Mockery::mock(UpdateCategoryInputDto::class, [
             $uuid,
-            $name,
-            $description,
-            $isActive,
+            $updatedName,
+            $updatedDescription,
+            $updatedIsActive,
         ]);
 
         // criando o mock da entidade
@@ -48,7 +48,7 @@ class UpdateCategoryUseCaseUnitTest extends TestCase
         $mockEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
         $mockEntity->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
         $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
-        $mockEntity->shouldReceive('update')->times(1)->with($name, $description, $isActive)->andReturn(); //definindo o retorno do update()
+        $mockEntity->shouldReceive('update')->times(1)->with($updatedName, $updatedDescription, $updatedIsActive)->andReturn(); //definindo o retorno do update()
 
         // criando o mock da entidade atualizada
         $mockEntityUpdated = Mockery::mock(Category::class, [

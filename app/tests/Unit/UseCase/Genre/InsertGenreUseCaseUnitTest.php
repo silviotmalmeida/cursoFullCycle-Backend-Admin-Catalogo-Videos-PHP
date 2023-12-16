@@ -77,16 +77,16 @@ class InsertGenreUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(GenreRepositoryInterface::class);
-        $mockRepository->shouldReceive('insert')->andReturn($mockEntity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('insert')->times(1)->andReturn($mockEntity); //definindo o retorno do insert()
 
         // criando o mock do transactionDb
         $mockTransactionDb = Mockery::mock(TransactionDbInterface::class);
-        $mockTransactionDb->shouldReceive('commit')->andReturn(); //definindo o retorno do commit()
-        $mockTransactionDb->shouldReceive('rollback')->andReturn(); //definindo o retorno do rollback()
+        $mockTransactionDb->shouldReceive('commit')->times(1)->andReturn(); //definindo o retorno do commit()
+        $mockTransactionDb->shouldReceive('rollback')->times(0)->andReturn(); //definindo o retorno do rollback()
 
         // criando o mock do categoryRepository
         $mockCategoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
-        $mockCategoryRepository->shouldReceive('findByIdArray')->andReturn([$mockCategory1, $mockCategory2]); //definindo o retorno do insert()
+        $mockCategoryRepository->shouldReceive('findByIdArray')->times(1)->andReturn([$mockCategory1, $mockCategory2]); //definindo o retorno do insert()
 
         // criando o usecase
         $useCase = new InsertGenreUseCase($mockRepository, $mockTransactionDb, $mockCategoryRepository);
@@ -161,16 +161,16 @@ class InsertGenreUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(GenreRepositoryInterface::class);
-        $mockRepository->shouldReceive('insert')->andReturn($mockEntity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('insert')->times(0)->andReturn($mockEntity); //definindo o retorno do insert()
 
         // criando o mock do transactionDb
         $mockTransactionDb = Mockery::mock(TransactionDbInterface::class);
-        $mockTransactionDb->shouldReceive('commit')->andReturn(); //definindo o retorno do commit()
-        $mockTransactionDb->shouldReceive('rollback')->andReturn(); //definindo o retorno do rollback()
+        $mockTransactionDb->shouldReceive('commit')->times(0)->andReturn(); //definindo o retorno do commit()
+        $mockTransactionDb->shouldReceive('rollback')->times(1)->andReturn(); //definindo o retorno do rollback()
 
         // criando o mock do categoryRepository
         $mockCategoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
-        $mockCategoryRepository->shouldReceive('findByIdArray')->andReturn([]); //definindo o retorno do insert()
+        $mockCategoryRepository->shouldReceive('findByIdArray')->times(1)->andReturn([]); //definindo o retorno do insert()
 
         // tratamento de exceções
         try {

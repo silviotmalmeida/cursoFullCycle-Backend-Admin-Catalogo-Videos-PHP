@@ -11,7 +11,7 @@ class UpdateGenreInputDto
         public string $id,
         public ?string $name,
         public ?bool $isActive,
-        public ?array $categoriesID,
+        public ?array $categoriesId,
     ) {
     }
 }

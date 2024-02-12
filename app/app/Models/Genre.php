@@ -9,19 +9,18 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 // definindo a model
-class Category extends Model
+class Genre extends Model
 {
     // traits a serem utilizadas
     use HasFactory, SoftDeletes;
 
     // definindo o nome da tabela no BD
-    protected $table = 'categories';
+    protected $table = 'genres';
 
     // definindo os atributos a serem informados
     protected $fillable = [
         'id',
         'name',
-        'description',
         'is_active',
     ];
 
@@ -37,9 +36,9 @@ class Category extends Model
     // desativando o autoincremento
     public $incrementing = false;
 
-    // definindo o relacionamento muitos-para-muitos com genre
-    public function genres()
+    // definindo o relacionamento muitos-para-muitos com category
+    public function categories()
     {
-        return $this->belongsToMany(Genre::class);
+        return $this->belongsToMany(Category::class);
     }
 }

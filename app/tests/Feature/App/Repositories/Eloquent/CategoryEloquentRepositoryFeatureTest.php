@@ -37,7 +37,7 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(CategoryEntity::class, $response);
         $this->assertDatabaseHas('categories', [
-            'name' => $entity->name
+            'id' => $entity->id()
         ]);
     }
 

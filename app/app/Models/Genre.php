@@ -39,6 +39,6 @@ class Genre extends Model
     // definindo o relacionamento muitos-para-muitos com category
     public function categories()
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class, 'category_genre', 'genre_id', 'category_id');
     }
 }

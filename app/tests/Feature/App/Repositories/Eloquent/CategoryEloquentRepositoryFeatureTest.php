@@ -26,6 +26,12 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $this->repository = new CategoryEloquentRepository(new CategoryModel());
     }
 
+    // testando se o repositório implementa a interface definida
+    public function testImplementsInterface()
+    {
+        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
+    }
+
     // testando a função de inserção no bd
     public function testInsert()
     {
@@ -34,10 +40,25 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         // inserindo no bd
         $response = $this->repository->insert($entity);
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(CategoryEntity::class, $response);
         $this->assertDatabaseHas('categories', [
             'id' => $entity->id()
+        ]);
+    }
+
+    // testando a função de inserção no bd
+    public function testInsertDeactivate()
+    {
+        // criando a entidade
+        $entity = new CategoryEntity(name: 'test');
+        $entity->deactivate();
+        // inserindo no bd
+        $response = $this->repository->insert($entity);
+        // verificando
+        $this->assertInstanceOf(CategoryEntity::class, $response);
+        $this->assertDatabaseHas('categories', [
+            'id' => $entity->id(),
+            'is_active' => false,
         ]);
     }
 
@@ -49,7 +70,6 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         // buscando no bd
         $response = $this->repository->findById($model->id);
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(CategoryEntity::class, $response);
         $this->assertSame($model->id, $response->id());
     }
@@ -86,7 +106,6 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
             $model5->id,
         ]);
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(CategoryEntity::class, $response[0]);
         $this->assertCount(3, $response);
         $this->assertContains(
@@ -119,7 +138,6 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
             Uuid::uuid4()->toString(),
         ]);
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(CategoryEntity::class, $response[0]);
         $this->assertCount(2, $response);
         $this->assertContains(
@@ -148,7 +166,6 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
             Uuid::uuid4()->toString(),
         ]);
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertCount(0, $response);
     }
 
@@ -156,14 +173,22 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
     public function testFindAll()
     {
         // definindo a quantidade de registros a serem criados
-        $qtd = 50;
+        $qtd = rand(30, 60);
         // inserindo múltiplos registros no bd
         CategoryModel::factory()->count($qtd)->create();
         // buscando no bd
         $response = $this->repository->findAll();
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertCount($qtd, $response);
+    }
+
+    // testando a função de busca geral no bd, semm sucesso na busca
+    public function testFindAllEmpty()
+    {
+        // buscando no bd
+        $response = $this->repository->findAll();
+        // verificando
+        $this->assertCount(0, $response);
     }
 
     // testando a função de busca geral paginada no bd, com sucesso na busca
@@ -176,7 +201,6 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         // buscando no bd
         $response = $this->repository->paginate();
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(PaginationInterface::class, $response);
         $this->assertCount(15, $response->items());
         $this->assertSame($qtd, $response->total());
@@ -188,7 +212,6 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         // buscando no bd
         $response = $this->repository->paginate();
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(PaginationInterface::class, $response);
         $this->assertCount(0, $response->items());
         $this->assertSame(0, $response->total());
@@ -209,7 +232,6 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $response = $this->repository->update($category);
 
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(CategoryEntity::class, $response);
         $this->assertSame($model->id, $response->id());
         $this->assertSame("updated name", $response->name);
@@ -243,7 +265,6 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         // deletando no bd
         $response = $this->repository->deleteById($model->id);
         // verificando
-        $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
         $this->assertTrue($response);
     }
 

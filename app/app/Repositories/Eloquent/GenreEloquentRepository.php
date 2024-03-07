@@ -22,7 +22,7 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toGenre(object $object): GenreEntity
+    private function toGenre(GenreModel $object): GenreEntity
     {
         $Genre = new GenreEntity(
             id: $object->id,
@@ -52,11 +52,12 @@ class GenreEloquentRepository implements GenreRepositoryInterface
 
         // sincronizando os relacionamentos
         if (count($Genre->categoriesId) > 0) {
-
-
-        
-        dd($Genre->categoriesId);
-            $response->categories()->sync($Genre->categoriesId->);
+            // convertendo os valores a serem inseridos em string
+            $arraySync = [];
+            for ($i=0; $i < count($Genre->categoriesId); $i++) { 
+                array_push($arraySync, strval($Genre->categoriesId[$i]));
+            }            
+            $response->categories()->sync($arraySync);
         }
 
         // retornando a entidade populada com os dados inseridos

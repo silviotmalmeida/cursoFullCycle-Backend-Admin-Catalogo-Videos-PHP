@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\App\Repositories\Eloquent;
 
-use App\Models\Category;
+use App\Models\Category as CategoryModel;
 use App\Repositories\Eloquent\GenreEloquentRepository;
 use App\Models\Genre as GenreModel;
 use Core\Domain\Entity\Genre as GenreEntity;
@@ -27,6 +27,12 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->repository = new GenreEloquentRepository(new GenreModel());
     }
 
+    // testando se o repositório implementa a interface definida
+    public function testImplementsInterface()
+    {
+        $this->assertInstanceOf(GenreRepositoryInterface::class, $this->repository);
+    }
+
     // testando a função de inserção no bd
     public function testInsert()
     {
@@ -35,65 +41,78 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         // inserindo no bd
         $response = $this->repository->insert($entity);
         // verificando
-        $this->assertInstanceOf(GenreRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(GenreEntity::class, $response);
         $this->assertDatabaseHas('genres', [
             'id' => $entity->id()
+        ]);
+    }
+
+    // testando a função de inserção no bd
+    public function testInsertDeactivate()
+    {
+        // criando a entidade
+        $entity = new GenreEntity(name: 'test');
+        $entity->deactivate();
+        // inserindo no bd
+        $response = $this->repository->insert($entity);
+        // verificando
+        $this->assertInstanceOf(GenreEntity::class, $response);
+        $this->assertDatabaseHas('genres', [
+            'id' => $entity->id(),
+            'is_active' => false,
         ]);
     }
 
     // testando a função de inserção no bd com os relacionamentos
     public function testInsertWithRelationships()
     {
+        // definindo número randomico de categorias
+        $nCategories = rand(1, 9);
         // criando categorias no bd para possibilitar os relacionamentos
-        $categories = Category::factory()->count(4)->create();        
+        $categories = CategoryModel::factory()->count($nCategories)->create();
         // criando a entidade
         $entity = new GenreEntity(name: 'test with relationships');
         // adicionando as categorias
         foreach ($categories as $category) {
-            dump($category->id);
             $entity->addCategory($category->id);
         }
-        dump($entity->categoriesId);
         // inserindo no bd
         $response = $this->repository->insert($entity);
-        dump($response);
         // verificando
-        $this->assertInstanceOf(GenreRepositoryInterface::class, $this->repository);
         $this->assertInstanceOf(GenreEntity::class, $response);
         $this->assertDatabaseHas('genres', [
             'id' => $entity->id()
         ]);
+        $this->assertDatabaseCount('category_genre', $nCategories);
     }
 
-    // // testando a função de busca por id no bd, com sucesso na busca
-    // public function testFindById()
-    // {
-    //     // inserindo um registro no bd
-    //     $model = CategoryModel::factory()->create();
-    //     // buscando no bd
-    //     $response = $this->repository->findById($model->id);
-    //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
-    //     $this->assertInstanceOf(CategoryEntity::class, $response);
-    //     $this->assertSame($model->id, $response->id());
-    // }
+    // testando a função de busca por id no bd, com sucesso na busca
+    public function testFindById()
+    {
+        // inserindo um registro no bd
+        $model = GenreModel::factory()->create();
+        // buscando no bd
+        $response = $this->repository->findById($model->id);
+        // verificando
+        $this->assertInstanceOf(GenreEntity::class, $response);
+        $this->assertSame($model->id, $response->id());
+    }
 
-    // // testando a função de busca por id no bd, sem sucesso na busca
-    // public function testFindByIdNotFound()
-    // {
-    //     try {
-    //         // buscando no bd
-    //         $this->repository->findById('fake');
-    //         // se não lançar exceção o teste deve falhar
-    //         $this->assertTrue(false);
-    //     } catch (\Throwable $th) {
-    //         // verificando o tipo da exceção
-    //         $this->assertInstanceOf(NotFoundException::class, $th);
-    //         // verificando a mensagem da exceção
-    //         $this->assertSame($th->getMessage(), 'ID not found');
-    //     }
-    // }
+    // testando a função de busca por id no bd, sem sucesso na busca
+    public function testFindByIdNotFound()
+    {
+        try {
+            // buscando no bd
+            $this->repository->findById('fake');
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(NotFoundException::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame($th->getMessage(), 'ID not found');
+        }
+    }
 
     // // testando a função de busca múltipla por id no bd, com sucesso na busca
     // public function testFindByIdArray()
@@ -111,7 +130,6 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     //         $model5->id,
     //     ]);
     //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
     //     $this->assertInstanceOf(CategoryEntity::class, $response[0]);
     //     $this->assertCount(3, $response);
     //     $this->assertContains(
@@ -144,7 +162,6 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     //         Uuid::uuid4()->toString(),
     //     ]);
     //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
     //     $this->assertInstanceOf(CategoryEntity::class, $response[0]);
     //     $this->assertCount(2, $response);
     //     $this->assertContains(
@@ -173,23 +190,30 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     //         Uuid::uuid4()->toString(),
     //     ]);
     //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
     //     $this->assertCount(0, $response);
     // }
 
-    // // testando a função de busca geral no bd, com sucesso na busca
-    // public function testFindAll()
-    // {
-    //     // definindo a quantidade de registros a serem criados
-    //     $qtd = 50;
-    //     // inserindo múltiplos registros no bd
-    //     CategoryModel::factory()->count($qtd)->create();
-    //     // buscando no bd
-    //     $response = $this->repository->findAll();
-    //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
-    //     $this->assertCount($qtd, $response);
-    // }
+    // testando a função de busca geral no bd, com sucesso na busca
+    public function testFindAll()
+    {
+        // definindo a quantidade de registros a serem criados
+        $qtd = rand(30, 60);
+        // inserindo múltiplos registros no bd
+        GenreModel::factory()->count($qtd)->create();
+        // buscando no bd
+        $response = $this->repository->findAll();
+        // verificando
+        $this->assertCount($qtd, $response);
+    }
+
+    // testando a função de busca geral no bd, semm sucesso na busca
+    public function testFindAllEmpty()
+    {
+        // buscando no bd
+        $response = $this->repository->findAll();
+        // verificando
+        $this->assertCount(0, $response);
+    }
 
     // // testando a função de busca geral paginada no bd, com sucesso na busca
     // public function testPaginate()
@@ -201,7 +225,6 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     //     // buscando no bd
     //     $response = $this->repository->paginate();
     //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
     //     $this->assertInstanceOf(PaginationInterface::class, $response);
     //     $this->assertCount(15, $response->items());
     //     $this->assertSame($qtd, $response->total());
@@ -213,7 +236,6 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     //     // buscando no bd
     //     $response = $this->repository->paginate();
     //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
     //     $this->assertInstanceOf(PaginationInterface::class, $response);
     //     $this->assertCount(0, $response->items());
     //     $this->assertSame(0, $response->total());
@@ -234,7 +256,6 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     //     $response = $this->repository->update($category);
 
     //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
     //     $this->assertInstanceOf(CategoryEntity::class, $response);
     //     $this->assertSame($model->id, $response->id());
     //     $this->assertSame("updated name", $response->name);
@@ -268,7 +289,6 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     //     // deletando no bd
     //     $response = $this->repository->deleteById($model->id);
     //     // verificando
-    //     $this->assertInstanceOf(CategoryRepositoryInterface::class, $this->repository);
     //     $this->assertTrue($response);
     // }
 

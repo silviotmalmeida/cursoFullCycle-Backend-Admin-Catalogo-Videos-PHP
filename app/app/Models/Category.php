@@ -40,6 +40,6 @@ class Category extends Model
     // definindo o relacionamento muitos-para-muitos com genre
     public function genres()
     {
-        return $this->belongsToMany(Genre::class);
+        return $this->belongsToMany(Genre::class, 'category_genre', 'category_id', 'genre_id');
     }
 }

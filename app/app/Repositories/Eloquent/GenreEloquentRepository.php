@@ -96,9 +96,9 @@ class GenreEloquentRepository implements GenreRepositoryInterface
         // iniciando a busca
         $query = $this->model;
         // aplicando o filtro, se existir
-        if ($filter) $query->where('name', 'LIKE', "%{$filter}%");
+        if ($filter) $query = $query->where('name', 'LIKE', "%{$filter}%");
         // ordenando
-        $query->orderBy('id', $order);
+        $query = $query->orderBy('name', $order);
         // executando a busca
         $response = $query->get();
         // retornando os dados
@@ -111,9 +111,9 @@ class GenreEloquentRepository implements GenreRepositoryInterface
         // iniciando a busca
         $query = $this->model;
         // aplicando o filtro, se existir
-        if ($filter) $query->where('name', 'LIKE', "%{$filter}%");
+        if ($filter) $query = $query->where('name', 'LIKE', "%{$filter}%");
         // ordenando
-        $query->orderBy('id', $order);
+        $query = $query->orderBy('id', $order);
         // executando a busca paginada
         $paginator = $query->paginate($perPage);
 
@@ -132,7 +132,6 @@ class GenreEloquentRepository implements GenreRepositoryInterface
         $GenreDb->update([
             'id' => $Genre->id(),
             'name' => $Genre->name,
-            'description' => $Genre->description,
             'is_active' => $Genre->isActive,
             'updated_at' => new DateTime()
         ]);

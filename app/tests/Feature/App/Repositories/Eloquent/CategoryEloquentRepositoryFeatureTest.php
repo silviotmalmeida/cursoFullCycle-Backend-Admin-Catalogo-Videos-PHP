@@ -191,11 +191,34 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $this->assertCount(0, $response);
     }
 
+    // testando a função de busca geral no bd, com filtro
+    public function testFindAllWithFilter()
+    {
+        // definindo a quantidade de registros a serem criados
+        $qtd = rand(30, 60);
+        // criando registros com o filtro a ser aplicado
+        CategoryModel::factory()->count($qtd)->create([
+            'name' => 'abcde',
+        ]);
+        // criando registros sem o filtro a ser aplicado
+        CategoryModel::factory()->count($qtd)->create();
+        // buscando no bd
+        $response = $this->repository->findAll(
+            filter: 'abcde'
+        );
+        // verificando
+        $this->assertCount($qtd, $response);
+        // buscando no bd
+        $response = $this->repository->findAll();
+        // verificando
+        $this->assertEquals($qtd*2, count($response));
+    }
+
     // testando a função de busca geral paginada no bd, com sucesso na busca
     public function testPaginate()
     {
         // definindo a quantidade de registros a serem criados
-        $qtd = 50;
+        $qtd = rand(30, 60);
         // inserindo múltiplos registros no bd
         CategoryModel::factory()->count($qtd)->create();
         // buscando no bd

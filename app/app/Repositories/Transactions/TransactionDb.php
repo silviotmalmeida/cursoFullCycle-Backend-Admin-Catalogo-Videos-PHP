@@ -4,7 +4,7 @@
 namespace App\Repositories\Transactions;
 
 // importações
-use Core\UseCase\Intefaces\TransactionDbInterface;
+use Core\UseCase\Interfaces\TransactionDbInterface;
 use Illuminate\Support\Facades\DB;
 
 // definindo a classe concreta de tratamento de transações no BD

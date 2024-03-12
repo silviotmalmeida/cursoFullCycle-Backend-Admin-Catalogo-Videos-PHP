@@ -10,7 +10,7 @@ use Core\Domain\Repository\CategoryRepositoryInterface;
 use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\UseCase\DTO\Genre\UpdateGenre\UpdateGenreInputDto;
 use Core\UseCase\DTO\Genre\UpdateGenre\UpdateGenreOutputDto;
-use Core\UseCase\Intefaces\TransactionDbInterface;
+use Core\UseCase\Interfaces\TransactionDbInterface;
 
 // definindo o usecase
 class UpdateGenreUseCase

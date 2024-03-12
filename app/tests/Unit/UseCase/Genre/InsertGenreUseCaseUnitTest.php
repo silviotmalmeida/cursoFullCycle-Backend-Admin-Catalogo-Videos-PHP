@@ -13,7 +13,7 @@ use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\UseCase\Genre\InsertGenreUseCase;
 use Core\UseCase\DTO\Genre\InsertGenre\InsertGenreInputDto;
 use Core\UseCase\DTO\Genre\InsertGenre\InsertGenreOutputDto;
-use Core\UseCase\Intefaces\TransactionDbInterface;
+use Core\UseCase\Interfaces\TransactionDbInterface;
 use DateTime;
 use Mockery;
 use PHPUnit\Framework\TestCase;

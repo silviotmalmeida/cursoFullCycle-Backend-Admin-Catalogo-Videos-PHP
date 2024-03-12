@@ -10,7 +10,7 @@ use Core\Domain\Repository\CategoryRepositoryInterface;
 use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\UseCase\DTO\Genre\InsertGenre\InsertGenreInputDto;
 use Core\UseCase\DTO\Genre\InsertGenre\InsertGenreOutputDto;
-use Core\UseCase\Intefaces\TransactionDbInterface;
+use Core\UseCase\Interfaces\TransactionDbInterface;
 
 // definindo o usecase
 class InsertGenreUseCase
@@ -49,7 +49,7 @@ class InsertGenreUseCase
                 id: $insertedGenre->id(),
                 name: $insertedGenre->name,
                 is_active: $insertedGenre->isActive,
-                categories_id: $insertedGenre->categoriesId,
+                categories_id: $input->categoriesId,
                 created_at: $insertedGenre->createdAt(),
                 updated_at: $insertedGenre->updatedAt(),
             );

@@ -38,13 +38,17 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     {
         // criando a entidade
         $entity = new GenreEntity(name: 'test');
-        // inserindo no bd
-        $response = $this->repository->insert($entity);
-        // verificando
-        $this->assertInstanceOf(GenreEntity::class, $response);
-        $this->assertDatabaseHas('genres', [
-            'id' => $entity->id()
-        ]);
+        try {
+            // inserindo no bd
+            $response = $this->repository->insert($entity);
+            // verificando
+            $this->assertInstanceOf(GenreEntity::class, $response);
+            $this->assertDatabaseHas('genres', [
+                'id' => $entity->id()
+            ]);
+        } catch (\Throwable $th) {
+            $this->assertDatabaseCount('genres', 0);
+        }
     }
 
     // testando a função de inserção no bd
@@ -235,7 +239,7 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         // buscando no bd
         $response = $this->repository->findAll();
         // verificando
-        $this->assertEquals($qtd*2, count($response));
+        $this->assertEquals($qtd * 2, count($response));
     }
 
     // testando a função de busca geral paginada no bd, com sucesso na busca

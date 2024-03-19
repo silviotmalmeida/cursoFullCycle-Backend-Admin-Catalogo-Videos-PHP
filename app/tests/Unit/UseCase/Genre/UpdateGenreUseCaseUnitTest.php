@@ -14,6 +14,7 @@ use Core\UseCase\DTO\Genre\UpdateGenre\UpdateGenreInputDto;
 use Core\UseCase\DTO\Genre\UpdateGenre\UpdateGenreOutputDto;
 use Core\UseCase\Interfaces\TransactionDbInterface;
 use DateTime;
+use Exception;
 use Mockery;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
@@ -114,6 +115,100 @@ class UpdateGenreUseCaseUnitTest extends TestCase
 
         // encerrando os mocks
         Mockery::close();
+    }
+
+    // função que testa o método de execução, sem sucesso e com rollback
+    public function testExecuteRollback()
+    {
+        // definindo os atributos a serem utilizados nos mocks
+        $uuid = Uuid::uuid4()->toString();
+        $cat1 = Uuid::uuid4()->toString();
+        $cat2 = Uuid::uuid4()->toString();
+        $cat3 = Uuid::uuid4()->toString();
+        $name = 'name';
+        $updatedName = 'updated name';
+        $description = 'description';
+        $isActive = false;
+        $updatedIsActive = true;
+        $categoriesId = [$cat1, $cat2];
+        $updatedCategoriesId = [$cat3];
+        $now = (new DateTime())->format('Y-m-d H:i:s');
+
+        // criando o mock da cat3
+        $mockCat3 = Mockery::mock(Category::class, [
+            $cat3,
+            $name,
+            $description,
+            $isActive,
+        ]);
+        $mockCat3->shouldReceive('id')->andReturn($cat3); //definindo o retorno do id()
+        $mockCat3->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockCat3->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
+
+        // criando o mock do inputDto
+        $mockInputDto = Mockery::mock(UpdateGenreInputDto::class, [
+            $uuid,
+            $updatedName,
+            $updatedIsActive,
+            $updatedCategoriesId
+        ]);
+
+        // criando o mock da entidade
+        $mockEntity = Mockery::mock(Genre::class, [
+            $uuid,
+            $name,
+            $isActive,
+            $categoriesId
+        ]);
+        $mockEntity->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
+        $mockEntity->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockEntity->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
+        $mockEntity->shouldReceive('update')->times(1)->with($updatedName, $updatedIsActive, $updatedCategoriesId)->andReturn(); //definindo o retorno do update()
+
+        // criando o mock da entidade atualizada
+        $mockEntityUpdated = Mockery::mock(Genre::class, [
+            $uuid,
+            $updatedName,
+            $updatedIsActive,
+            $updatedCategoriesId
+        ]);
+        sleep(1);
+        $nowUpdated = (new DateTime())->format('Y-m-d H:i:s');
+        $mockEntityUpdated->shouldReceive('id')->andReturn($uuid); //definindo o retorno do id()
+        $mockEntityUpdated->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockEntityUpdated->shouldReceive('updatedAt')->andReturn($nowUpdated); //definindo o retorno do updatedAt()
+        $mockEntity->shouldReceive('update')->times(0)->with($updatedName, $updatedIsActive, $updatedCategoriesId)->andReturn(); //definindo o retorno do update()
+
+        // criando o mock do repository
+        $mockRepository = Mockery::mock(GenreRepositoryInterface::class);
+        $mockRepository->shouldReceive('findById')->with($uuid)->andReturn($mockEntity); //definindo o retorno do findById()
+        $mockRepository->shouldReceive('update')->times(1)->andReturn($mockEntityUpdated); //definindo o retorno do update()
+
+        // criando o mock do transactionDb
+        $mockTransactionDb = Mockery::mock(TransactionDbInterface::class);
+        $mockTransactionDb->shouldReceive('commit')->times(0)->andReturn(); //definindo o retorno do commit()
+        $mockTransactionDb->shouldReceive('rollback')->times(1)->andReturn(); //definindo o retorno do rollback()
+
+        // criando o mock do categoryRepository
+        $mockCategoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
+        $mockCategoryRepository->shouldReceive('findByIdArray')->times(1)->andReturn([$mockCat3]); //definindo o retorno do insert()
+
+        // tratamento de exceções
+        try {
+            // criando o usecase
+            $useCase = new UpdateGenreUseCase($mockRepository, $mockTransactionDb, $mockCategoryRepository);
+            // executando o usecase
+            $useCase->execute($mockInputDto, true);
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(Exception::class, $th);
+            $this->assertEquals($th->getMessage(), "rollback test");
+        } finally {
+            // encerrando os mocks
+            Mockery::close();
+        }
     }
 
     // função que testa o método de execução, sem sucesso na validação de categorias

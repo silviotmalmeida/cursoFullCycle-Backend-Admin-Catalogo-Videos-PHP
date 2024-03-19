@@ -11,6 +11,7 @@ use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\UseCase\DTO\Genre\InsertGenre\InsertGenreInputDto;
 use Core\UseCase\DTO\Genre\InsertGenre\InsertGenreOutputDto;
 use Core\UseCase\Interfaces\TransactionDbInterface;
+use Exception;
 
 // definindo o usecase
 class InsertGenreUseCase
@@ -25,7 +26,8 @@ class InsertGenreUseCase
 
     // método de execução do usecase
     // recebe um inputDto e retorna um outputDto
-    public function execute(InsertGenreInputDto $input): InsertGenreOutputDto
+    // o segundo argumento é para possibilitar o teste de rollback da transação
+    public function execute(InsertGenreInputDto $input, bool $simulateTransactionException = false): InsertGenreOutputDto
     {
         // como os dados serão inseridos em mais de uma tabela,
         // o uso de transações é necessário
@@ -41,6 +43,10 @@ class InsertGenreUseCase
             $this->validateCategoriesIds($input->categoriesId);
             // inserindo a entidade no BD utilizando o repository
             $insertedGenre = $this->repository->insert($Genre);
+
+            // lançando exception para testar o rollback
+            if ($simulateTransactionException) throw new Exception('rollback test');
+
             // em caso de sucesso, comita
             $this->transactionDb->commit();
 

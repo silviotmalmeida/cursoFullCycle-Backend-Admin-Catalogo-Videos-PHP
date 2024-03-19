@@ -7,8 +7,6 @@ use App\Repositories\Eloquent\CategoryEloquentRepository;
 use Core\UseCase\Category\FindByIdCategoryUseCase;
 use Core\UseCase\DTO\Category\FindByIdCategory\FindByIdCategoryInputDto;
 use Core\UseCase\DTO\Category\FindByIdCategory\FindByIdCategoryOutputDto;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class FindByIdCategoryUseCaseFeatureTest extends TestCase

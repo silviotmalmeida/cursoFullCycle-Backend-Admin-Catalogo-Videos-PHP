@@ -51,14 +51,12 @@ class GenreEloquentRepository implements GenreRepositoryInterface
         );
 
         // sincronizando os relacionamentos
-        if (count($Genre->categoriesId) > 0) {
-            // convertendo os valores a serem inseridos em string
-            $arraySync = [];
-            for ($i=0; $i < count($Genre->categoriesId); $i++) { 
-                array_push($arraySync, strval($Genre->categoriesId[$i]));
-            }            
-            $response->categories()->sync($arraySync);
+        // convertendo os valores a serem inseridos em string
+        $arraySync = [];
+        for ($i = 0; $i < count($Genre->categoriesId); $i++) {
+            array_push($arraySync, strval($Genre->categoriesId[$i]));
         }
+        $response->categories()->sync($arraySync);
 
         // retornando a entidade populada com os dados inseridos
         return $this->toGenre($response);
@@ -135,6 +133,15 @@ class GenreEloquentRepository implements GenreRepositoryInterface
             'is_active' => $Genre->isActive,
             'updated_at' => new DateTime()
         ]);
+
+        // sincronizando os relacionamentos
+        // convertendo os valores a serem inseridos em string
+        $arraySync = [];
+        for ($i = 0; $i < count($Genre->categoriesId); $i++) {
+            array_push($arraySync, strval($Genre->categoriesId[$i]));
+        }
+        $GenreDb->categories()->sync($arraySync);
+
         // forçando a atualização do registro
         $GenreDb->refresh();
         // retornando a entidade populada com os dados inseridos

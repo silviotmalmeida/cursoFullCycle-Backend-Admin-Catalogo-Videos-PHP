@@ -11,6 +11,7 @@ use Core\Domain\Exception\NotFoundException;
 use Core\UseCase\Genre\InsertGenreUseCase;
 use Core\UseCase\DTO\Genre\InsertGenre\InsertGenreInputDto;
 use Core\UseCase\DTO\Genre\InsertGenre\InsertGenreOutputDto;
+use Exception;
 use Tests\TestCase;
 
 class InsertGenreUseCaseFeatureTest extends TestCase
@@ -110,6 +111,53 @@ class InsertGenreUseCaseFeatureTest extends TestCase
         $this->assertDatabaseCount('category_genre', $qtd);
     }
 
+    // função que testa o método de execução com categorias e rollback
+    public function testExecuteWithCategoriesAndRollback()
+    {
+        // criando as categorias
+        $qtd = random_int(10, 20);
+        $categories = CategoryModel::factory()->count($qtd)->create();
+
+        // obtendo o array de id das categorias
+        $categoriesIds = $categories->pluck('id')->toArray();
+
+        // dados de entrada
+        $name = 'name genre';
+        $isActive = false;
+
+        // criando o inputDto
+        $inputDto = new InsertGenreInputDto(
+            name: $name,
+            isActive: $isActive,
+            categoriesId: $categoriesIds
+        );
+
+        // criando o repository
+        $repository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o repository da Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // tratamento de exceções
+        try {
+            // criando o usecase
+            $useCase = new InsertGenreUseCase($repository, $transactionDb, $categoryRepository);
+            // executando o usecase
+            $useCase->execute($inputDto, true);
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(Exception::class, $th);
+            $this->assertEquals($th->getMessage(), "rollback test");
+            $this->assertDatabaseCount('genres', 0);
+            $this->assertDatabaseCount('category_genre', 0);
+        }
+    }
+
     // função que testa o método de execução com categorias inválidas
     public function testExecuteWithInvalidCategories()
     {
@@ -142,7 +190,7 @@ class InsertGenreUseCaseFeatureTest extends TestCase
             $useCase = new InsertGenreUseCase($repository, $transactionDb, $categoryRepository);
 
             // executando o usecase
-            $responseUseCase = $useCase->execute($inputDto);
+            $useCase->execute($inputDto);
 
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);

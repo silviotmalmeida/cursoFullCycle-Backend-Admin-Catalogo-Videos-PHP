@@ -11,6 +11,7 @@ use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\UseCase\DTO\Genre\UpdateGenre\UpdateGenreInputDto;
 use Core\UseCase\DTO\Genre\UpdateGenre\UpdateGenreOutputDto;
 use Core\UseCase\Interfaces\TransactionDbInterface;
+use Exception;
 
 // definindo o usecase
 class UpdateGenreUseCase
@@ -25,7 +26,8 @@ class UpdateGenreUseCase
 
     // método de execução do usecase
     // recebe um inputDto e retorna um outputDto
-    public function execute(UpdateGenreInputDto $input): UpdateGenreOutputDto
+    // o segundo argumento é para possibilitar o teste de rollback da transação
+    public function execute(UpdateGenreInputDto $input, bool $simulateTransactionException = false): UpdateGenreOutputDto
     {
         // como os dados serão inseridos em mais de uma tabela,
         // o uso de transações é necessário
@@ -43,6 +45,10 @@ class UpdateGenreUseCase
             $this->validateCategoriesIds($input->categoriesId);
             // atualizando a entidade no BD utilizando o repository
             $updatedGenre = $this->repository->update($genre);
+
+            // lançando exception para testar o rollback
+            if ($simulateTransactionException) throw new Exception('rollback test');
+
             // em caso de sucesso, comita
             $this->transactionDb->commit();
             // retornando os dados

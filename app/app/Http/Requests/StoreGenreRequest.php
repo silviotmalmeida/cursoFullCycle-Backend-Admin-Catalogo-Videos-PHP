@@ -34,6 +34,10 @@ class StoreGenreRequest extends FormRequest
                 'nullable',
                 'boolean',
             ],
+            'categories_id' => [
+                'nullable',
+                'array'
+            ]
         ];
     }
 }

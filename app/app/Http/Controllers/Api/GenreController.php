@@ -62,6 +62,7 @@ class GenreController extends Controller
         $inputDto = new InsertGenreInputDto(
             name: $request->name,
             isActive: (bool) $request->is_active ?? true,
+            categoriesId: $request->categories_id ?? []
         );
 
         // executando o usecase
@@ -102,7 +103,7 @@ class GenreController extends Controller
             id: $id,
             name: $request->name ?? '',
             isActive: $request->is_active ?? '',
-            categoriesId: [],
+            categoriesId: $request->categories_id ?? []
         );
 
         // executando o usecase

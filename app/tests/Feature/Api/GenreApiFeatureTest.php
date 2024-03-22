@@ -315,20 +315,54 @@ class GenreApiFeatureTest extends TestCase
         $response->assertStatus(Response::HTTP_NOT_FOUND);
     }
 
-    // // testando o método destroy
-    // public function testDestroy()
-    // {
-    //     // inserindo um registro no bd
-    //     $genre = GenreModel::factory()->create();
+    // testando o método destroy
+    public function testDestroy()
+    {
+        // inserindo um registro no bd
+        $genre = GenreModel::factory()->create();
 
-    //     // fazendo o request
-    //     $response = $this->deleteJson("{$this->endpoint}/{$genre->id}");
+        // fazendo o request
+        $response = $this->deleteJson("{$this->endpoint}/{$genre->id}");
 
-    //     // verificando os dados
-    //     $response->assertStatus(Response::HTTP_NO_CONTENT);
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
 
-    //     $this->assertSoftDeleted('categories', [
-    //         'id' => $genre->id
-    //     ]);
-    // }
+        $this->assertSoftDeleted('genres', [
+            'id' => $genre->id
+        ]);
+    }
+
+    // testando o método destroy com categorias
+    public function testDestroyWithCategories()
+    {
+        // criando as categorias
+        $qtd = random_int(10, 20);
+        $categories = CategoryModel::factory()->count($qtd)->create();
+        // obtendo o array de id das categorias
+        $categoriesIds = $categories->pluck('id')->toArray();
+
+        // definindo os dados a serem passados no body
+        $name = 'name genre';
+        $isActive = false;
+        $data = [
+            'name' => $name,
+            'is_active' => $isActive,
+            'categories_id' => $categoriesIds
+        ];
+
+        // inserindo o registro no bd
+        $responseStore = $this->postJson($this->endpoint, $data);
+
+        // fazendo o request
+        $response = $this->deleteJson("{$this->endpoint}/{$responseStore['data']['id']}");
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_NO_CONTENT);
+
+        $this->assertSoftDeleted('genres', [
+            'id' => $responseStore['data']['id']
+        ]);
+
+        $this->assertDatabaseCount('category_genre', $qtd);
+    }
 }

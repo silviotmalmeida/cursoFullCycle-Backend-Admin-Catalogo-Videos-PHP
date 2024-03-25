@@ -192,6 +192,92 @@ class GenreApiFeatureTest extends TestCase
         $this->assertDatabaseCount('category_genre', $qtd);
     }
 
+    // testando o método store, com falhas na validação
+    public function testStoreValidationFailure()
+    {
+        // validando o atributo name
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => '',
+            'is_active' => true,
+            'categories_id' => []
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'name',
+            ]
+        ]);
+
+        // validando o atributo is_active
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => 'name',
+            'is_active' => 'fake',
+            'categories_id' => []
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'is_active',
+            ]
+        ]);
+
+        // validando o atributo categories_id
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => 'name',
+            'is_active' => true,
+            'categories_id' => ['fake']
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'categories_id',
+            ]
+        ]);
+
+        // validando todos os atributos
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => '',
+            'is_active' => 'fake',
+            'categories_id' => ['fake']
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'name',
+                'is_active',
+                'categories_id',
+            ]
+        ]);
+    }
+
     // testando o método update com id inexistente
     public function testUpdateNotFound()
     {

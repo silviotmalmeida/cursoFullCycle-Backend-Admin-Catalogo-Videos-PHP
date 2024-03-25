@@ -36,7 +36,8 @@ class StoreGenreRequest extends FormRequest
             ],
             'categories_id' => [
                 'nullable',
-                'array'
+                'array',
+                'exists:categories,id,deleted_at,NULL',
             ]
         ];
     }

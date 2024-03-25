@@ -152,6 +152,92 @@ class CategoryApiFeatureTest extends TestCase
         ]);
     }
 
+    // testando o método store, com falhas na validação
+    public function testStoreValidationFailure()
+    {
+        // validando o atributo name
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => '',
+            'description' => 'description',
+            'is_active' => true,
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'name',
+            ]
+        ]);
+
+        // validando o atributo description
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => 'name',
+            'description' => 'de',
+            'is_active' => true,
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'description',
+            ]
+        ]);
+
+        // validando o atributo is_active
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => 'name',
+            'description' => 'description',
+            'is_active' => 'fake'
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'is_active',
+            ]
+        ]);
+
+        // validando todos os atributos
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => '',
+            'description' => 'de',
+            'is_active' => 'fake'
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'name',
+                'description',
+                'is_active',
+            ]
+        ]);
+    }
+
     // testando o método update com id inexistente
     public function testUpdateNotFound()
     {

@@ -337,6 +337,8 @@ class GenreApiFeatureTest extends TestCase
             'name' => $name,
             'is_active' => $isActiveAlternate,
         ]);
+
+        $this->assertDatabaseCount('category_genre', 0);
     }
 
     // testando o método update
@@ -389,6 +391,104 @@ class GenreApiFeatureTest extends TestCase
         ]);
 
         $this->assertDatabaseCount('category_genre', $qtd);
+    }
+
+    // testando o método update, com falhas na validação
+    public function testUpdateValidationFailure()
+    {
+        // criando as categorias
+        $qtd = random_int(10, 20);
+        $categories = CategoryModel::factory()->count($qtd)->create();
+        // obtendo o array de id das categorias
+        $categoriesIds = $categories->pluck('id')->toArray();
+
+        // inserindo um registro no bd
+        $genre = GenreModel::factory()->create();
+
+        // alterando o valor do isActive
+        $isActiveAlternate = ($genre->is_active) ? false : true;
+
+        // validando o atributo name
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => '',
+            'is_active' => $isActiveAlternate,
+            'categories_id' => $categoriesIds
+        ];
+
+        // fazendo o request
+        $response = $this->putJson("{$this->endpoint}/{$genre->id}", $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'name',
+            ]
+        ]);
+
+        // validando o atributo is_active
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => 'name',
+            'is_active' => 'fake',
+            'categories_id' => $categoriesIds
+        ];
+
+        // fazendo o request
+        $response = $this->putJson("{$this->endpoint}/{$genre->id}", $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'is_active',
+            ]
+        ]);
+
+        // validando o atributo categories_id
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => 'name',
+            'is_active' => true,
+            'categories_id' => ['fake']
+        ];
+
+        // fazendo o request        
+        $response = $this->putJson("{$this->endpoint}/{$genre->id}", $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'categories_id',
+            ]
+        ]);
+
+        // validando todos os atributos
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => '',
+            'is_active' => 'fake',
+            'categories_id' => ['fake']
+        ];
+
+        // fazendo o request
+        $response = $this->postJson($this->endpoint, $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'name',
+                'is_active',
+                'categories_id',
+            ]
+        ]);
     }
 
     // testando o método destroy com id inexistente

@@ -34,6 +34,11 @@ class UpdateGenreRequest extends FormRequest
                 'nullable',
                 'boolean',
             ],
+            'categories_id' => [
+                'nullable',
+                'array',
+                'exists:categories,id,deleted_at,NULL',
+            ]
         ];
     }
 }

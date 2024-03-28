@@ -20,7 +20,7 @@ class CastMember
     public function __construct(
         protected Uuid|string $id = '',
         protected string $name = '',
-        protected ?CastMemberType $type = null,
+        protected CastMemberType|int $type = 0,
         protected DateTime|string $createdAt = '',
         protected DateTime|string $updatedAt = '',
     ) {
@@ -33,7 +33,7 @@ class CastMember
         else {
             $this->id = new Uuid($this->id);
         }
-
+       
         // processamento do createdAt
         // se o createdAt for vazio, atribui a data atual
         if ($this->createdAt == '') {
@@ -83,6 +83,6 @@ class CastMember
         DomainValidation::strMinLenght($this->name);
 
         // validação do type
-        DomainValidation::notNullOrEmpty($this->type);
+        if(is_int($this->type)) DomainValidation::isCastMemberType($this->type);
     }
 }

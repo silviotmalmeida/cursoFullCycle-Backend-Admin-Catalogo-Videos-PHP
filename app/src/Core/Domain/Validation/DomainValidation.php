@@ -4,6 +4,8 @@
 namespace Core\Domain\Validation;
 
 // importações
+
+use Core\Domain\Enum\CastMemberType;
 use Core\Domain\Exception\EntityValidationException;
 
 // definindo a classe
@@ -49,5 +51,13 @@ class DomainValidation
         // se não for vazio ou nulo e possuir quantidade de caracteres menor do que o número mínimo permitido, lança exceção
         // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
         if (!empty($value) and strlen($value) < $lenght) throw new EntityValidationException($exceptMessage ?? "Value must not be smaller than {$lenght} characters");
+    }
+
+    // valida se o valor é compatível com a enumeração CastMemberType
+    public static function isCastMemberType(int $value, string $exceptMessage = null): void
+    {
+        // se não for compatível com a enumeração CastMemberType, lança exceção
+        // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
+        if (!CastMemberType::tryFrom($value)) throw new EntityValidationException($exceptMessage ?? "Type value {$value} not found");
     }
 }

@@ -22,3 +22,10 @@
     para listar as rotas cadastradas: php artisan route:list
     para criar uma migration: php artisan make:migration <nome-da-migration>
 
+- ordem de implementação das classes
+    entidades;
+    repositoryInterface da entidade;
+    usecases;
+    
+
+

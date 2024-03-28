@@ -36,9 +36,6 @@ class CastMemberUnitTest extends TestCase
     {
         // mock de uuid
         $uuid = RamseyUuid::uuid4()->toString();
-        $cat1 = RamseyUuid::uuid4()->toString();
-        $cat2 = RamseyUuid::uuid4()->toString();
-        $cat3 = RamseyUuid::uuid4()->toString();
 
         // criando o castMember
         $castMember = new CastMember(
@@ -132,12 +129,24 @@ class CastMemberUnitTest extends TestCase
             $this->assertTrue(false);
         }
 
-        // validando type nulo
+        // validando type inválido
         try {
             // criando o castMember
             $castMember = new CastMember(
                 name: 'name 1',
-                type: null,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção            
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        try {
+            // criando o castMember
+            $castMember = new CastMember(
+                name: 'name 1',
+                type: 3,
             );
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);

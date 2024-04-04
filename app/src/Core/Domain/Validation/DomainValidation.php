@@ -58,6 +58,6 @@ class DomainValidation
     {
         // se não for compatível com a enumeração CastMemberType, lança exceção
         // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
-        if (!CastMemberType::tryFrom($value)) throw new EntityValidationException($exceptMessage ?? "Type value {$value} not found");
+        if (!CastMemberType::tryFrom($value)) throw new EntityValidationException($exceptMessage ?? "Type value {$value} not found for cast member");
     }
 }

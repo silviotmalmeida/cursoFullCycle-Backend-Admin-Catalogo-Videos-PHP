@@ -5,13 +5,9 @@ namespace Core\UseCase\CastMember;
 
 // importações
 use Core\Domain\Entity\CastMember;
-use Core\Domain\Exception\NotFoundException;
-use Core\Domain\Repository\CategoryRepositoryInterface;
 use Core\Domain\Repository\CastMemberRepositoryInterface;
 use Core\UseCase\DTO\CastMember\InsertCastMember\InsertCastMemberInputDto;
 use Core\UseCase\DTO\CastMember\InsertCastMember\InsertCastMemberOutputDto;
-use Core\UseCase\Interfaces\TransactionDbInterface;
-use Exception;
 
 // definindo o usecase
 class InsertCastMemberUseCase

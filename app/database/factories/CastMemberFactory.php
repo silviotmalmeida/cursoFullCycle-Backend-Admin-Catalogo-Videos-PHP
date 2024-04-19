@@ -19,13 +19,13 @@ class CastMemberFactory extends Factory
     public function definition()
     {
         // array de valores possíveis do type
-        $types = array_column(CastMemberType::cases(), 'value');
+        $typeValues = array_column(CastMemberType::cases(), 'value');
 
         CastMemberType::cases();
         return [
             'id' => (string) Str::uuid(),
             'name' => $this->faker->name(),
-            'type' => $types[array_rand($types)],
+            'type' => $typeValues[array_rand($typeValues)],
             'created_at' => (string) now(),
             'updated_at' => (string) now(),
         ];

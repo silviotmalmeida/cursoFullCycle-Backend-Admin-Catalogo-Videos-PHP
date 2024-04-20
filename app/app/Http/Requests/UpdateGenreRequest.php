@@ -26,16 +26,13 @@ class UpdateGenreRequest extends FormRequest
         return [
             // definindo as validações dos atributos
             'name' => [
-                'required',
                 'min:3',
                 'max:255',
             ],
             'is_active' => [
-                'nullable',
                 'boolean',
             ],
             'categories_id' => [
-                'nullable',
                 'array',
                 'exists:categories,id,deleted_at,NULL',
             ]

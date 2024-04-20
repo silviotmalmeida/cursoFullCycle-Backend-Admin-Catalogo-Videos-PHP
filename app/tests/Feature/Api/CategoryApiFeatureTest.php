@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Models\Category as CategoryModel;
+use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Tests\TestCase;
 
@@ -87,8 +88,8 @@ class CategoryApiFeatureTest extends TestCase
         $this->assertSame($category->name, $response['data']['name']);
         $this->assertSame($category->description, $response['data']['description']);
         $this->assertSame($category->is_active, $response['data']['is_active']);
-        $this->assertEquals($category->created_at, $response['data']['created_at']);
-        $this->assertEquals($category->updated_at, $response['data']['updated_at']);
+        $this->assertSame(Carbon::make($category->created_at)->format('Y-m-d H:i:s'), $response['data']['created_at']);
+        $this->assertSame(Carbon::make($category->updated_at)->format('Y-m-d H:i:s'), $response['data']['updated_at']);
     }
 
     // testando o método store sem passagem dos atributos para criação
@@ -277,6 +278,7 @@ class CategoryApiFeatureTest extends TestCase
         ];
 
         // fazendo o request
+        sleep(1);
         $response = $this->putJson("{$this->endpoint}/{$category->id}", $data);
 
         // verificando os dados
@@ -295,14 +297,42 @@ class CategoryApiFeatureTest extends TestCase
         $this->assertSame($name, $response['data']['name']);
         $this->assertSame($description, $response['data']['description']);
         $this->assertSame($isActiveAlternate, $response['data']['is_active']);
-        $this->assertNotSame($category->created_at, $response['data']['created_at']);
-        $this->assertNotSame($category->updated_at, $response['data']['updated_at']);
+        $this->assertSame(Carbon::make($category->created_at)->format('Y-m-d H:i:s'), $response['data']['created_at']);
+        $this->assertNotSame(Carbon::make($category->updated_at)->format('Y-m-d H:i:s'), $response['data']['updated_at']);
 
         $this->assertDatabaseHas('categories', [
             'id' => $category->id,
             'name' => $name,
             'description' => $description,
             'is_active' => $isActiveAlternate,
+        ]);
+    }
+
+    // testando o método update passando valores vazios
+    public function testUpdateEmptyValues()
+    {
+        // inserindo um registro no bd
+        $category = CategoryModel::factory()->create();
+
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => '',
+            'description' => '',
+            'is_active' => '',
+        ];
+
+        // fazendo o request
+        $response = $this->putJson("{$this->endpoint}/{$category->id}", $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'name',
+                'description',
+                'is_active',
+            ]
         ]);
     }
 
@@ -314,11 +344,11 @@ class CategoryApiFeatureTest extends TestCase
 
         // alterando o valor do isActive
         $isActiveAlternate = ($category->is_active) ? false : true;
-        
+
         // validando o atributo name
         // definindo os dados a serem passados no body
         $data = [
-            'name' => '',
+            'name' => 'n',
             'description' => 'description',
             'is_active' => $isActiveAlternate,
         ];
@@ -378,7 +408,7 @@ class CategoryApiFeatureTest extends TestCase
         // validando todos os atributos
         // definindo os dados a serem passados no body
         $data = [
-            'name' => '',
+            'name' => 'n',
             'description' => 'de',
             'is_active' => 'fake'
         ];

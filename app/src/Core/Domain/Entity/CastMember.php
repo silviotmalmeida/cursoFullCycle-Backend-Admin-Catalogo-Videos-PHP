@@ -61,7 +61,7 @@ class CastMember
     // função de atualização dos atributos possíveis
     public function update(
         ?string $name = null,
-        ?CastMemberType $type = null,
+        CastMemberType|int $type = null,
     ): void {
         // atualiza somente os atributos com valores recebidos
         if (isset($name)) $this->name = $name;
@@ -84,7 +84,7 @@ class CastMember
 
         // validação do type
         if (is_int($this->type)) {
-            DomainValidation::isCastMemberType($this->type);
+            DomainValidation::isCastMemberTypeCompatible($this->type);
             if (CastMemberType::tryFrom($this->type)) $this->type = CastMemberType::from($this->type);
         }
     }

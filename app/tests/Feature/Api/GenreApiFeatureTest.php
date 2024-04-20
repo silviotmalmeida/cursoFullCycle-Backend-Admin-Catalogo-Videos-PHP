@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\Category as CategoryModel;
 use App\Models\Genre as GenreModel;
+use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Tests\TestCase;
 
@@ -86,8 +87,8 @@ class GenreApiFeatureTest extends TestCase
         $this->assertSame($genre->id, $response['data']['id']);
         $this->assertSame($genre->name, $response['data']['name']);
         $this->assertSame($genre->is_active, $response['data']['is_active']);
-        $this->assertEquals($genre->created_at, $response['data']['created_at']);
-        $this->assertEquals($genre->updated_at, $response['data']['updated_at']);
+        $this->assertSame(Carbon::make($genre->created_at)->format('Y-m-d H:i:s'), $response['data']['created_at']);
+        $this->assertSame(Carbon::make($genre->updated_at)->format('Y-m-d H:i:s'), $response['data']['updated_at']);
     }
 
     // testando o método store sem passagem dos atributos para criação
@@ -313,6 +314,7 @@ class GenreApiFeatureTest extends TestCase
         ];
 
         // fazendo o request
+        sleep(1);
         $response = $this->putJson("{$this->endpoint}/{$genre->id}", $data);
 
         // verificando os dados
@@ -329,8 +331,8 @@ class GenreApiFeatureTest extends TestCase
         $this->assertSame($genre->id, $response['data']['id']);
         $this->assertSame($name, $response['data']['name']);
         $this->assertSame($isActiveAlternate, $response['data']['is_active']);
-        $this->assertNotSame($genre->created_at, $response['data']['created_at']);
-        $this->assertNotSame($genre->updated_at, $response['data']['updated_at']);
+        $this->assertSame(Carbon::make($genre->created_at)->format('Y-m-d H:i:s'), $response['data']['created_at']);
+        $this->assertNotSame(Carbon::make($genre->updated_at)->format('Y-m-d H:i:s'), $response['data']['updated_at']);
 
         $this->assertDatabaseHas('genres', [
             'id' => $genre->id,
@@ -365,6 +367,7 @@ class GenreApiFeatureTest extends TestCase
         ];
 
         // fazendo o request
+        sleep(1);
         $response = $this->putJson("{$this->endpoint}/{$genre->id}", $data);
 
         // verificando os dados
@@ -381,8 +384,8 @@ class GenreApiFeatureTest extends TestCase
         $this->assertSame($genre->id, $response['data']['id']);
         $this->assertSame($name, $response['data']['name']);
         $this->assertSame($isActiveAlternate, $response['data']['is_active']);
-        $this->assertNotSame($genre->created_at, $response['data']['created_at']);
-        $this->assertNotSame($genre->updated_at, $response['data']['updated_at']);
+        $this->assertSame(Carbon::make($genre->created_at)->format('Y-m-d H:i:s'), $response['data']['created_at']);
+        $this->assertNotSame(Carbon::make($genre->updated_at)->format('Y-m-d H:i:s'), $response['data']['updated_at']);
 
         $this->assertDatabaseHas('genres', [
             'id' => $genre->id,
@@ -391,6 +394,34 @@ class GenreApiFeatureTest extends TestCase
         ]);
 
         $this->assertDatabaseCount('category_genre', $qtd);
+    }
+
+    // testando o método update passando valores vazios
+    public function testUpdateEmptyValues()
+    {       
+        // inserindo um registro no bd
+        $genre = GenreModel::factory()->create();
+        
+        // definindo os dados a serem passados no body
+        $data = [
+            'name' => '',
+            'is_active' => '',
+            'categories_id' => ''
+        ];
+
+        // fazendo o request
+        $response = $this->putJson("{$this->endpoint}/{$genre->id}", $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
+        $response->assertJsonStructure([
+            'message',
+            'errors' => [
+                'name',
+                'is_active',
+                'categories_id',
+            ]
+        ]);
     }
 
     // testando o método update, com falhas na validação
@@ -411,7 +442,7 @@ class GenreApiFeatureTest extends TestCase
         // validando o atributo name
         // definindo os dados a serem passados no body
         $data = [
-            'name' => '',
+            'name' => 'n',
             'is_active' => $isActiveAlternate,
             'categories_id' => $categoriesIds
         ];
@@ -471,7 +502,7 @@ class GenreApiFeatureTest extends TestCase
         // validando todos os atributos
         // definindo os dados a serem passados no body
         $data = [
-            'name' => '',
+            'name' => 'n',
             'is_active' => 'fake',
             'categories_id' => ['fake']
         ];

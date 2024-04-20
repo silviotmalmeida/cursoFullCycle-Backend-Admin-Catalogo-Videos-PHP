@@ -54,7 +54,7 @@ class DomainValidation
     }
 
     // valida se o valor é compatível com a enumeração CastMemberType
-    public static function isCastMemberType(int $value, string $exceptMessage = null): void
+    public static function isCastMemberTypeCompatible(int $value, string $exceptMessage = null): void
     {
         // se não for compatível com a enumeração CastMemberType, lança exceção
         // envia a mensagem recebida caso seja válida, senão envia mensagem padrão

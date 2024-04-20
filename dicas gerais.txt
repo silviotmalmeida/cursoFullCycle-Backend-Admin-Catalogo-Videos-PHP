@@ -30,6 +30,7 @@
 
     - infra
       - models, migrations e factories;
+      - controller, requests e resources;
 
     
 

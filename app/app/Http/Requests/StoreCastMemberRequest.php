@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateCategoryRequest extends FormRequest
+class StoreCastMemberRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,15 +26,13 @@ class UpdateCategoryRequest extends FormRequest
         return [
             // definindo as validações dos atributos
             'name' => [
+                'required',
                 'min:3',
                 'max:255',
             ],
-            'description' => [
-                'min:3',
-                'max:255',
-            ],
-            'is_active' => [
-                'boolean',
+            'type' => [
+                'required',
+                'int',
             ],
         ];
     }

@@ -31,6 +31,7 @@
     - infra
       - models, migrations e factories;
       - controller, requests e resources;
+      - bind do repositoryInterface(AppServiceProvider), rotas(app/routes/api)
 
     
 

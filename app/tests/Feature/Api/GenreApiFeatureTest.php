@@ -11,7 +11,7 @@ use Tests\TestCase;
 class GenreApiFeatureTest extends TestCase
 {
     // atributos
-    protected $endpoint = '/api/genres';
+    private $endpoint = '/api/genres';
 
     // testando o método index com retorno vazio
     public function testIndexWithNoCategories()

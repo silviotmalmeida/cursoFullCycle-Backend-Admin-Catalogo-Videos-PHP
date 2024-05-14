@@ -6,7 +6,10 @@ namespace Core\Domain\Validation;
 // importações
 
 use Core\Domain\Enum\CastMemberType;
+use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\EntityValidationException;
+
+use function PHPUnit\Framework\isNull;
 
 // definindo a classe
 // classe com  métodos genéricos de validação
@@ -59,5 +62,21 @@ class DomainValidation
         // se não for compatível com a enumeração CastMemberType, lança exceção
         // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
         if (!CastMemberType::tryFrom($value)) throw new EntityValidationException($exceptMessage ?? "Type value {$value} not found for cast member");
+    }
+
+    // valida se o valor é compatível com a enumeração Rating
+    public static function isRatingCompatible(string $value, string $exceptMessage = null): void
+    {
+        // se não for compatível com a enumeração Rating, lança exceção
+        // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
+        if (!Rating::tryFrom($value)) throw new EntityValidationException($exceptMessage ?? "Type value {$value} not found for rating");
+    }
+
+    // valida se um valor não está nulo ou vazio
+    public static function notNullOrZero(mixed $value, string $exceptMessage = null): void
+    {
+        // se for nulo ou vazio, lança exceção
+        // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
+        if ($value === null or $value === 0) throw new EntityValidationException($exceptMessage ?? 'Value must not be null or zero');
     }
 }

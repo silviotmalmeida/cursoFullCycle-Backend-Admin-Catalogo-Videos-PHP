@@ -11,7 +11,7 @@ use Tests\TestCase;
 class CastMemberApiFeatureTest extends TestCase
 {
     // atributos
-    protected $endpoint = '/api/cast_members';
+    private $endpoint = '/api/cast_members';
 
     // testando o método index com retorno vazio
     public function testIndexWithNoCastMembers()

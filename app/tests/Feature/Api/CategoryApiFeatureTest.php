@@ -10,7 +10,7 @@ use Tests\TestCase;
 class CategoryApiFeatureTest extends TestCase
 {
     // atributos
-    protected $endpoint = '/api/categories';
+    private $endpoint = '/api/categories';
 
     // testando o método index com retorno vazio
     public function testIndexWithNoCategories()

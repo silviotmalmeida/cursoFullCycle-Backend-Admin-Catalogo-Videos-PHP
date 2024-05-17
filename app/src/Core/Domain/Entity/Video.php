@@ -5,8 +5,11 @@ namespace Core\Domain\Entity;
 
 // importações
 use Core\Domain\Entity\Traits\MagicMethodsTrait;
+use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Validation\DomainValidation;
+use Core\Domain\ValueObject\Image;
+use Core\Domain\ValueObject\Media;
 use Core\Domain\ValueObject\Uuid;
 use DateTime;
 
@@ -28,6 +31,11 @@ class Video
         protected array $genresId = [],
         protected array $castMembersId = [],
         protected Rating|string $rating = '',
+        protected ?Image $thumbFile = null,
+        protected ?Image $thumbHalf = null,
+        protected ?Image $bannerFile = null,
+        protected ?Media $trailerFile = null,
+        protected ?Media $videoFile = null,
         protected DateTime|string $createdAt = '',
         protected DateTime|string $updatedAt = '',
     ) {
@@ -63,6 +71,36 @@ class Video
 
         // validando os atributos
         $this->validate();
+    }
+
+    // função para retorno do thumbFile
+    public function thumbFile(): ?Image
+    {
+        return $this->thumbFile;
+    }
+
+    // função para retorno do thumbHalf
+    public function thumbHalf(): ?Image
+    {
+        return $this->thumbHalf;
+    }
+
+    // função para retorno do bannerFile
+    public function bannerFile(): ?Image
+    {
+        return $this->bannerFile;
+    }
+
+    // função para retorno do trailerFile
+    public function trailerFile(): ?Media
+    {
+        return $this->trailerFile;
+    }
+
+    // função para retorno do videoFile
+    public function videoFile(): ?Media
+    {
+        return $this->videoFile;
     }
 
     // função de abertura
@@ -150,10 +188,15 @@ class Video
         ?int $yearLaunched = null,
         ?int $duration = null,
         ?bool $opened = null,
-        ?Rating $rating = null,
         ?array $categoriesId = null,
         ?array $genresId = null,
-        ?array $castMembersId = null
+        ?array $castMembersId = null,
+        ?Rating $rating = null,
+        ?Image $thumbFile = null,
+        ?Image $thumbHalf = null,
+        ?Image $bannerFile = null,
+        ?Media $trailerFile = null,
+        ?Media $videoFile = null,
     ): void {
         // atualiza somente os atributos com valores recebidos
         if (isset($title)) $this->title = $title;
@@ -168,8 +211,6 @@ class Video
                 $this->close();
             }
         }
-
-        if (isset($rating)) $this->rating = $rating;
 
         if (isset($categoriesId)) {
             // removendo as categorias previamente cadastradas
@@ -204,6 +245,13 @@ class Video
             }
         }
 
+        if (isset($rating)) $this->rating = $rating;
+        if (isset($thumbFile)) $this->thumbFile = $thumbFile;
+        if (isset($thumbHalf)) $this->thumbHalf = $thumbHalf;
+        if (isset($bannerFile)) $this->bannerFile = $bannerFile;
+        if (isset($trailerFile)) $this->trailerFile = $trailerFile;
+        if (isset($videoFile)) $this->videoFile = $videoFile;
+
         // atualiza o updatedAt com a data atual
         if (
             isset($title) or
@@ -211,10 +259,16 @@ class Video
             isset($yearLaunched) or
             isset($duration) or
             isset($opened) or
-            isset($rating) or
             isset($categoriesId) or
             isset($genresId) or
-            isset($castMembersId)
+            isset($castMembersId) or
+            isset($rating) or
+            isset($thumbFile) or
+            isset($thumbHalf) or
+            isset($thumbFile) or
+            isset($bannerFile) or
+            isset($trailerFile) or
+            isset($videoFile)
         ) $this->updatedAt = new DateTime();
 
         // validando os atributos

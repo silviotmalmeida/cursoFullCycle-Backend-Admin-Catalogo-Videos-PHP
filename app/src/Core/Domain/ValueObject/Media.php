@@ -1,0 +1,56 @@
+<?php
+
+// definindo o namespace, referente ao caminho das pastas
+namespace Core\Domain\ValueObject;
+
+use Core\Domain\Enum\MediaStatus;
+use Core\Domain\Validation\DomainValidation;
+
+// importações
+
+
+// definindo o objeto de valor
+class Media
+{
+    // construtor e atributos
+    public function __construct(
+        protected string $filePath = '',
+        protected MediaStatus|int $mediaStatus = 0,
+        protected string $encodedPath = '',
+    ) {
+
+        // validando os atributos
+        $this->validate();
+    }
+
+    // função de obtenção do filePath
+    public function filePath(): string
+    {
+        return $this->filePath;
+    }
+
+    // função de obtenção do mediaStatus
+    public function mediaStatus(): MediaStatus
+    {
+        return $this->mediaStatus;
+    }
+
+    // função de obtenção do encodedPath
+    public function encodedPath(): string
+    {
+        return $this->encodedPath;
+    }
+
+    // função de validação dos atributos
+    private function validate(): void
+    {
+        // validação do filePath
+        DomainValidation::notNullOrEmpty($this->filePath);
+
+        // validação do mediaStatus
+        if (is_int($this->mediaStatus)) {
+            DomainValidation::isMediaStatusCompatible($this->mediaStatus);
+            if (MediaStatus::tryFrom($this->mediaStatus)) $this->mediaStatus = MediaStatus::from($this->mediaStatus);
+        }
+    }
+}

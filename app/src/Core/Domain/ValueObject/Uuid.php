@@ -15,7 +15,7 @@ class Uuid
         protected string $value
     ) {
         // validando os atributos
-        $this->validate($value);
+        $this->validate();
     }
 
     // função de criação de um novo uuid randômico
@@ -31,11 +31,11 @@ class Uuid
     }
 
     // função de validação dos atributos
-    private function validate(string $id): void
+    private function validate(): void
     {
-        if (!RamseyUuid::isValid($id)) {
+        if (!RamseyUuid::isValid($this->value)) {
             $classname = static::class;
-            throw new InvalidArgumentException("{$classname} does not allow the value {$id}");
+            throw new InvalidArgumentException("{$classname} does not allow the value {$this->value}");
         }
     }
 }

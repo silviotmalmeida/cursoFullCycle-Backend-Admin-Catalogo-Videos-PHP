@@ -5,8 +5,11 @@ namespace Tests\Unit\Domain\Entity;
 
 // importações
 use Core\Domain\Entity\Video;
+use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\EntityValidationException;
+use Core\Domain\ValueObject\Image;
+use Core\Domain\ValueObject\Media;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid as RamseyUuid;
 
@@ -16,6 +19,20 @@ class VideoUnitTest extends TestCase
     // função que testa o construtor
     public function testConstructor()
     {
+        // criando o trailerFile
+        $trailerFile = new Media(
+            filePath: 'path/trailerFile.mp4',
+            mediaStatus: MediaStatus::PENDING,
+            encodedPath: ''
+        );
+
+        // criando o videoFile
+        $videoFile = new Media(
+            filePath: 'path/videoFile.mp4',
+            mediaStatus: MediaStatus::PENDING,
+            encodedPath: ''
+        );
+
         // criando o video
         $video = new Video(
             title: 'New Title',
@@ -24,6 +41,11 @@ class VideoUnitTest extends TestCase
             duration: 60,
             opened: true,
             rating: Rating::RATE12,
+            thumbFile: new Image('path/para/thumbFile.png'),
+            thumbHalf: new Image('path/para/thumbHalf.png'),
+            bannerFile: new Image('path/para/bannerFile.png'),
+            trailerFile: $trailerFile,
+            videoFile: $videoFile,
         );
 
         // verificando os atributos
@@ -34,6 +56,15 @@ class VideoUnitTest extends TestCase
         $this->assertSame(60, $video->duration);
         $this->assertTrue($video->opened);
         $this->assertSame(Rating::RATE12, $video->rating);
+        $this->assertSame('path/para/thumbFile.png', $video->thumbFile()->path());
+        $this->assertSame('path/para/thumbHalf.png', $video->thumbHalf()->path());
+        $this->assertSame('path/para/bannerFile.png', $video->bannerFile()->path());
+        $this->assertSame($trailerFile->filePath(), $video->trailerFile()->filePath());
+        $this->assertSame($trailerFile->mediaStatus(), $video->trailerFile()->mediaStatus());
+        $this->assertSame($trailerFile->encodedPath(), $video->trailerFile()->encodedPath());
+        $this->assertSame($videoFile->filePath(), $video->videoFile()->filePath());
+        $this->assertSame($videoFile->mediaStatus(), $video->videoFile()->mediaStatus());
+        $this->assertSame($videoFile->encodedPath(), $video->videoFile()->encodedPath());
         $this->assertNotEmpty($video->createdAt());
         $this->assertNotEmpty($video->updatedAt());
         $this->assertSame($video->createdAt(), $video->updatedAt());
@@ -48,10 +79,9 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: false,
+            opened: true,
             rating: Rating::RATE12,
         );
-
         // abrindo
         $video->open();
 
@@ -71,7 +101,6 @@ class VideoUnitTest extends TestCase
             opened: true,
             rating: Rating::RATE12,
         );
-
         // fechando
         $video->close();
 
@@ -274,57 +303,72 @@ class VideoUnitTest extends TestCase
     //     $this->assertSame($firstUpdateDate, $video->updatedAt());
     // }
 
-    // // função que testa a função de validação
-    // public function testValidate()
-    // {
-    //     // validando name vazio
-    //     try {
-    //         // criando o video
-    //         $video = new Video(
-    //             name: '',
-    //         );
-    //         // se não lançar exceção o teste deve falhar
-    //         $this->assertTrue(false);
-    //     } catch (\Throwable $th) {
-    //         // verificando o tipo da exceção
-    //         $this->assertInstanceOf(EntityValidationException::class, $th);
-    //     }
+    // função que testa a função de validação
+    public function testValidate()
+    {
+        // validando name vazio
+        try {
+            // criando o video
+            $video = new Video(
+                title: '',
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
 
-    //     // validando name longo
-    //     try {
-    //         // criando o video
-    //         $video = new Video(
-    //             name: random_bytes(256),
-    //         );
-    //         // se não lançar exceção o teste deve falhar
-    //         $this->assertTrue(false);
-    //     } catch (\Throwable $th) {
-    //         // verificando o tipo da exceção
-    //         $this->assertInstanceOf(EntityValidationException::class, $th);
-    //     }
+        // validando name longo
+        try {
+            // criando o video
+            $video = new Video(
+                title: random_bytes(256),
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
 
-    //     // validando name curto
-    //     try {
-    //         // criando o video
-    //         $video = new Video(
-    //             name: random_bytes(2),
-    //         );
-    //         // se não lançar exceção o teste deve falhar
-    //         $this->assertTrue(false);
-    //     } catch (\Throwable $th) {
-    //         // verificando o tipo da exceção
-    //         $this->assertInstanceOf(EntityValidationException::class, $th);
-    //     }
+        // validando name curto
+        try {
+            // criando o video
+            $video = new Video(
+                title: random_bytes(256),
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
 
-    //     // validando name válido
-    //     try {
-    //         // criando o video
-    //         $video = new Video(
-    //             name: 'name 1',
-    //         );
-    //     } catch (\Throwable $th) {
-    //         // se lançar exceção o teste deve falhar
-    //         $this->assertTrue(false);
-    //     }
-    // }
+        // // validando name válido
+        // try {
+        //     // criando o video
+        //     $video = new Video(
+        //         name: 'name 1',
+        //     );
+        // } catch (\Throwable $th) {
+        //     // se lançar exceção o teste deve falhar
+        //     $this->assertTrue(false);
+        // }
+    }
 }

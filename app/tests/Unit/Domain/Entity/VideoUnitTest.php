@@ -306,7 +306,10 @@ class VideoUnitTest extends TestCase
     // função que testa a função de validação
     public function testValidate()
     {
-        // validando name vazio
+        // 
+        // validando title
+        // 
+        // validando title vazio
         try {
             // criando o video
             $video = new Video(
@@ -324,7 +327,7 @@ class VideoUnitTest extends TestCase
             $this->assertInstanceOf(EntityValidationException::class, $th);
         }
 
-        // validando name longo
+        // validando title longo
         try {
             // criando o video
             $video = new Video(
@@ -342,11 +345,11 @@ class VideoUnitTest extends TestCase
             $this->assertInstanceOf(EntityValidationException::class, $th);
         }
 
-        // validando name curto
+        // validando title curto
         try {
             // criando o video
             $video = new Video(
-                title: random_bytes(256),
+                title: random_bytes(2),
                 description: 'New Description',
                 yearLaunched: 2024,
                 duration: 60,
@@ -360,15 +363,204 @@ class VideoUnitTest extends TestCase
             $this->assertInstanceOf(EntityValidationException::class, $th);
         }
 
-        // // validando name válido
-        // try {
-        //     // criando o video
-        //     $video = new Video(
-        //         name: 'name 1',
-        //     );
-        // } catch (\Throwable $th) {
-        //     // se lançar exceção o teste deve falhar
-        //     $this->assertTrue(false);
-        // }
+        // validando title válido
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        }
+
+        // 
+        // validando description
+        // 
+        // validando description vazio
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: '',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando description longo
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: random_bytes(256),
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando description curto
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: random_bytes(2),
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando description válido
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        }
+
+        // 
+        // validando yearLaunched
+        // 
+        // validando yearLaunched zerado
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: 'New Description',
+                yearLaunched: 0,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando yearLaunched válido
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        }
+
+        // 
+        // validando duration
+        // 
+        // validando duration zerado
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 0,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando duration válido
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        }
+
+        // 
+        // validando rating
+        //
+        // validando rating inválido
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: 'INVALIDO',
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção            
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando rating válido
+        try {
+            // criando o video
+            $video = new Video(
+                title: 'New Title',
+                description: 'New Description',
+                yearLaunched: 2024,
+                duration: 60,
+                opened: true,
+                rating: Rating::RATE12,
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        }
     }
 }

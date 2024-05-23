@@ -4,9 +4,9 @@
 namespace Core\Domain\Entity;
 
 // importações
-use Core\Domain\Entity\Traits\MagicMethodsTrait;
-use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Enum\Rating;
+use Core\Domain\Factory\VideoValidatorFactory;
+use Core\Domain\Notification\NotificationException;
 use Core\Domain\Validation\DomainValidation;
 use Core\Domain\ValueObject\Image;
 use Core\Domain\ValueObject\Media;
@@ -14,11 +14,8 @@ use Core\Domain\ValueObject\Uuid;
 use DateTime;
 
 // definindo a entidade
-class Video
+class Video extends Entity
 {
-    // incluindo a trait que ativa os métodos mágicos
-    use MagicMethodsTrait;
-
     // construtor e atributos
     public function __construct(
         protected Uuid|string $id = '',
@@ -39,6 +36,9 @@ class Video
         protected DateTime|string $createdAt = '',
         protected DateTime|string $updatedAt = '',
     ) {
+        // incluindo as regras do médoto de criação da classe-mãe
+        parent::__construct();
+
         // processamento do id
         // se o id for vazio, atribui um uuid randomicamente
         if ($this->id == '') {
@@ -278,22 +278,20 @@ class Video
     // função de validação dos atributos
     private function validate(): void
     {
-        // validação do title
-        DomainValidation::notNullOrEmpty($this->title);
-        DomainValidation::strMaxLenght($this->title);
-        DomainValidation::strMinLenght($this->title);
+        // Validação utilizando o Laravel e agregador de notificação
+        // utilizado em validações genéricas
+        // 
+        VideoValidatorFactory::create()->validate($this);
 
-        // validação do description
-        DomainValidation::notNullOrEmpty($this->description);
-        DomainValidation::strMaxLenght($this->description);
-        DomainValidation::strMinLenght($this->description);
+        if ($this->notification->hasErrors()) {
+            throw new NotificationException(
+                $this->notification->messages('video')
+            );
+        }
 
-        // validação do yearLaunched
-        DomainValidation::notNullOrZero($this->yearLaunched);
-
-        // validação do duration
-        DomainValidation::notNullOrZero($this->duration);
-
+        // Validação utilizando o DomainValidation e sem agregador de notificação
+        // utilizado em validações específicas
+        // 
         // validação do rating
         if (is_string($this->rating)) {
             DomainValidation::isRatingCompatible($this->rating);

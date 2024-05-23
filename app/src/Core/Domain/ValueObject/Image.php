@@ -3,18 +3,18 @@
 // definindo o namespace, referente ao caminho das pastas
 namespace Core\Domain\ValueObject;
 
+// importações
 use Core\Domain\Validation\DomainValidation;
 
-// importações
-
-
 // definindo o objeto de valor
-class Image
+class Image extends ValueObject
 {
     // construtor e atributos
     public function __construct(
         protected string $path
     ) {
+        // incluindo as regras do médoto de criação da classe-mãe
+        parent::__construct();
 
         // validando os atributos
         $this->validate();

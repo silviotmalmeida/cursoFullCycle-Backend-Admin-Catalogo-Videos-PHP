@@ -3,14 +3,12 @@
 // definindo o namespace, referente ao caminho das pastas
 namespace Core\Domain\ValueObject;
 
+// importações
 use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Validation\DomainValidation;
 
-// importações
-
-
 // definindo o objeto de valor
-class Media
+class Media extends ValueObject
 {
     // construtor e atributos
     public function __construct(
@@ -18,6 +16,8 @@ class Media
         protected MediaStatus|int $mediaStatus = 0,
         protected string $encodedPath = '',
     ) {
+        // incluindo as regras do médoto de criação da classe-mãe
+        parent::__construct();
 
         // validando os atributos
         $this->validate();

@@ -8,9 +8,11 @@ use Core\Domain\Entity\Video;
 use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\EntityValidationException;
+use Core\Domain\Notification\NotificationException;
 use Core\Domain\ValueObject\Image;
 use Core\Domain\ValueObject\Media;
-use PHPUnit\Framework\TestCase;
+// use PHPUnit\Framework\TestCase;
+use Tests\TestCase;
 use Ramsey\Uuid\Uuid as RamseyUuid;
 
 // definindo a classe de teste, que estende a TestCase do PHPUnit
@@ -303,264 +305,199 @@ class VideoUnitTest extends TestCase
     //     $this->assertSame($firstUpdateDate, $video->updatedAt());
     // }
 
-    // função que testa a função de validação
-    public function testValidate()
+    // função que testa a função de validação de title válido
+    public function testValidateTitleValid()
     {
-        // 
-        // validando title
-        // 
-        // validando title vazio
-        try {
-            // criando o video
-            $video = new Video(
-                title: '',
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+        $video = new Video(
+            title: str_repeat('a', random_int(3, 255)),
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+        $this->assertInstanceOf(Video::class, $video);
+    }
 
-        // validando title longo
-        try {
-            // criando o video
-            $video = new Video(
-                title: random_bytes(256),
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+    // função que testa a função de validação de title vazio
+    public function testValidateTitleEmpty()
+    {
+        $this->expectException(NotificationException::class);
+        new Video(
+            title: '',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+    }
 
-        // validando title curto
-        try {
-            // criando o video
-            $video = new Video(
-                title: random_bytes(2),
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+    // função que testa a função de validação de title longo
+    public function testValidateTitleLong()
+    {
+        $this->expectException(NotificationException::class);
+        new Video(
+            title: str_repeat('a', 256),
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+    }
 
-        // validando title válido
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-        } catch (\Throwable $th) {
-            // se lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        }
+    // função que testa a função de validação de title curto
+    public function testValidateTitleShort()
+    {
+        $this->expectException(NotificationException::class);
+        new Video(
+            title: str_repeat('a', 2),
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+    }
 
-        // 
-        // validando description
-        // 
-        // validando description vazio
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: '',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+    // função que testa a função de validação de description válido
+    public function testValidateDescriptionValid()
+    {
+        $video = new Video(
+            title: 'New Title',
+            description: str_repeat('a', random_int(3, 255)),
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+        $this->assertInstanceOf(Video::class, $video);
+    }
 
-        // validando description longo
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: random_bytes(256),
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+    // função que testa a função de validação de description vazio
+    public function testValidateDescriptionEmpty()
+    {
+        $this->expectException(NotificationException::class);
+        new Video(
+            title: 'New Title',
+            description: '',
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+    }
 
-        // validando description curto
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: random_bytes(2),
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+    // função que testa a função de validação de description longo
+    public function testValidateDescriptionLong()
+    {
+        $this->expectException(NotificationException::class);
+        new Video(
+            title: 'New Title',
+            description: str_repeat('a', 256),
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+    }
 
-        // validando description válido
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-        } catch (\Throwable $th) {
-            // se lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        }
+    // função que testa a função de validação de description curto
+    public function testValidateDescriptionShort()
+    {
+        $this->expectException(NotificationException::class);
+        new Video(
+            title: 'New Title',
+            description: str_repeat('a', 2),
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+    }
 
-        // 
-        // validando yearLaunched
-        // 
-        // validando yearLaunched zerado
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: 'New Description',
-                yearLaunched: 0,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+    // função que testa a função de validação de yearLaunched válido
+    public function testValidateYearLaunchedValid()
+    {
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: random_int(1, 9999),
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+        $this->assertInstanceOf(Video::class, $video);
+    }
 
-        // validando yearLaunched válido
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-        } catch (\Throwable $th) {
-            // se lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        }
+    // função que testa a função de validação de yearLaunched zerado
+    public function testValidateYearLaunchedZero()
+    {
+        $this->expectException(NotificationException::class);
+        new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 0,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+    }
 
-        // 
-        // validando duration
-        // 
-        // validando duration zerado
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 0,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+    // função que testa a função de validação de duration válido
+    public function testValidateDurationValid()
+    {
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+        $this->assertInstanceOf(Video::class, $video);
+    }
 
-        // validando duration válido
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-        } catch (\Throwable $th) {
-            // se lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        }
+    // função que testa a função de validação de duration zerado
+    public function testValidateDurationZero()
+    {
+        $this->expectException(NotificationException::class);
+        new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 0,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+    }
 
-        // 
-        // validando rating
-        //
-        // validando rating inválido
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: 'INVALIDO',
-            );
-            // se não lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        } catch (\Throwable $th) {
-            // verificando o tipo da exceção            
-            $this->assertInstanceOf(EntityValidationException::class, $th);
-        }
+    // função que testa a função de validação de rating válido
+    public function testValidateRatingValid()
+    {
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: Rating::RATE12,
+        );
+        $this->assertInstanceOf(Video::class, $video);
+    }
 
-        // validando rating válido
-        try {
-            // criando o video
-            $video = new Video(
-                title: 'New Title',
-                description: 'New Description',
-                yearLaunched: 2024,
-                duration: 60,
-                opened: true,
-                rating: Rating::RATE12,
-            );
-        } catch (\Throwable $th) {
-            // se lançar exceção o teste deve falhar
-            $this->assertTrue(false);
-        }
+    // função que testa a função de validação de rating inválido
+    public function testValidateRatingInvalid()
+    {
+        $this->expectException(EntityValidationException::class);
+        new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            opened: true,
+            rating: 'INVALIDO',
+        );
     }
 }

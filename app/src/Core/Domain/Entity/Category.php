@@ -4,17 +4,13 @@
 namespace Core\Domain\Entity;
 
 // importações
-use Core\Domain\Entity\Traits\MagicMethodsTrait;
 use Core\Domain\Validation\DomainValidation;
 use Core\Domain\ValueObject\Uuid;
 use DateTime;
 
 // definindo a entidade
-class Category
+class Category extends Entity
 {
-    // incluindo a trait que ativa os métodos mágicos
-    use MagicMethodsTrait;
-
     // construtor e atributos
     public function __construct(
         protected Uuid|string $id = '',
@@ -24,6 +20,9 @@ class Category
         protected DateTime|string $createdAt = '',
         protected DateTime|string $updatedAt = '',
     ) {
+        // incluindo as regras do médoto de criação da classe-mãe
+        parent::__construct();
+
         // processamento do id
         // se o id for vazio, atribui um uuid randomicamente
         if ($this->id == '') {

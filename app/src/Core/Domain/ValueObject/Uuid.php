@@ -8,12 +8,15 @@ use InvalidArgumentException;
 use Ramsey\Uuid\Uuid as RamseyUuid;
 
 // definindo o objeto de valor
-class Uuid
+class Uuid extends ValueObject
 {
     // construtor e atributos
     public function __construct(
         protected string $value
     ) {
+        // incluindo as regras do médoto de criação da classe-mãe
+        parent::__construct();
+
         // validando os atributos
         $this->validate();
     }

@@ -8,10 +8,10 @@ use Core\Domain\Entity\Video;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\CategoryRepositoryInterface;
 use Core\Domain\Repository\VideoRepositoryInterface;
-use Core\UseCase\DTO\Video\InsertVideo\InsertVideoInputDto;
-use Core\UseCase\DTO\Video\InsertVideo\InsertVideoOutputDto;
 use Core\UseCase\Interfaces\FileStorageInterface;
 use Core\UseCase\Interfaces\TransactionDbInterface;
+use Core\UseCase\Video\Insert\DTO\InsertVideoInputDto;
+use Core\UseCase\Video\Insert\DTO\InsertVideoOutputDto;
 use Core\UseCase\Video\Interfaces\VideoEventManagerInterface;
 use Exception;
 
@@ -25,7 +25,7 @@ class InsertVideoUseCase
         protected FileStorageInterface $fileStorage,
         protected VideoEventManagerInterface $eventManager,
 
-        protected CategoryRepositoryInterface $categoryRepository
+        // protected CategoryRepositoryInterface $categoryRepository
     ) {
     }
 
@@ -39,15 +39,41 @@ class InsertVideoUseCase
         // tratamento de exceções
         try {
             // criando a entidade com os dados do input
-            $Video = new Video(
-                name: $input->name,
-                isActive: $input->isActive,
-                categoriesId: $input->categoriesId
+            $video = new Video(
+                title: $input->title,
+                description: $input->description,
+                yearLaunched: $input->yearLaunched,
+                duration: $input->duration,
+                opened: $input->opened,
+                rating: $input->rating,
             );
-            // validando as categorias informadas
-            $this->validateCategoriesIds($input->categoriesId);
+
+            // adicionando as categories
+            foreach ($input->categoriesId as $categoryId) {
+                
+                $video->addCategory($categoryId);
+            }
+            // validando as categories informadas
+            $this->validateCategoriesIds($video->categoriesId);
+
+            // adicionando os genres
+            foreach ($input->genresId as $genreId) {
+                
+                $video->addGenre($genreId);
+            }
+            // validando os genres informados
+            $this->validateGenresIds($video->genresId);
+
+            // adicionando os cast members
+            foreach ($input->castMembersId as $castMemberId) {
+                
+                $video->addCastMember($castMemberId);
+            }
+            // validando os cast members informados
+            $this->validateCastMembersIds($video->castMembersId);
+
             // inserindo a entidade no BD utilizando o repository
-            $insertedVideo = $this->repository->insert($Video);
+            $insertedVideo = $this->repository->insert($video);
 
             // lançando exception para testar o rollback
             if ($simulateTransactionException) throw new Exception('rollback test');
@@ -58,9 +84,12 @@ class InsertVideoUseCase
             // retornando os dados
             return new InsertVideoOutputDto(
                 id: $insertedVideo->id(),
-                name: $insertedVideo->name,
-                is_active: $insertedVideo->isActive,
-                categories_id: $input->categoriesId,
+                title: $insertedVideo->title,
+                description: $insertedVideo->description,
+                yearLaunched: $input->yearLaunched,
+                duration: $input->duration,
+                opened: $input->opened,
+                rating: $input->rating,
                 created_at: $insertedVideo->createdAt(),
                 updated_at: $insertedVideo->updatedAt(),
             );
@@ -93,6 +122,58 @@ class InsertVideoUseCase
             $msg = sprintf(
                 '%s %s not found',
                 count($diff) > 1 ? 'Categories' : 'Category',
+                implode(', ', $diff)
+            );
+            // lança exceção
+            throw new NotFoundException($msg);
+        }
+    }
+
+    // método auxiliar para verificação de existência dos genresId recebidos
+    private function validateGenresIds(array $listIds): void
+    {
+        // removendo duplicatas da lista
+        $listIds = array_unique($listIds);
+        // obtendo a lista de genres existentes no bd
+        $genresBd = $this->genreRepository->findByIdArray($listIds);
+        // coletando somente os id dos genres existentes
+        $genresBdId = array_map(function ($n) {
+            return $n->id();
+        }, $genresBd);
+        // verificando as diferenças entre as listas
+        $diff = array_diff($listIds, $genresBdId);
+        // se existem diferenças, lança exceção
+        if (count($diff)) {
+            // preparando a mensagem
+            $msg = sprintf(
+                '%s %s not found',
+                count($diff) > 1 ? 'Genres' : 'Genre',
+                implode(', ', $diff)
+            );
+            // lança exceção
+            throw new NotFoundException($msg);
+        }
+    }
+
+    // método auxiliar para verificação de existência dos castMembersId recebidos
+    private function validateCastMembersIds(array $listIds): void
+    {
+        // removendo duplicatas da lista
+        $listIds = array_unique($listIds);
+        // obtendo a lista de cast members existentes no bd
+        $castMembersBd = $this->castMemberRepository->findByIdArray($listIds);
+        // coletando somente os id dos cast members existentes
+        $castMembersBdId = array_map(function ($n) {
+            return $n->id();
+        }, $castMembersBd);
+        // verificando as diferenças entre as listas
+        $diff = array_diff($listIds, $castMembersBdId);
+        // se existem diferenças, lança exceção
+        if (count($diff)) {
+            // preparando a mensagem
+            $msg = sprintf(
+                '%s %s not found',
+                count($diff) > 1 ? 'Cast Members' : 'Cast Member',
                 implode(', ', $diff)
             );
             // lança exceção

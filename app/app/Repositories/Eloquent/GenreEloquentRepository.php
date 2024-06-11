@@ -79,9 +79,9 @@ class GenreEloquentRepository implements GenreRepositoryInterface
         // inicializando o array de saída
         $response = [];
         // buscando no bd a partir da lista recebida
-        $categoriesDb = $this->model->whereIn('id', $listIds)->get();
+        $genresDb = $this->model->whereIn('id', $listIds)->get();
         // convertendo os resultados para entidade
-        foreach ($categoriesDb as $GenreDb) {
+        foreach ($genresDb as $GenreDb) {
             array_push($response, $this->toGenre($GenreDb));
         }
         // retornando a lista de entidades

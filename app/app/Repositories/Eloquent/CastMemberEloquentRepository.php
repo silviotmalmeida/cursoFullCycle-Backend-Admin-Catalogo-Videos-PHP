@@ -71,9 +71,9 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
         // inicializando o array de saída
         $response = [];
         // buscando no bd a partir da lista recebida
-        $categoriesDb = $this->model->whereIn('id', $listIds)->get();
+        $castMembersDb = $this->model->whereIn('id', $listIds)->get();
         // convertendo os resultados para entidade
-        foreach ($categoriesDb as $castMemberDb) {
+        foreach ($castMembersDb as $castMemberDb) {
             array_push($response, $this->toCastMember($castMemberDb));
         }
         // retornando a lista de entidades

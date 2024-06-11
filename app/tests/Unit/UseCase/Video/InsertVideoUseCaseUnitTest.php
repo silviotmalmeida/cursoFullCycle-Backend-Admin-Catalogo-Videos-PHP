@@ -5,11 +5,16 @@ namespace Tests\Unit\UseCase\Video;
 
 // importações
 
+use Core\Domain\Entity\CastMember;
 use Core\Domain\Entity\Category;
+use Core\Domain\Entity\Genre;
 use Core\Domain\Entity\Video;
+use Core\Domain\Enum\CastMemberType;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\NotFoundException;
+use Core\Domain\Repository\CastMemberRepositoryInterface;
 use Core\Domain\Repository\CategoryRepositoryInterface;
+use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\UseCase\Interfaces\FileStorageInterface;
 use Core\UseCase\Interfaces\TransactionDbInterface;
@@ -37,32 +42,75 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $duration = 120;
         $opened = false;
         $rating = Rating::RATE10;
-        // $categoryId1 = Uuid::uuid4()->toString();
-        // $categoryId2 = Uuid::uuid4()->toString();
-        // $categoriesId = [$categoryId1, $categoryId2];
+        $nameCategory = 'Category Name';
+        $isActiveCategory = true;
+        $nameGenre = 'Genre Name';
+        $isActiveGenre = true;
+        $nameCastMember = 'Cast Member Name';
+        $typeCastMember = CastMemberType::ACTOR;
+        $categoryId1 = Uuid::uuid4()->toString();
+        $categoryId2 = Uuid::uuid4()->toString();
+        $genreId1 = Uuid::uuid4()->toString();
+        $castMemberId1 = Uuid::uuid4()->toString();
+        $castMemberId2 = Uuid::uuid4()->toString();
+        $categoriesId = [$categoryId1, $categoryId2];
+        $genresId = [$genreId1];
+        $castMembersId = [$castMemberId1, $castMemberId2];
         $now = (new DateTime())->format('Y-m-d H:i:s');
 
-        // // criando o mock da categoria 1
-        // $mockCategory1 = Mockery::mock(Category::class, [
-        //     $categoryId1,
-        //     $name,
-        //     $description,
-        //     $isActive,
-        // ]);
-        // $mockCategory1->shouldReceive('id')->andReturn($categoryId1); //definindo o retorno do id()
-        // $mockCategory1->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
-        // $mockCategory1->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
+        // criando o mock da categoria 1
+        $mockCategory1 = Mockery::mock(Category::class, [
+            $categoryId1,
+            $nameCategory,
+            $description,
+            $isActiveCategory,
+        ]);
+        $mockCategory1->shouldReceive('id')->andReturn($categoryId1); //definindo o retorno do id()
+        $mockCategory1->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockCategory1->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
 
-        // // criando o mock da categoria 2
-        // $mockCategory2 = Mockery::mock(Category::class, [
-        //     $categoryId2,
-        //     $name,
-        //     $description,
-        //     $isActive,
-        // ]);
-        // $mockCategory2->shouldReceive('id')->andReturn($categoryId2); //definindo o retorno do id()
-        // $mockCategory2->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
-        // $mockCategory2->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
+        // criando o mock da categoria 2
+        $mockCategory2 = Mockery::mock(Category::class, [
+            $categoryId2,
+            $nameCategory,
+            $description,
+            $isActiveCategory,
+        ]);
+        $mockCategory2->shouldReceive('id')->andReturn($categoryId2); //definindo o retorno do id()
+        $mockCategory2->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockCategory2->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
+
+        // criando o mock do genre 1
+        $mockGenre1 = Mockery::mock(Genre::class, [
+            $genreId1,
+            $nameGenre,
+            $isActiveGenre,
+            $categoriesId
+        ]);
+        $mockGenre1->shouldReceive('id')->andReturn($genreId1); //definindo o retorno do id()
+        $mockGenre1->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockGenre1->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
+
+
+        // criando o mock do cast member 1
+        $mockCastMember1 = Mockery::mock(CastMember::class, [
+            $castMemberId1,
+            $nameCastMember,
+            $typeCastMember,
+        ]);
+        $mockCastMember1->shouldReceive('id')->andReturn($castMemberId1); //definindo o retorno do id()
+        $mockCastMember1->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockCastMember1->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
+
+        // criando o mock do cast member 2
+        $mockCastMember2 = Mockery::mock(CastMember::class, [
+            $castMemberId2,
+            $nameCastMember,
+            $typeCastMember,
+        ]);
+        $mockCastMember2->shouldReceive('id')->andReturn($castMemberId2); //definindo o retorno do id()
+        $mockCastMember2->shouldReceive('createdAt')->andReturn($now); //definindo o retorno do createdAt()
+        $mockCastMember2->shouldReceive('updatedAt')->andReturn($now); //definindo o retorno do updatedAt()
 
         // criando o mock do inputDto
         $mockInputDto = Mockery::mock(InsertVideoInputDto::class, [
@@ -88,19 +136,35 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // criando o mock do fileStorage
         $mockFileStorage = Mockery::mock(FileStorageInterface::class);
-        // $mockFileStorage->shouldReceive('store')->times(1)->andReturn('path_do_storage'); //definindo o retorno do store()
-        // $mockFileStorage->shouldReceive('delete')->times(0)->andReturn(true); //definindo o retorno do delete()
+        $mockFileStorage->shouldReceive('store')->times(1)->andReturn('path_do_storage ' . $uuid); //definindo o retorno do store()
+        $mockFileStorage->shouldReceive('delete')->times(0)->andReturn(true); //definindo o retorno do delete()
 
         // criando o mock do eventManager
         $mockEventManager = Mockery::mock(VideoEventManagerInterface::class);
-        // $mockEventManager->shouldReceive('dispatch')->times(1)->andReturn(); //definindo o retorno do dispatch()
+        $mockEventManager->shouldReceive('dispatch')->times(1)->andReturn(); //definindo o retorno do dispatch()
 
-        // // criando o mock do categoryRepository
-        // $mockCategoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
-        // $mockCategoryRepository->shouldReceive('findByIdArray')->times(1)->andReturn([$mockCategory1, $mockCategory2]); //definindo o retorno do insert()
+        // criando o mock do categoryRepository
+        $mockCategoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
+        $mockCategoryRepository->shouldReceive('findByIdArray')->times(1)->andReturn([$mockCategory1, $mockCategory2]); //definindo o retorno do insert()
+
+        // criando o mock do genreRepository
+        $mockGenreRepository = Mockery::mock(GenreRepositoryInterface::class);
+        $mockGenreRepository->shouldReceive('findByIdArray')->times(1)->andReturn([$mockGenre1]); //definindo o retorno do insert()
+
+        // criando o mock do castMemberRepository
+        $mockcastMemberRepository = Mockery::mock(CastMemberRepositoryInterface::class);
+        $mockcastMemberRepository->shouldReceive('findByIdArray')->times(1)->andReturn([$mockCastMember1, $mockCastMember2]); //definindo o retorno do insert()
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase($mockRepository, $mockTransactionDb, $mockFileStorage, $mockEventManager);
+        $useCase = new InsertVideoUseCase(
+            $mockRepository,
+            $mockTransactionDb,
+            $mockFileStorage,
+            $mockEventManager,
+            $mockCategoryRepository,
+            $mockGenreRepository,
+            $mockcastMemberRepository
+        );
         // executando o usecase
         $responseUseCase = $useCase->execute($mockInputDto);
 

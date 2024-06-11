@@ -5,8 +5,11 @@ namespace Core\UseCase\Video\Insert;
 
 // importações
 use Core\Domain\Entity\Video;
+use Core\Domain\Events\VideoCreatedEvent;
 use Core\Domain\Exception\NotFoundException;
+use Core\Domain\Repository\CastMemberRepositoryInterface;
 use Core\Domain\Repository\CategoryRepositoryInterface;
+use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\UseCase\Interfaces\FileStorageInterface;
 use Core\UseCase\Interfaces\TransactionDbInterface;
@@ -24,8 +27,9 @@ class InsertVideoUseCase
         protected TransactionDbInterface $transactionDb,
         protected FileStorageInterface $fileStorage,
         protected VideoEventManagerInterface $eventManager,
-
-        // protected CategoryRepositoryInterface $categoryRepository
+        protected CategoryRepositoryInterface $categoryRepository,
+        protected GenreRepositoryInterface $genreRepository,
+        protected CastMemberRepositoryInterface $castMemberRepository,
     ) {
     }
 
@@ -46,11 +50,25 @@ class InsertVideoUseCase
                 duration: $input->duration,
                 opened: $input->opened,
                 rating: $input->rating,
+                thumbFile: $input->thumbFile,
+                thumbHalf: $input->thumbHalf,
+                bannerFile: $input->bannerFile,
+                trailerFile: $input->trailerFile,
+                videoFile: $input->videoFile,
+                castMembersId: $input->castMembersId,
+                categoriesId: $input->categoriesId,
+                genresId: $input->genresId,
             );
+
+            // armazenando o arquivo
+            $videoFilePath = $this->fileStorage->store($video->id(), [$video->videoFile()]);
+
+            // se o vídeo foi armazenado, dispara o evento VideoCreatedEvent
+            if($videoFilePath) $this->eventManager->dispatch(new VideoCreatedEvent($video));
 
             // adicionando as categories
             foreach ($input->categoriesId as $categoryId) {
-                
+
                 $video->addCategory($categoryId);
             }
             // validando as categories informadas
@@ -58,7 +76,7 @@ class InsertVideoUseCase
 
             // adicionando os genres
             foreach ($input->genresId as $genreId) {
-                
+
                 $video->addGenre($genreId);
             }
             // validando os genres informados
@@ -66,7 +84,7 @@ class InsertVideoUseCase
 
             // adicionando os cast members
             foreach ($input->castMembersId as $castMemberId) {
-                
+
                 $video->addCastMember($castMemberId);
             }
             // validando os cast members informados

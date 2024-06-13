@@ -55,16 +55,7 @@ class InsertVideoUseCase
                 bannerFile: $input->bannerFile,
                 trailerFile: $input->trailerFile,
                 videoFile: $input->videoFile,
-                castMembersId: $input->castMembersId,
-                categoriesId: $input->categoriesId,
-                genresId: $input->genresId,
             );
-
-            // armazenando o arquivo
-            $videoFilePath = $this->fileStorage->store($video->id(), [$video->videoFile()]);
-
-            // se o vídeo foi armazenado, dispara o evento VideoCreatedEvent
-            if($videoFilePath) $this->eventManager->dispatch(new VideoCreatedEvent($video));
 
             // adicionando as categories
             foreach ($input->categoriesId as $categoryId) {
@@ -72,7 +63,7 @@ class InsertVideoUseCase
                 $video->addCategory($categoryId);
             }
             // validando as categories informadas
-            $this->validateCategoriesIds($video->categoriesId);
+            $categoriesBdId = $this->validateCategoriesIds($video->categoriesId);
 
             // adicionando os genres
             foreach ($input->genresId as $genreId) {
@@ -80,7 +71,7 @@ class InsertVideoUseCase
                 $video->addGenre($genreId);
             }
             // validando os genres informados
-            $this->validateGenresIds($video->genresId);
+            $genresBdId = $this->validateGenresIds($video->genresId);
 
             // adicionando os cast members
             foreach ($input->castMembersId as $castMemberId) {
@@ -88,7 +79,13 @@ class InsertVideoUseCase
                 $video->addCastMember($castMemberId);
             }
             // validando os cast members informados
-            $this->validateCastMembersIds($video->castMembersId);
+            $castMembersBdId = $this->validateCastMembersIds($video->castMembersId);
+
+            // armazenando o arquivo
+            $videoFilePath = $this->fileStorage->store($video->id(), [$video->videoFile()]);
+
+            // se o vídeo foi armazenado, dispara o evento VideoCreatedEvent
+            if ($videoFilePath) $this->eventManager->dispatch(new VideoCreatedEvent($video));
 
             // inserindo a entidade no BD utilizando o repository
             $insertedVideo = $this->repository->insert($video);
@@ -104,10 +101,18 @@ class InsertVideoUseCase
                 id: $insertedVideo->id(),
                 title: $insertedVideo->title,
                 description: $insertedVideo->description,
-                yearLaunched: $input->yearLaunched,
-                duration: $input->duration,
-                opened: $input->opened,
-                rating: $input->rating,
+                yearLaunched: $insertedVideo->yearLaunched,
+                duration: $insertedVideo->duration,
+                opened: $insertedVideo->opened,
+                rating: $insertedVideo->rating,
+                thumbFile: $insertedVideo->thumbFile(),
+                thumbHalf: $insertedVideo->thumbHalf(),
+                bannerFile: $insertedVideo->bannerFile(),
+                trailerFile: $insertedVideo->trailerFile(),
+                videoFile: $insertedVideo->videoFile(),
+                categoriesId: $categoriesBdId,
+                genresId: $genresBdId,
+                castMembersId: $castMembersBdId,
                 created_at: $insertedVideo->createdAt(),
                 updated_at: $insertedVideo->updatedAt(),
             );
@@ -116,13 +121,15 @@ class InsertVideoUseCase
         catch (\Throwable $th) {
             // executa o rollback
             $this->transactionDb->rollback();
+            // remove o arquivo, se tiver sido armazenado
+            if (isset($videoFilePath) and $videoFilePath) $this->fileStorage->delete($videoFilePath);
             // lança exceção
             throw $th;
         }
     }
 
     // método auxiliar para verificação de existência das categoriesId recebidas
-    private function validateCategoriesIds(array $listIds): void
+    private function validateCategoriesIds(array $listIds): array
     {
         // removendo duplicatas da lista
         $listIds = array_unique($listIds);
@@ -134,6 +141,7 @@ class InsertVideoUseCase
         }, $categoriesBd);
         // verificando as diferenças entre as listas
         $diff = array_diff($listIds, $categoriesBdId);
+
         // se existem diferenças, lança exceção
         if (count($diff)) {
             // preparando a mensagem
@@ -145,10 +153,12 @@ class InsertVideoUseCase
             // lança exceção
             throw new NotFoundException($msg);
         }
+
+        return $categoriesBdId;
     }
 
     // método auxiliar para verificação de existência dos genresId recebidos
-    private function validateGenresIds(array $listIds): void
+    private function validateGenresIds(array $listIds): array
     {
         // removendo duplicatas da lista
         $listIds = array_unique($listIds);
@@ -171,10 +181,12 @@ class InsertVideoUseCase
             // lança exceção
             throw new NotFoundException($msg);
         }
+
+        return $genresBdId;
     }
 
     // método auxiliar para verificação de existência dos castMembersId recebidos
-    private function validateCastMembersIds(array $listIds): void
+    private function validateCastMembersIds(array $listIds): array
     {
         // removendo duplicatas da lista
         $listIds = array_unique($listIds);
@@ -197,5 +209,7 @@ class InsertVideoUseCase
             // lança exceção
             throw new NotFoundException($msg);
         }
+
+        return $castMembersBdId;
     }
 }

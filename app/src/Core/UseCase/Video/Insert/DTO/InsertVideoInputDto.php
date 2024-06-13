@@ -24,9 +24,9 @@ class InsertVideoInputDto
         public ?Image $bannerFile = null,
         public ?Media $trailerFile = null,
         public ?Media $videoFile = null,
-        public array $castMembersId = [],
         public array $categoriesId = [],
         public array $genresId = [],
+        public array $castMembersId = [],
     ) {
     }
 }

@@ -6,6 +6,7 @@ namespace App\Repositories\Eloquent;
 // importações
 use App\Models\Genre as GenreModel;
 use App\Repositories\Presenters\PaginationPresenter;
+use Core\Domain\Entity\Entity;
 use Core\Domain\Entity\Genre as GenreEntity;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\GenreRepositoryInterface;
@@ -22,7 +23,7 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toGenre(GenreModel $object): GenreEntity
+    private function toGenre(GenreModel $object): Entity
     {
         $Genre = new GenreEntity(
             id: $object->id,
@@ -37,7 +38,7 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função de inserção no bd
-    public function insert(GenreEntity $Genre): GenreEntity
+    public function insert(Entity $Genre): Entity
     {
         // inserindo os dados recebidos
         $response = $this->model->create(
@@ -63,7 +64,7 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função de busca por id
-    public function findById(string $GenreId): GenreEntity
+    public function findById(string $GenreId): Entity
     {
         // buscando no bd
         $GenreDb = $this->model->find($GenreId);
@@ -120,7 +121,7 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função de atualização
-    public function update(GenreEntity $Genre): GenreEntity
+    public function update(Entity $Genre): Entity
     {
         // buscando no bd
         $GenreDb = $this->model->find($Genre->id());

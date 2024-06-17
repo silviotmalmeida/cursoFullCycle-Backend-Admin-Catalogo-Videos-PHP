@@ -7,6 +7,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\CastMember as CastMemberModel;
 use App\Repositories\Presenters\PaginationPresenter;
 use Core\Domain\Entity\CastMember as CastMemberEntity;
+use Core\Domain\Entity\Entity;
 use Core\Domain\Enum\CastMemberType;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\CastMemberRepositoryInterface;
@@ -23,7 +24,7 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
     }
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toCastMember(CastMemberModel $object): CastMemberEntity
+    private function toCastMember(CastMemberModel $object): Entity
     {
         $castMember = new CastMemberEntity(
             id: $object->id,
@@ -37,7 +38,7 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
     }
 
     // função de inserção no bd
-    public function insert(CastMemberEntity $castMember): CastMemberEntity
+    public function insert(Entity $castMember): Entity
     {
         // inserindo os dados recebidos
         $response = $this->model->create(
@@ -55,7 +56,7 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
     }
 
     // função de busca por id
-    public function findById(string $castMemberId): CastMemberEntity
+    public function findById(string $castMemberId): Entity
     {
         // buscando no bd
         $castMemberDb = $this->model->find($castMemberId);
@@ -112,7 +113,7 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
     }
 
     // função de atualização
-    public function update(CastMemberEntity $castMember): CastMemberEntity
+    public function update(Entity $castMember): Entity
     {
         // buscando no bd
         $castMemberDb = $this->model->find($castMember->id());

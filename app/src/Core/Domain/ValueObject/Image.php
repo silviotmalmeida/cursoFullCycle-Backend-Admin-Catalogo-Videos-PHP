@@ -11,7 +11,7 @@ class Image extends ValueObject
 {
     // construtor e atributos
     public function __construct(
-        protected string $path
+        protected string $filePath
     ) {
         // incluindo as regras do médoto de criação da classe-mãe
         parent::__construct();
@@ -20,16 +20,16 @@ class Image extends ValueObject
         $this->validate();
     }
 
-    // função de obtenção do path
-    public function path(): string
+    // função de obtenção do filePath
+    public function filePath(): string
     {
-        return $this->path;
+        return $this->filePath;
     }
 
     // função de validação dos atributos
     private function validate(): void
     {
-        // validação do path
-        DomainValidation::notNullOrEmpty($this->path);
+        // validação do filePath
+        DomainValidation::notNullOrEmpty($this->filePath);
     }
 }

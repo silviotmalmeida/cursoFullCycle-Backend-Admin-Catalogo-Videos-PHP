@@ -57,29 +57,29 @@ class InsertVideoUseCase
                 videoFile: $input->videoFile,
             );
 
+            // validando as categories informadas
+            $categoriesBdId = $this->validateCategoriesIds($input->categoriesId);
             // adicionando as categories
             foreach ($input->categoriesId as $categoryId) {
 
                 $video->addCategory($categoryId);
             }
-            // validando as categories informadas
-            $categoriesBdId = $this->validateCategoriesIds($video->categoriesId);
 
+            // validando os genres informados
+            $genresBdId = $this->validateGenresIds($input->genresId);
             // adicionando os genres
             foreach ($input->genresId as $genreId) {
 
                 $video->addGenre($genreId);
             }
-            // validando os genres informados
-            $genresBdId = $this->validateGenresIds($video->genresId);
 
+            // validando os cast members informados
+            $castMembersBdId = $this->validateCastMembersIds($input->castMembersId);
             // adicionando os cast members
             foreach ($input->castMembersId as $castMemberId) {
 
                 $video->addCastMember($castMemberId);
             }
-            // validando os cast members informados
-            $castMembersBdId = $this->validateCastMembersIds($video->castMembersId);
 
             // armazenando o arquivo
             $videoFilePath = $this->fileStorage->store($video->id(), [$video->videoFile()]);
@@ -105,14 +105,14 @@ class InsertVideoUseCase
                 duration: $insertedVideo->duration,
                 opened: $insertedVideo->opened,
                 rating: $insertedVideo->rating,
-                thumbFile: $insertedVideo->thumbFile(),
-                thumbHalf: $insertedVideo->thumbHalf(),
-                bannerFile: $insertedVideo->bannerFile(),
-                trailerFile: $insertedVideo->trailerFile(),
-                videoFile: $insertedVideo->videoFile(),
                 categoriesId: $categoriesBdId,
                 genresId: $genresBdId,
                 castMembersId: $castMembersBdId,
+                thumbFile: $insertedVideo->thumbFile()?->filePath(),
+                thumbHalf: $insertedVideo->thumbHalf()?->filePath(),
+                bannerFile: $insertedVideo->bannerFile()?->filePath(),
+                trailerFile: $insertedVideo->trailerFile()?->filePath(),
+                videoFile: $insertedVideo->videoFile()?->filePath(),
                 created_at: $insertedVideo->createdAt(),
                 updated_at: $insertedVideo->updatedAt(),
             );

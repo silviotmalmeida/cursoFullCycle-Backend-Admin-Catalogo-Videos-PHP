@@ -16,24 +16,24 @@ class ImageUnitTest extends TestCase
     {
         // criando o Image
         $image  = new Image(
-            path: 'path/para/image.png'
+            filePath: 'path/para/image.png'
         );
         
         // verificando os atributos
-        $this->assertSame('path/para/image.png', $image->path());
+        $this->assertSame('path/para/image.png', $image->filePath());
     }
 
     // função que testa a função de validação
     public function testValidate()
     {
         // 
-        // validando path
+        // validando filePath
         // 
-        // validando path vazio
+        // validando filePath vazio
         try {
             // criando o Image
             $image  = new Image(
-                path: ''
+                filePath: ''
             );
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);
@@ -42,11 +42,11 @@ class ImageUnitTest extends TestCase
             $this->assertInstanceOf(EntityValidationException::class, $th);
         }
 
-        // validando path válido
+        // validando filePath válido
         try {
             // criando o Image
             $image  = new Image(
-                path: 'path/para/image.png'
+                filePath: 'path/para/image.png'
             );
         } catch (\Throwable $th) {
             // se lançar exceção o teste deve falhar

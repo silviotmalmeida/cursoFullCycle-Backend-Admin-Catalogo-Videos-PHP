@@ -13,7 +13,6 @@ use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\UseCase\Interfaces\FileStorageInterface;
 use Core\UseCase\Interfaces\TransactionDbInterface;
-use Core\UseCase\Video\Insert\DTO\InsertVideoInputDto;
 use Core\UseCase\Video\Insert\DTO\InsertVideoOutputDto;
 use Core\UseCase\Video\Insert\InsertVideoUseCase;
 use Core\UseCase\Video\Interfaces\VideoEventManagerInterface;
@@ -69,26 +68,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando o mock do inputDto
-        $mockInputDto = Mockery::mock(InsertVideoInputDto::class, [
-            $title,
-            $description,
-            $yearLaunched,
-            $duration,
-            $opened,
-            $rating,
-            null,
-            null,
-            null,
-            null,
-            null,
-            $categoriesId,
-            $genresId,
-            $castMembersId
-        ]);
-
         // criando o mock da entidade
-        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating);
+        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating, $categoriesId, $genresId, $castMembersId);
+
+        // criando o mock do inputDto
+        $mockInputDto = MocksFactory::creatInsertVideoInputDtoMock($mockEntity);
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -199,26 +183,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando o mock do inputDto
-        $mockInputDto = Mockery::mock(InsertVideoInputDto::class, [
-            $title,
-            $description,
-            $yearLaunched,
-            $duration,
-            $opened,
-            $rating,
-            null,
-            null,
-            null,
-            null,
-            null,
-            $categoriesId,
-            $genresId,
-            $castMembersId
-        ]);
-
         // criando o mock da entidade
-        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating);
+        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating, $categoriesId, $genresId, $castMembersId);
+        
+        // criando o mock do inputDto
+        $mockInputDto = MocksFactory::creatInsertVideoInputDtoMock($mockEntity);
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -313,26 +282,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando o mock do inputDto
-        $mockInputDto = Mockery::mock(InsertVideoInputDto::class, [
-            $title,
-            $description,
-            $yearLaunched,
-            $duration,
-            $opened,
-            $rating,
-            null,
-            null,
-            null,
-            null,
-            null,
-            $categoriesId,
-            $genresId,
-            $castMembersId
-        ]);
-
         // criando o mock da entidade
-        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating);
+        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating, $categoriesId, $genresId, $castMembersId);
+        
+        // criando o mock do inputDto
+        $mockInputDto = MocksFactory::creatInsertVideoInputDtoMock($mockEntity);
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -427,26 +381,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando o mock do inputDto
-        $mockInputDto = Mockery::mock(InsertVideoInputDto::class, [
-            $title,
-            $description,
-            $yearLaunched,
-            $duration,
-            $opened,
-            $rating,
-            null,
-            null,
-            null,
-            null,
-            null,
-            $categoriesId,
-            $genresId,
-            $castMembersId
-        ]);
-
         // criando o mock da entidade
-        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating);
+        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating, $categoriesId, $genresId, $castMembersId);
+        
+        // criando o mock do inputDto
+        $mockInputDto = MocksFactory::creatInsertVideoInputDtoMock($mockEntity);
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -541,26 +480,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando o mock do inputDto
-        $mockInputDto = Mockery::mock(InsertVideoInputDto::class, [
-            $title,
-            $description,
-            $yearLaunched,
-            $duration,
-            $opened,
-            $rating,
-            null,
-            null,
-            null,
-            null,
-            null,
-            $categoriesId,
-            $genresId,
-            $castMembersId
-        ]);
-
         // criando o mock da entidade
-        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating);
+        $mockEntity = MocksFactory::createVideoMock($uuid, $title, $description, $yearLaunched, $duration, $opened, $rating, $categoriesId, $genresId, $castMembersId);
+        
+        // criando o mock do inputDto
+        $mockInputDto = MocksFactory::creatInsertVideoInputDtoMock($mockEntity);
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);

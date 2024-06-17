@@ -58,9 +58,9 @@ class VideoUnitTest extends TestCase
         $this->assertSame(60, $video->duration);
         $this->assertTrue($video->opened);
         $this->assertSame(Rating::RATE12, $video->rating);
-        $this->assertSame('path/para/thumbFile.png', $video->thumbFile()->path());
-        $this->assertSame('path/para/thumbHalf.png', $video->thumbHalf()->path());
-        $this->assertSame('path/para/bannerFile.png', $video->bannerFile()->path());
+        $this->assertSame('path/para/thumbFile.png', $video->thumbFile()->filePath());
+        $this->assertSame('path/para/thumbHalf.png', $video->thumbHalf()->filePath());
+        $this->assertSame('path/para/bannerFile.png', $video->bannerFile()->filePath());
         $this->assertSame($trailerFile->filePath(), $video->trailerFile()->filePath());
         $this->assertSame($trailerFile->mediaStatus(), $video->trailerFile()->mediaStatus());
         $this->assertSame($trailerFile->encodedPath(), $video->trailerFile()->encodedPath());

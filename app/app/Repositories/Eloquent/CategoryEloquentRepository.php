@@ -7,6 +7,7 @@ namespace App\Repositories\Eloquent;
 use App\Models\Category as CategoryModel;
 use App\Repositories\Presenters\PaginationPresenter;
 use Core\Domain\Entity\Category as CategoryEntity;
+use Core\Domain\Entity\Entity;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\CategoryRepositoryInterface;
 use Core\Domain\Repository\PaginationInterface;
@@ -22,7 +23,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     }
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toCategory(CategoryModel $object): CategoryEntity
+    private function toCategory(CategoryModel $object): Entity
     {
         $category = new CategoryEntity(
             id: $object->id,
@@ -38,7 +39,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     }
 
     // função de inserção no bd
-    public function insert(CategoryEntity $category): CategoryEntity
+    public function insert(Entity $category): Entity
     {
         // inserindo os dados recebidos
         $response = $this->model->create(
@@ -56,7 +57,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     }
 
     // função de busca por id
-    public function findById(string $categoryId): CategoryEntity
+    public function findById(string $categoryId): Entity
     {
         // buscando no bd
         $categoryDb = $this->model->find($categoryId);
@@ -113,7 +114,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     }
 
     // função de atualização
-    public function update(CategoryEntity $category): CategoryEntity
+    public function update(Entity $category): Entity
     {
         // buscando no bd
         $categoryDb = $this->model->find($category->id());

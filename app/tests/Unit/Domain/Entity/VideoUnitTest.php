@@ -21,33 +21,13 @@ class VideoUnitTest extends TestCase
     // função que testa o construtor
     public function testConstructor()
     {
-        // criando o trailerFile
-        $trailerFile = new Media(
-            filePath: 'path/trailerFile.mp4',
-            mediaStatus: MediaStatus::PENDING,
-            encodedPath: ''
-        );
-
-        // criando o videoFile
-        $videoFile = new Media(
-            filePath: 'path/videoFile.mp4',
-            mediaStatus: MediaStatus::PENDING,
-            encodedPath: ''
-        );
-
         // criando o video
         $video = new Video(
             title: 'New Title',
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
-            thumbFile: new Image('path/para/thumbFile.png'),
-            thumbHalf: new Image('path/para/thumbHalf.png'),
-            bannerFile: new Image('path/para/bannerFile.png'),
-            trailerFile: $trailerFile,
-            videoFile: $videoFile,
         );
 
         // verificando os atributos
@@ -56,20 +36,140 @@ class VideoUnitTest extends TestCase
         $this->assertSame('New Description', $video->description);
         $this->assertSame(2024, $video->yearLaunched);
         $this->assertSame(60, $video->duration);
-        $this->assertTrue($video->opened);
+        $this->assertFalse($video->opened);
         $this->assertSame(Rating::RATE12, $video->rating);
-        $this->assertSame('path/para/thumbFile.png', $video->thumbFile()->filePath());
-        $this->assertSame('path/para/thumbHalf.png', $video->thumbHalf()->filePath());
-        $this->assertSame('path/para/bannerFile.png', $video->bannerFile()->filePath());
-        $this->assertSame($trailerFile->filePath(), $video->trailerFile()->filePath());
-        $this->assertSame($trailerFile->mediaStatus(), $video->trailerFile()->mediaStatus());
-        $this->assertSame($trailerFile->encodedPath(), $video->trailerFile()->encodedPath());
-        $this->assertSame($videoFile->filePath(), $video->videoFile()->filePath());
-        $this->assertSame($videoFile->mediaStatus(), $video->videoFile()->mediaStatus());
-        $this->assertSame($videoFile->encodedPath(), $video->videoFile()->encodedPath());
         $this->assertNotEmpty($video->createdAt());
         $this->assertNotEmpty($video->updatedAt());
         $this->assertSame($video->createdAt(), $video->updatedAt());
+    }
+
+    // função que testa a função setThumbFile
+    public function testSetThumbFile()
+    {
+        // criando o video
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            rating: Rating::RATE12,
+        );
+        // verificando
+        $this->assertNull($video->thumbfile());
+
+        // criando o thumbfile
+        $thumbfile = new Image(
+            filePath: 'path/thumbfile.png',
+        );
+        // setando o thumbfile
+        $video->setThumbFile($thumbfile);
+
+        // verificando
+        $this->assertSame($thumbfile, $video->thumbfile());
+    }
+
+    // função que testa a função setThumbHalf
+    public function testSetThumbHalf()
+    {
+        // criando o video
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            rating: Rating::RATE12,
+        );
+        // verificando
+        $this->assertNull($video->thumbHalf());
+
+        // criando o thumbHalf
+        $thumbHalf = new Image(
+            filePath: 'path/thumbHalf.png',
+        );
+        // setando o thumbHalf
+        $video->setThumbHalf($thumbHalf);
+
+        // verificando
+        $this->assertSame($thumbHalf, $video->thumbHalf());
+    }
+
+    // função que testa a função setBannerFile
+    public function testSetBannerFile()
+    {
+        // criando o video
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            rating: Rating::RATE12,
+        );
+        // verificando
+        $this->assertNull($video->bannerFile());
+
+        // criando o bannerFile
+        $bannerFile = new Image(
+            filePath: 'path/bannerFile.png',
+        );
+        // setando o bannerFile
+        $video->setBannerFile($bannerFile);
+
+        // verificando
+        $this->assertSame($bannerFile, $video->bannerFile());
+    }
+
+    // função que testa a função setTraileFile
+    public function testSetTraileFile()
+    {
+        // criando o video
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            rating: Rating::RATE12,
+        );
+        // verificando
+        $this->assertNull($video->trailerFile());
+
+        // criando o trailerFile
+        $trailerFile = new Media(
+            filePath: 'path/trailerFile.mp4',
+            mediaStatus: MediaStatus::PENDING,
+            encodedPath: ''
+        );
+        // setando o trailerFile
+        $video->setTraileFile($trailerFile);
+
+        // verificando
+        $this->assertSame($trailerFile, $video->trailerFile());
+    }
+
+    // função que testa a função setVideoFile
+    public function testSetVideoFile()
+    {
+        // criando o video
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            rating: Rating::RATE12,
+        );
+        // verificando
+        $this->assertNull($video->videoFile());
+
+        // criando o videoFile
+        $videoFile = new Media(
+            filePath: 'path/videoFile.mp4',
+            mediaStatus: MediaStatus::PENDING,
+            encodedPath: ''
+        );
+        // setando o videoFile
+        $video->setVideoFile($videoFile);
+
+        // verificando
+        $this->assertSame($videoFile, $video->videoFile());
     }
 
     // função que testa a função de abertura
@@ -81,7 +181,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
         // abrindo
@@ -100,9 +199,10 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
+        // abrindo
+        $video->open();
         // fechando
         $video->close();
 
@@ -119,7 +219,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
 
@@ -129,31 +228,31 @@ class VideoUnitTest extends TestCase
         $uuid3 = RamseyUuid::uuid4()->toString();
 
         // inserindo
-        $video->addCategory($uuid1);
+        $video->addCategoryId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->categoriesId);
 
         // inserindo duplicata
-        $video->addCategory($uuid1);
+        $video->addCategoryId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->categoriesId);
 
         // inserindo outra
-        $video->addCategory($uuid2);
+        $video->addCategoryId($uuid2);
 
         // verificando
         $this->assertCount(2, $video->categoriesId);
 
         // removendo não adicionada
-        $video->removeCategory($uuid3);
+        $video->removeCategoryId($uuid3);
 
         // verificando
         $this->assertCount(2, $video->categoriesId);
 
         // removendo
-        $video->removeCategory($uuid1);
+        $video->removeCategoryId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->categoriesId);
@@ -168,7 +267,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
 
@@ -178,31 +276,31 @@ class VideoUnitTest extends TestCase
         $uuid3 = RamseyUuid::uuid4()->toString();
 
         // inserindo
-        $video->addGenre($uuid1);
+        $video->addGenreId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->genresId);
 
         // inserindo duplicata
-        $video->addGenre($uuid1);
+        $video->addGenreId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->genresId);
 
         // inserindo outra
-        $video->addGenre($uuid2);
+        $video->addGenreId($uuid2);
 
         // verificando
         $this->assertCount(2, $video->genresId);
 
         // removendo não adicionada
-        $video->removeGenre($uuid3);
+        $video->removeGenreId($uuid3);
 
         // verificando
         $this->assertCount(2, $video->genresId);
 
         // removendo
-        $video->removeGenre($uuid1);
+        $video->removeGenreId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->genresId);
@@ -217,7 +315,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
 
@@ -227,31 +324,31 @@ class VideoUnitTest extends TestCase
         $uuid3 = RamseyUuid::uuid4()->toString();
 
         // inserindo
-        $video->addCastMember($uuid1);
+        $video->addCastMemberId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->castMembersId);
 
         // inserindo duplicata
-        $video->addCastMember($uuid1);
+        $video->addCastMemberId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->castMembersId);
 
         // inserindo outra
-        $video->addCastMember($uuid2);
+        $video->addCastMemberId($uuid2);
 
         // verificando
         $this->assertCount(2, $video->castMembersId);
 
         // removendo não adicionada
-        $video->removeCastMember($uuid3);
+        $video->removeCastMemberId($uuid3);
 
         // verificando
         $this->assertCount(2, $video->castMembersId);
 
         // removendo
-        $video->removeCastMember($uuid1);
+        $video->removeCastMemberId($uuid1);
 
         // verificando
         $this->assertCount(1, $video->castMembersId);
@@ -313,7 +410,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
         $this->assertInstanceOf(Video::class, $video);
@@ -328,7 +424,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
     }
@@ -342,7 +437,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
     }
@@ -356,7 +450,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
     }
@@ -369,7 +462,6 @@ class VideoUnitTest extends TestCase
             description: str_repeat('a', random_int(3, 255)),
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
         $this->assertInstanceOf(Video::class, $video);
@@ -384,7 +476,6 @@ class VideoUnitTest extends TestCase
             description: '',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
     }
@@ -398,7 +489,6 @@ class VideoUnitTest extends TestCase
             description: str_repeat('a', 256),
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
     }
@@ -412,7 +502,6 @@ class VideoUnitTest extends TestCase
             description: str_repeat('a', 2),
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
     }
@@ -425,7 +514,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: random_int(1, 9999),
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
         $this->assertInstanceOf(Video::class, $video);
@@ -440,7 +528,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 0,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
     }
@@ -453,7 +540,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
         $this->assertInstanceOf(Video::class, $video);
@@ -468,7 +554,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 0,
-            opened: true,
             rating: Rating::RATE12,
         );
     }
@@ -481,7 +566,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: Rating::RATE12,
         );
         $this->assertInstanceOf(Video::class, $video);
@@ -496,7 +580,6 @@ class VideoUnitTest extends TestCase
             description: 'New Description',
             yearLaunched: 2024,
             duration: 60,
-            opened: true,
             rating: 'INVALIDO',
         );
     }

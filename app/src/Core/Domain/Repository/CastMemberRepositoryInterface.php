@@ -10,5 +10,4 @@ use Core\Domain\Entity\CastMember;
 // contém a descrição dos métodos a serem implementados no repository
 interface CastMemberRepositoryInterface extends EntityRepositoryInterface
 {
-    public function findByIdArray(array $listIds): array;
 }

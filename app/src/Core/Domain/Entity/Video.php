@@ -16,6 +16,17 @@ use DateTime;
 // definindo a entidade
 class Video extends Entity
 {
+    // atributos fora do construtor
+    protected bool $opened = false;
+    protected array $categoriesId = [];
+    protected array $genresId = [];
+    protected array $castMembersId = [];
+    protected ?Image $thumbFile = null;
+    protected ?Image $thumbHalf = null;
+    protected ?Image $bannerFile = null;
+    protected ?Media $trailerFile = null;
+    protected ?Media $videoFile = null;
+
     // construtor e atributos
     public function __construct(
         protected Uuid|string $id = '',
@@ -23,16 +34,7 @@ class Video extends Entity
         protected string $description = '',
         protected int $yearLaunched = 0,
         protected int $duration = 0,
-        protected bool $opened = false,
         protected Rating|string $rating = '',
-        protected array $categoriesId = [],
-        protected array $genresId = [],
-        protected array $castMembersId = [],
-        protected ?Image $thumbFile = null,
-        protected ?Image $thumbHalf = null,
-        protected ?Image $bannerFile = null,
-        protected ?Media $trailerFile = null,
-        protected ?Media $videoFile = null,
         protected DateTime|string $createdAt = '',
         protected DateTime|string $updatedAt = '',
     ) {
@@ -79,10 +81,22 @@ class Video extends Entity
         return $this->thumbFile;
     }
 
+    // função para set do thumbFile
+    public function setThumbFile(Image $thumbFile): void
+    {
+        $this->thumbFile = $thumbFile;
+    }
+
     // função para retorno do thumbHalf
     public function thumbHalf(): ?Image
     {
         return $this->thumbHalf;
+    }
+
+    // função para set do thumbHalf
+    public function setThumbHalf(Image $thumbHalf): void
+    {
+        $this->thumbHalf = $thumbHalf;
     }
 
     // função para retorno do bannerFile
@@ -91,16 +105,34 @@ class Video extends Entity
         return $this->bannerFile;
     }
 
+    // função para set do bannerFile
+    public function setBannerFile(Image $bannerFile): void
+    {
+        $this->bannerFile = $bannerFile;
+    }
+
     // função para retorno do trailerFile
     public function trailerFile(): ?Media
     {
         return $this->trailerFile;
     }
 
+    // função para set do trailerFile
+    public function setTraileFile(Media $trailerFile): void
+    {
+        $this->trailerFile = $trailerFile;
+    }
+
     // função para retorno do videoFile
     public function videoFile(): ?Media
     {
         return $this->videoFile;
+    }
+
+    // função para set do videoFile
+    public function setVideoFile(Media $videoFile): void
+    {
+        $this->videoFile = $videoFile;
     }
 
     // função de abertura
@@ -115,8 +147,8 @@ class Video extends Entity
         $this->opened = false;
     }
 
-    // função de atribuição de category
-    public function addCategory(Uuid|string $categoryId): void
+    // função de atribuição de categoryId
+    public function addCategoryId(Uuid|string $categoryId): void
     {
         // caso não seja uuid, valida a string informada
         if (!($categoryId instanceof Uuid)) $categoryId = new Uuid($categoryId);
@@ -126,8 +158,8 @@ class Video extends Entity
         $this->categoriesId = array_unique($this->categoriesId);
     }
 
-    // função de remoção de category
-    public function removeCategory(Uuid|string $categoryId): void
+    // função de remoção de categoryId
+    public function removeCategoryId(Uuid|string $categoryId): void
     {
         // caso não seja uuid, valida a string informada
         if (!($categoryId instanceof Uuid)) $categoryId = new Uuid($categoryId);
@@ -137,8 +169,8 @@ class Video extends Entity
         $this->categoriesId = array_unique($this->categoriesId);
     }
 
-    // função de atribuição de genre
-    public function addGenre(Uuid|string $genreId): void
+    // função de atribuição de genreId
+    public function addGenreId(Uuid|string $genreId): void
     {
         // caso não seja uuid, valida a string informada
         if (!($genreId instanceof Uuid)) $genreId = new Uuid($genreId);
@@ -148,8 +180,8 @@ class Video extends Entity
         $this->genresId = array_unique($this->genresId);
     }
 
-    // função de remoção de genre
-    public function removeGenre(Uuid|string $genreId): void
+    // função de remoção de genreId
+    public function removeGenreId(Uuid|string $genreId): void
     {
         // caso não seja uuid, valida a string informada
         if (!($genreId instanceof Uuid)) $genreId = new Uuid($genreId);
@@ -159,8 +191,8 @@ class Video extends Entity
         $this->genresId = array_unique($this->genresId);
     }
 
-    // função de atribuição de cast member
-    public function addCastMember(Uuid|string $castMemberId): void
+    // função de atribuição de castMemberId
+    public function addCastMemberId(Uuid|string $castMemberId): void
     {
         // caso não seja uuid, valida a string informada
         if (!($castMemberId instanceof Uuid)) $castMemberId = new Uuid($castMemberId);
@@ -170,8 +202,8 @@ class Video extends Entity
         $this->castMembersId = array_unique($this->castMembersId);
     }
 
-    // função de remoção de cast member
-    public function removeCastMember(Uuid|string $castMemberId): void
+    // função de remoção de castMemberId
+    public function removeCastMemberId(Uuid|string $castMemberId): void
     {
         // caso não seja uuid, valida a string informada
         if (!($castMemberId instanceof Uuid)) $castMemberId = new Uuid($castMemberId);

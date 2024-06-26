@@ -10,5 +10,4 @@ use Core\Domain\Entity\Category;
 // contém a descrição dos métodos a serem implementados no repository
 interface CategoryRepositoryInterface extends EntityRepositoryInterface
 {
-    public function findByIdArray(array $listIds): array;
 }

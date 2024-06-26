@@ -10,5 +10,4 @@ use Core\Domain\Entity\Genre;
 // contém a descrição dos métodos a serem implementados no repository
 interface GenreRepositoryInterface extends EntityRepositoryInterface
 {
-    public function findByIdArray(array $listIds): array;
 }

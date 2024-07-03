@@ -4,7 +4,6 @@
 namespace Tests\Unit\UseCase\Video;
 
 // importações
-
 use Core\Domain\Entity\Video;
 use Core\Domain\Enum\CastMemberType;
 use Core\Domain\Enum\Rating;
@@ -136,9 +135,9 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $this->assertNull($responseUseCase->bannerFile);
         $this->assertNull($responseUseCase->trailerFile);
         $this->assertNull($responseUseCase->videoFile);
-        $this->assertSame($categoriesId, $responseUseCase->categoriesId);
-        $this->assertSame($genresId, $responseUseCase->genresId);
-        $this->assertSame($castMembersId, $responseUseCase->castMembersId);
+        $this->assertEquals($categoriesId, $responseUseCase->categoriesId);
+        $this->assertEquals($genresId, $responseUseCase->genresId);
+        $this->assertEquals($castMembersId, $responseUseCase->castMembersId);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
 
@@ -247,8 +246,29 @@ class InsertVideoUseCaseUnitTest extends TestCase
         Mockery::close();
     }
 
+    // provedor de dados do testExecuteCategoriesValidationFail
+    public function dataProviderExecuteCategoriesValidationFail(): array
+    {
+        $categoryId1 = Uuid::uuid4()->toString();
+        $categoryId2 = Uuid::uuid4()->toString();
+        $nameCategory = 'Category Name';
+        $descriptionCategory = 'Category Description';
+        $isActiveCategory = true;
+        $mockCategory1 = MocksFactory::createCategoryMock($categoryId1, $nameCategory, $descriptionCategory, $isActiveCategory);
+        $mockCategory2 = MocksFactory::createCategoryMock($categoryId2, $nameCategory, $descriptionCategory, $isActiveCategory);
+
+        return [
+            [$categoryId1, $categoryId2, [$mockCategory1], "Category $categoryId2 not found"],
+            [$categoryId1, $categoryId2, [], "Categories $categoryId1, $categoryId2 not found"]
+        ];
+    }
+
     // função que testa o método de execução, sem sucesso na validação de categorias
-    public function testExecuteCategoriesValidationFail()
+    // utiliza o dataProvider dataProviderExecuteCategoriesValidationFail
+    /**
+     * @dataProvider dataProviderExecuteCategoriesValidationFail
+     */
+    public function testExecuteCategoriesValidationFail(string $categoryId1, string $categoryId2, array $returnCategoryRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
         $uuid = Uuid::uuid4()->toString();
@@ -258,27 +278,16 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $duration = 120;
         $opened = false;
         $rating = Rating::RATE10;
-        $nameCategory = 'Category Name';
-        $descriptionCategory = 'Category Description';
-        $isActiveCategory = true;
         $nameGenre = 'Genre Name';
         $isActiveGenre = true;
         $nameCastMember = 'Cast Member Name';
         $typeCastMember = CastMemberType::ACTOR;
-        $categoryId1 = Uuid::uuid4()->toString();
-        $categoryId2 = Uuid::uuid4()->toString();
         $genreId1 = Uuid::uuid4()->toString();
         $castMemberId1 = Uuid::uuid4()->toString();
         $castMemberId2 = Uuid::uuid4()->toString();
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1];
         $castMembersId = [$castMemberId1, $castMemberId2];
-
-        // criando o mock da categoria 1
-        $mockCategory1 = MocksFactory::createCategoryMock($categoryId1, $nameCategory, $descriptionCategory, $isActiveCategory);
-
-        // criando o mock da categoria 2
-        $mockCategory2 = MocksFactory::createCategoryMock($categoryId2, $nameCategory, $descriptionCategory, $isActiveCategory);
 
         // criando o mock do genre 1
         $mockGenre1 = MocksFactory::createGenreMock($genreId1, $nameGenre, $isActiveGenre, $categoriesId);
@@ -317,7 +326,7 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // criando o mock do categoryRepository
         $mockCategoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
-        $mockCategoryRepository->shouldReceive('findByIdArray')->times(1)->andReturn([]); //definindo o retorno do findByIdArray()
+        $mockCategoryRepository->shouldReceive('findByIdArray')->times(1)->andReturn($returnCategoryRepository); //definindo o retorno do findByIdArray()
 
         // criando o mock do genreRepository
         $mockGenreRepository = Mockery::mock(GenreRepositoryInterface::class);
@@ -329,7 +338,7 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // definindo as características da exceção a ser lançada
         $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage("Categories $categoryId1, $categoryId2 not found");
+        $this->expectExceptionMessage($exceptionMessage);
 
         // criando o usecase
         $useCase = new InsertVideoUseCase(
@@ -348,8 +357,28 @@ class InsertVideoUseCaseUnitTest extends TestCase
         Mockery::close();
     }
 
+    // provedor de dados do testExecuteGenreValidationFail
+    public function dataProviderExecuteGenreValidationFail(): array
+    {
+        $genreId1 = Uuid::uuid4()->toString();
+        $genreId2 = Uuid::uuid4()->toString();
+        $nameGenre = 'Genre Name';
+        $isActiveGenre = true;        
+        $mockGenre1 = MocksFactory::createGenreMock($genreId1, $nameGenre, $isActiveGenre, []);
+        $mockGenre2 = MocksFactory::createGenreMock($genreId2, $nameGenre, $isActiveGenre, []);
+
+        return [
+            [$genreId1, $genreId2, [$mockGenre1], "Genre $genreId2 not found"],
+            [$genreId1, $genreId2, [], "Genres $genreId1, $genreId2 not found"]
+        ];
+    }
+
     // função que testa o método de execução, sem sucesso na validação de genres
-    public function testExecuteGenreValidationFail()
+    // utiliza o dataProvider dataProviderExecuteGenreValidationFail
+    /**
+     * @dataProvider dataProviderExecuteGenreValidationFail
+     */
+    public function testExecuteGenreValidationFail(string $genreId1, string $genreId2, array $returnGenreRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
         $uuid = Uuid::uuid4()->toString();
@@ -362,17 +391,14 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $nameCategory = 'Category Name';
         $descriptionCategory = 'Category Description';
         $isActiveCategory = true;
-        $nameGenre = 'Genre Name';
-        $isActiveGenre = true;
         $nameCastMember = 'Cast Member Name';
         $typeCastMember = CastMemberType::ACTOR;
         $categoryId1 = Uuid::uuid4()->toString();
         $categoryId2 = Uuid::uuid4()->toString();
-        $genreId1 = Uuid::uuid4()->toString();
         $castMemberId1 = Uuid::uuid4()->toString();
         $castMemberId2 = Uuid::uuid4()->toString();
         $categoriesId = [$categoryId1, $categoryId2];
-        $genresId = [$genreId1];
+        $genresId = [$genreId1, $genreId2];
         $castMembersId = [$castMemberId1, $castMemberId2];
 
         // criando o mock da categoria 1
@@ -380,9 +406,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // criando o mock da categoria 2
         $mockCategory2 = MocksFactory::createCategoryMock($categoryId2, $nameCategory, $descriptionCategory, $isActiveCategory);
-
-        // criando o mock do genre 1
-        $mockGenre1 = MocksFactory::createGenreMock($genreId1, $nameGenre, $isActiveGenre, $categoriesId);
 
         // criando o mock do cast member 1
         $mockCastMember1 = MocksFactory::createCastMemberMock($castMemberId1, $nameCastMember, $typeCastMember);
@@ -422,7 +445,7 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // criando o mock do genreRepository
         $mockGenreRepository = Mockery::mock(GenreRepositoryInterface::class);
-        $mockGenreRepository->shouldReceive('findByIdArray')->times(1)->andReturn([]); //definindo o retorno do findByIdArray()
+        $mockGenreRepository->shouldReceive('findByIdArray')->times(1)->andReturn($returnGenreRepository); //definindo o retorno do findByIdArray()
 
         // criando o mock do castMemberRepository
         $mockcastMemberRepository = Mockery::mock(CastMemberRepositoryInterface::class);
@@ -430,7 +453,7 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // definindo as características da exceção a ser lançada
         $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage("Genre $genreId1 not found");
+        $this->expectExceptionMessage($exceptionMessage);
 
         // criando o usecase
         $useCase = new InsertVideoUseCase(
@@ -449,8 +472,28 @@ class InsertVideoUseCaseUnitTest extends TestCase
         Mockery::close();
     }
 
+    // provedor de dados do testExecuteGenreValidationFail
+    public function dataProviderExecuteCastMembersValidationFail(): array
+    {
+        $castMemberId1 = Uuid::uuid4()->toString();
+        $castMemberId2 = Uuid::uuid4()->toString();
+        $nameCastMember = 'Cast Member Name';
+        $typeCastMember = CastMemberType::ACTOR;
+        $mockCastMember1 = MocksFactory::createCastMemberMock($castMemberId1, $nameCastMember, $typeCastMember);
+        $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
+
+        return [
+            [$castMemberId1, $castMemberId2, [$mockCastMember1], "Cast Member $castMemberId2 not found"],
+            [$castMemberId1, $castMemberId2, [], "Cast Members $castMemberId1, $castMemberId2 not found"]
+        ];
+    }
+
     // função que testa o método de execução, sem sucesso na validação de cast members
-    public function testExecuteCastMembersValidationFail()
+    // utiliza o dataProvider dataProviderExecuteCastMembersValidationFail
+    /**
+     * @dataProvider dataProviderExecuteCastMembersValidationFail
+     */
+    public function testExecuteCastMembersValidationFail(string $castMemberId1, string $castMemberId2, array $returnCastMemberRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
         $uuid = Uuid::uuid4()->toString();
@@ -465,13 +508,9 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $isActiveCategory = true;
         $nameGenre = 'Genre Name';
         $isActiveGenre = true;
-        $nameCastMember = 'Cast Member Name';
-        $typeCastMember = CastMemberType::ACTOR;
         $categoryId1 = Uuid::uuid4()->toString();
         $categoryId2 = Uuid::uuid4()->toString();
         $genreId1 = Uuid::uuid4()->toString();
-        $castMemberId1 = Uuid::uuid4()->toString();
-        $castMemberId2 = Uuid::uuid4()->toString();
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1];
         $castMembersId = [$castMemberId1, $castMemberId2];
@@ -484,12 +523,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // criando o mock do genre 1
         $mockGenre1 = MocksFactory::createGenreMock($genreId1, $nameGenre, $isActiveGenre, $categoriesId);
-
-        // criando o mock do cast member 1
-        $mockCastMember1 = MocksFactory::createCastMemberMock($castMemberId1, $nameCastMember, $typeCastMember);
-
-        // criando o mock do cast member 2
-        $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
         // criando a entidade
         $entity = $this->createVideoEntity($uuid, $title, $description, $yearLaunched, $duration, $rating, $opened, $categoriesId, $genresId, $castMembersId);
@@ -527,11 +560,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // criando o mock do castMemberRepository
         $mockcastMemberRepository = Mockery::mock(CastMemberRepositoryInterface::class);
-        $mockcastMemberRepository->shouldReceive('findByIdArray')->times(1)->andReturn([]); //definindo o retorno do findByIdArray()
+        $mockcastMemberRepository->shouldReceive('findByIdArray')->times(1)->andReturn($returnCastMemberRepository); //definindo o retorno do findByIdArray()
 
         // definindo as características da exceção a ser lançada
         $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage("Cast Members $castMemberId1, $castMemberId2 not found");
+        $this->expectExceptionMessage($exceptionMessage);
 
         // criando o usecase
         $useCase = new InsertVideoUseCase(

@@ -26,7 +26,7 @@ class InsertVideoUseCase extends BaseVideoUseCase
 
             // validando as entidades informadas
             $this->validateAllEntitiesIds($input);
-            
+
             // criando a entidade com os dados do input
             $this->videoBuilder->createEntity($input);
 
@@ -34,35 +34,45 @@ class InsertVideoUseCase extends BaseVideoUseCase
             $insertedVideo = $this->repository->insert($this->videoBuilder->getEntity());
 
             // armazenando o thumbFile
-            $thumbFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->thumbFile);
-            // cria o objeto de thumbFile para a entidade
-            $this->videoBuilder->addThumbFile($thumbFilePath);
+            if ($input->thumbFile) {
+                $thumbFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->thumbFile);
+                // cria o objeto de thumbFile para a entidade
+                $this->videoBuilder->addThumbFile($thumbFilePath);
+            }
 
             // armazenando o thumbHalf
-            $thumbHalfPath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->thumbHalf);
-            // cria o objeto de thumbHalf para a entidade
-            $this->videoBuilder->addThumbHalf($thumbHalfPath);
+            if ($input->thumbHalf) {
+                $thumbHalfPath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->thumbHalf);
+                // cria o objeto de thumbHalf para a entidade
+                $this->videoBuilder->addThumbHalf($thumbHalfPath);
+            }
 
             // armazenando o bannerFile
-            $bannerFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->bannerFile);
-            // cria o objeto de bannerFile para a entidade
-            $this->videoBuilder->addBannerFile($bannerFilePath);
+            if ($input->bannerFile) {
+                $bannerFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->bannerFile);
+                // cria o objeto de bannerFile para a entidade
+                $this->videoBuilder->addBannerFile($bannerFilePath);
+            }
 
             // armazenando o trailerFile
-            $trailerFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->trailerFile);
-            // cria o objeto de trailerFile para a entidade
-            $this->videoBuilder->addTrailerFile($trailerFilePath, MediaStatus::PROCESSING);
+            if ($input->trailerFile) {
+                $trailerFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->trailerFile);
+                // cria o objeto de trailerFile para a entidade
+                $this->videoBuilder->addTrailerFile($trailerFilePath, MediaStatus::PROCESSING);
+            }
 
-            // armazenando o arquivo
-            $videoFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->videoFile);
-            // se o vídeo foi armazenado,
-            if ($videoFilePath) {
+            // armazenando o videoFile
+            if ($input->videoFile) {
+                $videoFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->videoFile);
+                // se o vídeo foi armazenado,
+                if ($videoFilePath) {
 
-                // cria o objeto de videoFile para a entidade
-                $this->videoBuilder->addVideoFile($videoFilePath, MediaStatus::PROCESSING);
+                    // cria o objeto de videoFile para a entidade
+                    $this->videoBuilder->addVideoFile($videoFilePath, MediaStatus::PROCESSING);
 
-                // dispara o evento VideoCreatedEvent
-                $this->eventManager->dispatch(new VideoCreatedEvent($this->videoBuilder->getEntity()));
+                    // dispara o evento VideoCreatedEvent
+                    $this->eventManager->dispatch(new VideoCreatedEvent($this->videoBuilder->getEntity()));
+                }
             }
 
             // atualizando o registro
@@ -76,23 +86,23 @@ class InsertVideoUseCase extends BaseVideoUseCase
 
             // retornando os dados
             return new InsertVideoOutputDto(
-                id: $insertedVideo->id(),
-                title: $insertedVideo->title,
-                description: $insertedVideo->description,
-                yearLaunched: $insertedVideo->yearLaunched,
-                duration: $insertedVideo->duration,
-                opened: $insertedVideo->opened,
-                rating: $insertedVideo->rating,
-                categoriesId: $insertedVideo->categoriesId,
-                genresId: $insertedVideo->genresId,
-                castMembersId: $insertedVideo->castMembersId,
-                thumbFile: $insertedVideo->thumbFile()?->filePath(),
-                thumbHalf: $insertedVideo->thumbHalf()?->filePath(),
-                bannerFile: $insertedVideo->bannerFile()?->filePath(),
-                trailerFile: $insertedVideo->trailerFile()?->filePath(),
-                videoFile: $insertedVideo->videoFile()?->filePath(),
-                created_at: $insertedVideo->createdAt(),
-                updated_at: $insertedVideo->updatedAt(),
+                id: $this->videoBuilder->getEntity()->id(),
+                title: $this->videoBuilder->getEntity()->title,
+                description: $this->videoBuilder->getEntity()->description,
+                yearLaunched: $this->videoBuilder->getEntity()->yearLaunched,
+                duration: $this->videoBuilder->getEntity()->duration,
+                opened: $this->videoBuilder->getEntity()->opened,
+                rating: $this->videoBuilder->getEntity()->rating,
+                categoriesId: $this->videoBuilder->getEntity()->categoriesId,
+                genresId: $this->videoBuilder->getEntity()->genresId,
+                castMembersId: $this->videoBuilder->getEntity()->castMembersId,
+                thumbFile: $this->videoBuilder->getEntity()->thumbFile()?->filePath(),
+                thumbHalf: $this->videoBuilder->getEntity()->thumbHalf()?->filePath(),
+                bannerFile: $this->videoBuilder->getEntity()->bannerFile()?->filePath(),
+                trailerFile: $this->videoBuilder->getEntity()->trailerFile()?->filePath(),
+                videoFile: $this->videoBuilder->getEntity()->videoFile()?->filePath(),
+                created_at: $this->videoBuilder->getEntity()->createdAt(),
+                updated_at: $this->videoBuilder->getEntity()->updatedAt(),
             );
         }
         // caso existam erros

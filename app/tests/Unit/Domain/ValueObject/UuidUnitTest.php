@@ -35,7 +35,6 @@ class UuidUnitTest extends TestCase
             $uuid  = new Uuid(
                 value: 'INVALIDO'
             );
-            dd($uuid);
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);
         } catch (\Throwable $th) {

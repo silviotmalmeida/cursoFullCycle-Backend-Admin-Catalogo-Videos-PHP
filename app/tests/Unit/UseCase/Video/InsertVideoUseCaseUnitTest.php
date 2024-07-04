@@ -4,7 +4,7 @@
 namespace Tests\Unit\UseCase\Video;
 
 // importações
-use Core\Domain\Entity\Video;
+use Core\Domain\Builder\Video\CreateVideoBuilder;
 use Core\Domain\Enum\CastMemberType;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\NotFoundException;
@@ -28,11 +28,43 @@ use Tests\MocksFactory;
 class InsertVideoUseCaseUnitTest extends TestCase
 {
 
-    // função que testa o método de execução, com sucesso
-    public function testExecute()
+    // provedor de dados do testExecute
+    public function dataProviderExecute(): array
     {
+        $arrayFile = ['tmp' => 'tmp/filename'];
+        $filepath = 'storage/filename';
+
+        return [
+            [[], [], [], [], [], 0, $filepath, 0, '', '', '', '', ''],
+            [$arrayFile, [], [], [], [], 1, $filepath, 0, $filepath, '', '', '', ''],
+            [[], $arrayFile, [], [], [], 1, $filepath, 0, '', $filepath, '', '', ''],
+            [[], [], $arrayFile, [], [], 1, $filepath, 0, '', '', $filepath, '', ''],
+            [[], [], [], $arrayFile, [], 1, $filepath, 0, '', '', '', $filepath, ''],
+            [[], [], [], [], $arrayFile, 1, $filepath, 1, '', '', '', '', $filepath],
+            [$arrayFile, $arrayFile, $arrayFile, $arrayFile, $arrayFile, 5, $filepath, 1, $filepath, $filepath, $filepath, $filepath, $filepath],
+        ];
+    }
+    // função que testa o método de execução, com sucesso
+    // utiliza o dataProvider dataProviderExecute
+    /**
+     * @dataProvider dataProviderExecute
+     */
+    public function testExecute(
+        array $thumbFile,
+        array $thumbHalf,
+        array $bannerFile,
+        array $trailerFile,
+        array $videoFile,
+        int $qtdStoreTimes,
+        string $returnStorage,
+        int $qtdDispatchTimes,
+        string $pathThumbFile,
+        string $pathThumbHalf,
+        string $pathBannerFile,
+        string $pathTrailerFile,
+        string $pathVideoFile
+    ) {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;
@@ -54,6 +86,7 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1];
         $castMembersId = [$castMemberId1, $castMemberId2];
+        $videoBuilder = new CreateVideoBuilder;
 
         // criando o mock da categoria 1
         $mockCategory1 = MocksFactory::createCategoryMock($categoryId1, $nameCategory, $descriptionCategory, $isActiveCategory);
@@ -70,12 +103,27 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando a entidade
-        $entity = $this->createVideoEntity($uuid, $title, $description, $yearLaunched, $duration, $rating, $opened, $categoriesId, $genresId, $castMembersId);
-
         // criando o inputDto
-        // $inputDto = MocksFactory::creatInsertVideoInputDtoMock($entity);
-        $inputDto = self::createInsertVideoInputDto($entity);
+        $inputDto = self::createInsertVideoInputDto(
+            $title,
+            $description,
+            $yearLaunched,
+            $duration,
+            $rating,
+            $opened,
+            $categoriesId,
+            $genresId,
+            $castMembersId,
+            $thumbFile,
+            $thumbHalf,
+            $bannerFile,
+            $trailerFile,
+            $videoFile
+        );
+
+        // criando a entidade com os dados do input
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -89,12 +137,12 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // criando o mock do fileStorage
         $mockFileStorage = Mockery::mock(FileStorageInterface::class);
-        $mockFileStorage->shouldReceive('store')->times(5)->andReturn('path_do_storage'); //definindo o retorno do store()
+        $mockFileStorage->shouldReceive('store')->times($qtdStoreTimes)->andReturn($returnStorage); //definindo o retorno do store()
         $mockFileStorage->shouldReceive('delete')->times(0)->andReturn(true); //definindo o retorno do delete()
 
         // criando o mock do eventManager
         $mockEventManager = Mockery::mock(VideoEventManagerInterface::class);
-        $mockEventManager->shouldReceive('dispatch')->times(1)->andReturn(); //definindo o retorno do dispatch()
+        $mockEventManager->shouldReceive('dispatch')->times($qtdDispatchTimes)->andReturn(); //definindo o retorno do dispatch()
 
         // criando o mock do categoryRepository
         $mockCategoryRepository = Mockery::mock(CategoryRepositoryInterface::class);
@@ -123,26 +171,23 @@ class InsertVideoUseCaseUnitTest extends TestCase
 
         // verificando os dados
         $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
-        $this->assertSame($uuid, $responseUseCase->id);
+        $this->assertNotEmpty($responseUseCase->id);
         $this->assertSame($title, $responseUseCase->title);
         $this->assertSame($description, $responseUseCase->description);
         $this->assertSame($yearLaunched, $responseUseCase->yearLaunched);
         $this->assertSame($duration, $responseUseCase->duration);
         $this->assertSame($opened, $responseUseCase->opened);
         $this->assertSame($rating, $responseUseCase->rating);
-        $this->assertNull($responseUseCase->thumbFile);
-        $this->assertNull($responseUseCase->thumbHalf);
-        $this->assertNull($responseUseCase->bannerFile);
-        $this->assertNull($responseUseCase->trailerFile);
-        $this->assertNull($responseUseCase->videoFile);
+        if ($pathThumbFile) $this->assertSame($returnStorage, $responseUseCase->thumbFile);
+        if ($pathThumbHalf) $this->assertSame($returnStorage, $responseUseCase->thumbHalf);
+        if ($pathBannerFile) $this->assertSame($returnStorage, $responseUseCase->bannerFile);
+        if ($pathTrailerFile) $this->assertSame($returnStorage, $responseUseCase->trailerFile);
+        if ($pathVideoFile) $this->assertSame($returnStorage, $responseUseCase->videoFile);
         $this->assertEquals($categoriesId, $responseUseCase->categoriesId);
         $this->assertEquals($genresId, $responseUseCase->genresId);
         $this->assertEquals($castMembersId, $responseUseCase->castMembersId);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
-
-        // encerrando os mocks
-        Mockery::close();
     }
 
     // função que testa o método de execução, sem sucesso e com rollback
@@ -171,6 +216,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1];
         $castMembersId = [$castMemberId1, $castMemberId2];
+        $thumbFile = ['tmp' => 'tmp/thumbFile.png'];
+        $thumbHalf = ['tmp' => 'tmp/thumbHalf.png'];
+        $bannerFile = ['tmp' => 'tmp/bannerFile.png'];
+        $trailerFile = ['tmp' => 'tmp/trailerFile.mp4'];
+        $videoFile = ['tmp' => 'tmp/videoFile.mp4'];
 
         // criando o mock da categoria 1
         $mockCategory1 = MocksFactory::createCategoryMock($categoryId1, $nameCategory, $descriptionCategory, $isActiveCategory);
@@ -187,12 +237,27 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando a entidade
-        $entity = $this->createVideoEntity($uuid, $title, $description, $yearLaunched, $duration, $rating, $opened, $categoriesId, $genresId, $castMembersId);
-
         // criando o inputDto
-        // $inputDto = MocksFactory::creatInsertVideoInputDtoMock($entity);
-        $inputDto = self::createInsertVideoInputDto($entity);
+        $inputDto = self::createInsertVideoInputDto(
+            $title,
+            $description,
+            $yearLaunched,
+            $duration,
+            $rating,
+            $opened,
+            $categoriesId,
+            $genresId,
+            $castMembersId,
+            $thumbFile,
+            $thumbHalf,
+            $bannerFile,
+            $trailerFile,
+            $videoFile
+        );
+
+        // criando a entidade com os dados do input
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -241,9 +306,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
         );
         // executando o usecase
         $responseUseCase = $useCase->execute($inputDto, true);
-
-        // encerrando os mocks
-        Mockery::close();
     }
 
     // provedor de dados do testExecuteCategoriesValidationFail
@@ -262,7 +324,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
             [$categoryId1, $categoryId2, [], "Categories $categoryId1, $categoryId2 not found"]
         ];
     }
-
     // função que testa o método de execução, sem sucesso na validação de categorias
     // utiliza o dataProvider dataProviderExecuteCategoriesValidationFail
     /**
@@ -288,6 +349,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1];
         $castMembersId = [$castMemberId1, $castMemberId2];
+        $thumbFile = ['tmp' => 'tmp/thumbFile.png'];
+        $thumbHalf = ['tmp' => 'tmp/thumbHalf.png'];
+        $bannerFile = ['tmp' => 'tmp/bannerFile.png'];
+        $trailerFile = ['tmp' => 'tmp/trailerFile.mp4'];
+        $videoFile = ['tmp' => 'tmp/videoFile.mp4'];
 
         // criando o mock do genre 1
         $mockGenre1 = MocksFactory::createGenreMock($genreId1, $nameGenre, $isActiveGenre, $categoriesId);
@@ -298,12 +364,27 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando a entidade
-        $entity = $this->createVideoEntity($uuid, $title, $description, $yearLaunched, $duration, $rating, $opened, $categoriesId, $genresId, $castMembersId);
-
         // criando o inputDto
-        // $inputDto = MocksFactory::creatInsertVideoInputDtoMock($entity);
-        $inputDto = self::createInsertVideoInputDto($entity);
+        $inputDto = self::createInsertVideoInputDto(
+            $title,
+            $description,
+            $yearLaunched,
+            $duration,
+            $rating,
+            $opened,
+            $categoriesId,
+            $genresId,
+            $castMembersId,
+            $thumbFile,
+            $thumbHalf,
+            $bannerFile,
+            $trailerFile,
+            $videoFile
+        );
+
+        // criando a entidade com os dados do input
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -352,9 +433,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
         );
         // executando o usecase
         $responseUseCase = $useCase->execute($inputDto);
-
-        // encerrando os mocks
-        Mockery::close();
     }
 
     // provedor de dados do testExecuteGenreValidationFail
@@ -363,7 +441,7 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $genreId1 = Uuid::uuid4()->toString();
         $genreId2 = Uuid::uuid4()->toString();
         $nameGenre = 'Genre Name';
-        $isActiveGenre = true;        
+        $isActiveGenre = true;
         $mockGenre1 = MocksFactory::createGenreMock($genreId1, $nameGenre, $isActiveGenre, []);
         $mockGenre2 = MocksFactory::createGenreMock($genreId2, $nameGenre, $isActiveGenre, []);
 
@@ -372,7 +450,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
             [$genreId1, $genreId2, [], "Genres $genreId1, $genreId2 not found"]
         ];
     }
-
     // função que testa o método de execução, sem sucesso na validação de genres
     // utiliza o dataProvider dataProviderExecuteGenreValidationFail
     /**
@@ -400,6 +477,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1, $genreId2];
         $castMembersId = [$castMemberId1, $castMemberId2];
+        $thumbFile = ['tmp' => 'tmp/thumbFile.png'];
+        $thumbHalf = ['tmp' => 'tmp/thumbHalf.png'];
+        $bannerFile = ['tmp' => 'tmp/bannerFile.png'];
+        $trailerFile = ['tmp' => 'tmp/trailerFile.mp4'];
+        $videoFile = ['tmp' => 'tmp/videoFile.mp4'];
 
         // criando o mock da categoria 1
         $mockCategory1 = MocksFactory::createCategoryMock($categoryId1, $nameCategory, $descriptionCategory, $isActiveCategory);
@@ -413,12 +495,27 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
-        // criando a entidade
-        $entity = $this->createVideoEntity($uuid, $title, $description, $yearLaunched, $duration, $rating, $opened, $categoriesId, $genresId, $castMembersId);
-
         // criando o inputDto
-        // $inputDto = MocksFactory::creatInsertVideoInputDtoMock($entity);
-        $inputDto = self::createInsertVideoInputDto($entity);
+        $inputDto = self::createInsertVideoInputDto(
+            $title,
+            $description,
+            $yearLaunched,
+            $duration,
+            $rating,
+            $opened,
+            $categoriesId,
+            $genresId,
+            $castMembersId,
+            $thumbFile,
+            $thumbHalf,
+            $bannerFile,
+            $trailerFile,
+            $videoFile
+        );
+
+        // criando a entidade com os dados do input
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -467,9 +564,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
         );
         // executando o usecase
         $responseUseCase = $useCase->execute($inputDto);
-
-        // encerrando os mocks
-        Mockery::close();
     }
 
     // provedor de dados do testExecuteGenreValidationFail
@@ -487,7 +581,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
             [$castMemberId1, $castMemberId2, [], "Cast Members $castMemberId1, $castMemberId2 not found"]
         ];
     }
-
     // função que testa o método de execução, sem sucesso na validação de cast members
     // utiliza o dataProvider dataProviderExecuteCastMembersValidationFail
     /**
@@ -514,6 +607,11 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1];
         $castMembersId = [$castMemberId1, $castMemberId2];
+        $thumbFile = ['tmp' => 'tmp/thumbFile.png'];
+        $thumbHalf = ['tmp' => 'tmp/thumbHalf.png'];
+        $bannerFile = ['tmp' => 'tmp/bannerFile.png'];
+        $trailerFile = ['tmp' => 'tmp/trailerFile.mp4'];
+        $videoFile = ['tmp' => 'tmp/videoFile.mp4'];
 
         // criando o mock da categoria 1
         $mockCategory1 = MocksFactory::createCategoryMock($categoryId1, $nameCategory, $descriptionCategory, $isActiveCategory);
@@ -524,12 +622,27 @@ class InsertVideoUseCaseUnitTest extends TestCase
         // criando o mock do genre 1
         $mockGenre1 = MocksFactory::createGenreMock($genreId1, $nameGenre, $isActiveGenre, $categoriesId);
 
-        // criando a entidade
-        $entity = $this->createVideoEntity($uuid, $title, $description, $yearLaunched, $duration, $rating, $opened, $categoriesId, $genresId, $castMembersId);
-
         // criando o inputDto
-        // $inputDto = MocksFactory::creatInsertVideoInputDtoMock($entity);
-        $inputDto = self::createInsertVideoInputDto($entity);
+        $inputDto = self::createInsertVideoInputDto(
+            $title,
+            $description,
+            $yearLaunched,
+            $duration,
+            $rating,
+            $opened,
+            $categoriesId,
+            $genresId,
+            $castMembersId,
+            $thumbFile,
+            $thumbHalf,
+            $bannerFile,
+            $trailerFile,
+            $videoFile
+        );
+
+        // criando a entidade com os dados do input
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
@@ -578,14 +691,10 @@ class InsertVideoUseCaseUnitTest extends TestCase
         );
         // executando o usecase
         $responseUseCase = $useCase->execute($inputDto);
-
-        // encerrando os mocks
-        Mockery::close();
     }
 
-    // função auxiliar para criação da entidade video
-    private static function createVideoEntity(
-        string $uuid,
+    // função auxiliar para criação do input dto
+    private static function createInsertVideoInputDto(
         string $title,
         string $description,
         int $yearLaunched,
@@ -595,53 +704,38 @@ class InsertVideoUseCaseUnitTest extends TestCase
         array  $categoriesId,
         array  $genresId,
         array  $castMembersId,
-    ): Video {
-
-        $entity = new Video(
-            $uuid,
+        array $thumbFile = [],
+        array $thumbHalf = [],
+        array $bannerFile = [],
+        array $trailerFile = [],
+        array $videoFile = []
+    ): InsertVideoInputDto {
+        $dto = new InsertVideoInputDto(
             $title,
             $description,
             $yearLaunched,
             $duration,
-            $rating
-        );
-        if ($opened) $entity->open();
-        foreach ($categoriesId as $categoryId) {
-
-            $entity->addCategoryId($categoryId);
-        }
-        foreach ($genresId as $genreId) {
-
-            $entity->addGenreId($genreId);
-        }
-        foreach ($castMembersId as $castMemberId) {
-
-            $entity->addCastMemberId($castMemberId);
-        }
-
-        return $entity;
-    }
-
-    // função auxiliar para criação do input dto
-    private static function createInsertVideoInputDto(Video $entity): InsertVideoInputDto
-    {
-        $dto = new InsertVideoInputDto(
-            $entity->title,
-            $entity->description,
-            $entity->yearLaunched,
-            $entity->duration,
-            $entity->opened,
-            $entity->rating,
-            $entity->categoriesId,
-            $entity->genresId,
-            $entity->castMembersId,
-            ['thumb', 'file'],
-            ['thumb', 'half'],
-            ['banner', 'file'],
-            ['trailer', 'file'],
-            ['video', 'file'],
+            $opened,
+            $rating,
+            $categoriesId,
+            $genresId,
+            $castMembersId,
+            $thumbFile,
+            $thumbHalf,
+            $bannerFile,
+            $trailerFile,
+            $videoFile,
         );
 
         return $dto;
+    }
+
+    // método para encerrar os mocks
+    protected function tearDown(): void
+    {
+        // encerrando os mocks
+        Mockery::close();
+
+        parent::tearDown();
     }
 }

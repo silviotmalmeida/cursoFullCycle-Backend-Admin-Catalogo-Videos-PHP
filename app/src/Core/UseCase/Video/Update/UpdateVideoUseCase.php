@@ -1,26 +1,25 @@
 <?php
 
 // definindo o namespace, referente ao caminho das pastas
-namespace Core\UseCase\Video\Insert;
+namespace Core\UseCase\Video\Update;
 
 // importações
-
-use Core\Domain\Builder\Video\CreateVideoBuilder;
+use Core\Domain\Builder\Video\UpdateVideoBuilder;
 use Core\Domain\Builder\Video\VideoBuilderInterface;
 use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Events\VideoCreatedEvent;
 use Core\UseCase\Video\BaseVideoUseCase;
-use Core\UseCase\Video\Insert\DTO\InsertVideoInputDto;
-use Core\UseCase\Video\Insert\DTO\InsertVideoOutputDto;
+use Core\UseCase\Video\Update\DTO\UpdateVideoInputDto;
+use Core\UseCase\Video\Update\DTO\UpdateVideoOutputDto;
 use Exception;
 
 // definindo o usecase
-class InsertVideoUseCase extends BaseVideoUseCase
+class UpdateVideoUseCase extends BaseVideoUseCase
 {
     // método de execução do usecase
     // recebe um inputDto e retorna um outputDto
     // o segundo argumento é para possibilitar o teste de rollback da transação
-    public function execute(InsertVideoInputDto $input, bool $simulateTransactionException = false): InsertVideoOutputDto
+    public function execute(UpdateVideoInputDto $input, bool $simulateTransactionException = false): UpdateVideoOutputDto
     {
         // como os dados serão inseridos em mais de uma tabela,
         // o uso de transações é necessário
@@ -34,7 +33,7 @@ class InsertVideoUseCase extends BaseVideoUseCase
             $this->videoBuilder->createEntity($input);
 
             // inserindo a entidade no BD utilizando o repository
-            $insertedVideo = $this->repository->insert($this->videoBuilder->getEntity());
+            $insertedVideo = $this->repository->update($this->videoBuilder->getEntity());
 
             // armazenando o thumbFile
             if ($input->thumbFile) {
@@ -88,7 +87,7 @@ class InsertVideoUseCase extends BaseVideoUseCase
             $this->transactionDb->commit();
 
             // retornando os dados
-            return new InsertVideoOutputDto(
+            return new UpdateVideoOutputDto(
                 id: $this->videoBuilder->getEntity()->id(),
                 title: $this->videoBuilder->getEntity()->title,
                 description: $this->videoBuilder->getEntity()->description,
@@ -126,6 +125,6 @@ class InsertVideoUseCase extends BaseVideoUseCase
     // método responsável por retornar o builder a ser utilizado pelo usecase
     protected function getBuilder(): VideoBuilderInterface
     {
-        return new CreateVideoBuilder();
+        return new UpdateVideoBuilder();
     }
 }

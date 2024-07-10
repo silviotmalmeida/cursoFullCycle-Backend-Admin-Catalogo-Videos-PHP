@@ -5,6 +5,7 @@ namespace Core\UseCase\Video;
 
 // importações
 use Core\Domain\Builder\Video\CreateVideoBuilder;
+use Core\Domain\Builder\Video\VideoBuilderInterface;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\CastMemberRepositoryInterface;
 use Core\Domain\Repository\CategoryRepositoryInterface;
@@ -19,7 +20,10 @@ use Core\UseCase\Video\Interfaces\VideoEventManagerInterface;
 abstract class BaseVideoUseCase
 {
     // atributos fora do construtor
-    protected CreateVideoBuilder $videoBuilder;
+    protected VideoBuilderInterface $videoBuilder;
+
+    // métodos abstratos a serem implementados nas classes filhas
+    abstract protected function getBuilder() : VideoBuilderInterface;
 
     // construtor e atributos
     public function __construct(
@@ -32,7 +36,7 @@ abstract class BaseVideoUseCase
         protected CastMemberRepositoryInterface $castMemberRepository,
     ) {
         // criando o builder da entidade video
-        $this->videoBuilder = new CreateVideoBuilder;
+        $this->videoBuilder = $this->getBuilder();
     }
 
     // método auxiliar para verificação de existência dos ids recebidos para uma entidade

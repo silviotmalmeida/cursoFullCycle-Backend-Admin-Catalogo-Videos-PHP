@@ -20,8 +20,6 @@ class UpdateVideoBuilder extends CreateVideoBuilder
             yearLaunched: $input->yearLaunched,
             duration: $input->duration,
             rating: $input->rating,
-            createdAt: $input->created_at,
-            updatedAt: $input->updated_at,
         );
         if ($input->opened) $this->entity->open();
 

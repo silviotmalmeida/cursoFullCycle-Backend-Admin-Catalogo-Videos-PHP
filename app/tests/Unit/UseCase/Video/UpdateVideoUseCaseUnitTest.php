@@ -5,6 +5,8 @@ namespace Tests\Unit\UseCase\Video;
 
 // importações
 use Core\Domain\Builder\Video\CreateVideoBuilder;
+use Core\Domain\Builder\Video\UpdateVideoBuilder;
+use Core\Domain\Entity\Video;
 use Core\Domain\Enum\CastMemberType;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\NotFoundException;
@@ -15,9 +17,10 @@ use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\UseCase\Interfaces\FileStorageInterface;
 use Core\UseCase\Interfaces\TransactionDbInterface;
 use Core\UseCase\Video\Insert\DTO\InsertVideoInputDto;
-use Core\UseCase\Video\Insert\DTO\InsertVideoOutputDto;
-use Core\UseCase\Video\Insert\InsertVideoUseCase;
 use Core\UseCase\Video\Interfaces\VideoEventManagerInterface;
+use Core\UseCase\Video\Update\DTO\UpdateVideoInputDto;
+use Core\UseCase\Video\Update\DTO\UpdateVideoOutputDto;
+use Core\UseCase\Video\Update\UpdateVideoUseCase;
 use Exception;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -86,7 +89,6 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1];
         $castMembersId = [$castMemberId1, $castMemberId2];
-        $videoBuilder = new CreateVideoBuilder;
 
         // criando o mock da categoria 1
         $mockCategory1 = MocksFactory::createCategoryMock($categoryId1, $nameCategory, $descriptionCategory, $isActiveCategory);
@@ -103,8 +105,12 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
+        // criando o video inicial
+        $initialVideo = self::createInitialVideo();
+
         // criando o inputDto
-        $inputDto = self::createInsertVideoInputDto(
+        $inputDto = self::createUpdateVideoInputDto(
+            $initialVideo->id,
             $title,
             $description,
             $yearLaunched,
@@ -122,12 +128,13 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
-        $mockRepository->shouldReceive('insert')->times(1)->andReturn($entity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('findById')->times(1)->andReturn($initialVideo); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('update')->times(1)->andReturn($entity); //definindo o retorno do insert()
         $mockRepository->shouldReceive('updateMedia')->times(1)->andReturn($entity); //definindo o retorno do insert()
 
         // criando o mock do transactionDb
@@ -157,7 +164,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $mockcastMemberRepository->shouldReceive('findByIdArray')->times(1)->andReturn([$mockCastMember1, $mockCastMember2]); //definindo o retorno do findByIdArray()
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $mockRepository,
             $mockTransactionDb,
             $mockFileStorage,
@@ -170,8 +177,8 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $responseUseCase = $useCase->execute($inputDto);
 
         // verificando os dados
-        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
-        $this->assertNotEmpty($responseUseCase->id);
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
+        $this->assertSame($initialVideo->id(), $responseUseCase->id);
         $this->assertSame($title, $responseUseCase->title);
         $this->assertSame($description, $responseUseCase->description);
         $this->assertSame($yearLaunched, $responseUseCase->yearLaunched);
@@ -194,7 +201,6 @@ class UpdateVideoUseCaseUnitTest extends TestCase
     public function testExecuteRollback()
     {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;
@@ -237,8 +243,12 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
+        // criando o video inicial
+        $initialVideo = self::createInitialVideo();
+
         // criando o inputDto
-        $inputDto = self::createInsertVideoInputDto(
+        $inputDto = self::createUpdateVideoInputDto(
+            $initialVideo->id,
             $title,
             $description,
             $yearLaunched,
@@ -256,12 +266,13 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
-        $mockRepository->shouldReceive('insert')->times(1)->andReturn($entity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('findById')->times(1)->andReturn($initialVideo); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('update')->times(1)->andReturn($entity); //definindo o retorno do insert()
         $mockRepository->shouldReceive('updateMedia')->times(1)->andReturn($entity); //definindo o retorno do insert()
 
         // criando o mock do transactionDb
@@ -295,7 +306,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $this->expectExceptionMessage("rollback test");
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $mockRepository,
             $mockTransactionDb,
             $mockFileStorage,
@@ -332,7 +343,6 @@ class UpdateVideoUseCaseUnitTest extends TestCase
     public function testExecuteCategoriesValidationFail(string $categoryId1, string $categoryId2, array $returnCategoryRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;
@@ -364,8 +374,12 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
+        // criando o video inicial
+        $initialVideo = self::createInitialVideo();
+
         // criando o inputDto
-        $inputDto = self::createInsertVideoInputDto(
+        $inputDto = self::createUpdateVideoInputDto(
+            $initialVideo->id,
             $title,
             $description,
             $yearLaunched,
@@ -383,12 +397,13 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
-        $mockRepository->shouldReceive('insert')->times(0)->andReturn($entity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('findById')->times(0)->andReturn($initialVideo); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('update')->times(0)->andReturn($entity); //definindo o retorno do insert()
         $mockRepository->shouldReceive('updateMedia')->times(0)->andReturn($entity); //definindo o retorno do insert()
 
         // criando o mock do transactionDb
@@ -422,7 +437,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $this->expectExceptionMessage($exceptionMessage);
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $mockRepository,
             $mockTransactionDb,
             $mockFileStorage,
@@ -458,7 +473,6 @@ class UpdateVideoUseCaseUnitTest extends TestCase
     public function testExecuteGenreValidationFail(string $genreId1, string $genreId2, array $returnGenreRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;
@@ -495,8 +509,12 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         // criando o mock do cast member 2
         $mockCastMember2 = MocksFactory::createCastMemberMock($castMemberId2, $nameCastMember, $typeCastMember);
 
+        // criando o video inicial
+        $initialVideo = self::createInitialVideo();
+
         // criando o inputDto
-        $inputDto = self::createInsertVideoInputDto(
+        $inputDto = self::createUpdateVideoInputDto(
+            $initialVideo->id,
             $title,
             $description,
             $yearLaunched,
@@ -514,12 +532,13 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
-        $mockRepository->shouldReceive('insert')->times(0)->andReturn($entity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('findById')->times(0)->andReturn($initialVideo); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('update')->times(0)->andReturn($entity); //definindo o retorno do insert()
         $mockRepository->shouldReceive('updateMedia')->times(0)->andReturn($entity); //definindo o retorno do insert()
 
         // criando o mock do transactionDb
@@ -553,7 +572,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $this->expectExceptionMessage($exceptionMessage);
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $mockRepository,
             $mockTransactionDb,
             $mockFileStorage,
@@ -589,7 +608,6 @@ class UpdateVideoUseCaseUnitTest extends TestCase
     public function testExecuteCastMembersValidationFail(string $castMemberId1, string $castMemberId2, array $returnCastMemberRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;
@@ -622,8 +640,12 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         // criando o mock do genre 1
         $mockGenre1 = MocksFactory::createGenreMock($genreId1, $nameGenre, $isActiveGenre, $categoriesId);
 
+        // criando o video inicial
+        $initialVideo = self::createInitialVideo();
+
         // criando o inputDto
-        $inputDto = self::createInsertVideoInputDto(
+        $inputDto = self::createUpdateVideoInputDto(
+            $initialVideo->id,
             $title,
             $description,
             $yearLaunched,
@@ -641,12 +663,13 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
-        $mockRepository->shouldReceive('insert')->times(0)->andReturn($entity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('findById')->times(0)->andReturn($initialVideo); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('update')->times(0)->andReturn($entity); //definindo o retorno do insert()
         $mockRepository->shouldReceive('updateMedia')->times(0)->andReturn($entity); //definindo o retorno do insert()
 
         // criando o mock do transactionDb
@@ -680,7 +703,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $this->expectExceptionMessage($exceptionMessage);
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $mockRepository,
             $mockTransactionDb,
             $mockFileStorage,
@@ -693,8 +716,33 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $responseUseCase = $useCase->execute($inputDto);
     }
 
+    // função auxiliar para criação do video inicial
+    private static function createInitialVideo(): Video
+    {
+        $inputDto = new InsertVideoInputDto(
+            title: 'Original Title',
+            description: 'Original Description',
+            yearLaunched: 2023,
+            duration: 50,
+            rating: Rating::RATE10,
+            opened: false,
+            categoriesId: [Uuid::uuid4()->toString(), Uuid::uuid4()->toString(), Uuid::uuid4()->toString()],
+            genresId: [Uuid::uuid4()->toString(), Uuid::uuid4()->toString()],
+            castMembersId: [Uuid::uuid4()->toString(), Uuid::uuid4()->toString(), Uuid::uuid4()->toString()],
+            thumbFile: ['Original thumbFile'],
+            thumbHalf: ['Original thumbHalf'],
+            bannerFile: ['Original bannerFile'],
+            trailerFile: ['Original trailerFile'],
+            videoFile: ['Original videoFile']
+        );
+        $video = ((new CreateVideoBuilder)->createEntity($inputDto))->getEntity();
+
+        return $video;
+    }
+
     // função auxiliar para criação do input dto
-    private static function createInsertVideoInputDto(
+    private static function createUpdateVideoInputDto(
+        string $id,
         string $title,
         string $description,
         int $yearLaunched,
@@ -709,8 +757,9 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         array $bannerFile = [],
         array $trailerFile = [],
         array $videoFile = []
-    ): InsertVideoInputDto {
-        $dto = new InsertVideoInputDto(
+    ): UpdateVideoInputDto {
+        $dto = new UpdateVideoInputDto(
+            $id,
             $title,
             $description,
             $yearLaunched,

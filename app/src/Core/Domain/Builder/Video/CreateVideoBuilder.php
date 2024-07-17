@@ -4,8 +4,6 @@
 namespace Core\Domain\Builder\Video;
 
 // importações
-
-use Core\Domain\Entity\Entity;
 use Core\Domain\Entity\Video;
 use Core\Domain\Enum\MediaStatus;
 use Core\Domain\ValueObject\Image;
@@ -134,7 +132,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
     }
 
     // método de retorno da entidade
-    public function getEntity(): Entity
+    public function getEntity(): Video
     {
         return $this->entity;
     }

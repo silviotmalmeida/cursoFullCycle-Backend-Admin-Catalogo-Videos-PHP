@@ -354,53 +354,58 @@ class VideoUnitTest extends TestCase
         $this->assertCount(1, $video->castMembersId);
     }
 
-    // // função que testa a função de atualização
-    // public function testUpdate()
-    // {
-    //     // mock de uuid
-    //     $uuid = RamseyUuid::uuid4()->toString();
-    //     $cat1 = RamseyUuid::uuid4()->toString();
-    //     $cat2 = RamseyUuid::uuid4()->toString();
-    //     $cat3 = RamseyUuid::uuid4()->toString();
+    // função que testa a função de atualização
+    public function testUpdate()
+    {
+        // mock de uuid
+        $uuid = RamseyUuid::uuid4()->toString();
 
-    //     // criando o video
-    //     $video = new Video(
-    //         id: $uuid,
-    //         name: 'name 1',
-    //         isActive: true,
-    //         categoriesId: [$cat1, $cat2],
-    //     );
+        // criando o video
+        $video = new Video(
+            id: $uuid,
+            title: 'Title',
+            description: 'Description',
+            yearLaunched: 2023,
+            duration: 50,
+            rating: Rating::RATE12,
+        );
 
-    //     // retardo na execução para permitir diferenciação do updatedAt
-    //     sleep(1);
+        // retardo na execução para permitir diferenciação do updatedAt
+        sleep(1);
 
-    //     // atualizando com valores
-    //     $video->update(
-    //         name: 'name 2',
-    //         isActive: false,
-    //         categoriesId: [$cat3],
-    //     );
+        // atualizando com valores
+        $video->update(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            rating: Rating::RATE18,
+        );
 
-    //     // memorizando a data da primeira atualização para comparar com a segunda
-    //     $firstUpdateDate = $video->updatedAt();
+        // memorizando a data da primeira atualização para comparar com a segunda
+        $firstUpdateDate = $video->updatedAt();
 
-    //     // verificando os atributos
-    //     $this->assertSame($uuid, $video->id());
-    //     $this->assertSame('name 2', $video->name);
-    //     $this->assertFalse($video->isActive);
-    //     $this->assertEquals([$cat3], $video->categoriesId);
-    //     $this->assertNotSame($video->createdAt(), $video->updatedAt());
+        // verificando os atributos
+        $this->assertSame($uuid, $video->id());
+        $this->assertSame('New Title', $video->title);
+        $this->assertSame('New Description', $video->description);
+        $this->assertSame(2024, $video->yearLaunched);
+        $this->assertSame(60, $video->duration);
+        $this->assertSame(Rating::RATE18, $video->rating);
+        $this->assertNotSame($video->createdAt(), $video->updatedAt());
 
-    //     // atualizando sem valores, o updatedAt não deve ser modificado
-    //     $video->update();
+        // atualizando sem valores, o updatedAt não deve ser modificado
+        $video->update();
 
-    //     // verificando os atributos
-    //     $this->assertSame($uuid, $video->id());
-    //     $this->assertSame('name 2', $video->name);
-    //     $this->assertFalse($video->isActive);
-    //     $this->assertEquals([$cat3], $video->categoriesId);
-    //     $this->assertSame($firstUpdateDate, $video->updatedAt());
-    // }
+        // verificando os atributos
+        $this->assertSame($uuid, $video->id());
+        $this->assertSame('New Title', $video->title);
+        $this->assertSame('New Description', $video->description);
+        $this->assertSame(2024, $video->yearLaunched);
+        $this->assertSame(60, $video->duration);
+        $this->assertSame(Rating::RATE18, $video->rating);
+        $this->assertSame($firstUpdateDate, $video->updatedAt());
+    }
 
     // função que testa a função de validação de title válido
     public function testValidateTitleValid()

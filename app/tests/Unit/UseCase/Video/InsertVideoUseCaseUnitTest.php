@@ -86,7 +86,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
         $categoriesId = [$categoryId1, $categoryId2];
         $genresId = [$genreId1];
         $castMembersId = [$castMemberId1, $castMemberId2];
-        $videoBuilder = new CreateVideoBuilder;
 
         // criando o mock da categoria 1
         $mockCategory1 = MocksFactory::createCategoryMock($categoryId1, $nameCategory, $descriptionCategory, $isActiveCategory);
@@ -194,7 +193,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
     public function testExecuteRollback()
     {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;
@@ -332,7 +330,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
     public function testExecuteCategoriesValidationFail(string $categoryId1, string $categoryId2, array $returnCategoryRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;
@@ -458,7 +455,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
     public function testExecuteGenreValidationFail(string $genreId1, string $genreId2, array $returnGenreRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;
@@ -589,7 +585,6 @@ class InsertVideoUseCaseUnitTest extends TestCase
     public function testExecuteCastMembersValidationFail(string $castMemberId1, string $castMemberId2, array $returnCastMemberRepository, string $exceptionMessage)
     {
         // definindo os atributos a serem utilizados nos mocks
-        $uuid = Uuid::uuid4()->toString();
         $title = 'title';
         $description = 'description';
         $yearLaunched = 2024;

@@ -26,44 +26,36 @@ class InsertVideoUseCase extends BaseVideoUseCase
         // o uso de transações é necessário
         // tratamento de exceções
         try {
-
             // validando as entidades informadas
             $this->validateAllEntitiesIds($input);
-
             // criando a entidade com os dados do input
             $this->videoBuilder->createEntity($input);
-
             // inserindo a entidade no BD utilizando o repository
             $insertedVideo = $this->repository->insert($this->videoBuilder->getEntity());
-
             // armazenando o thumbFile
             if ($input->thumbFile) {
                 $thumbFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->thumbFile);
                 // cria o objeto de thumbFile para a entidade
                 $this->videoBuilder->addThumbFile($thumbFilePath);
             }
-
             // armazenando o thumbHalf
             if ($input->thumbHalf) {
                 $thumbHalfPath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->thumbHalf);
                 // cria o objeto de thumbHalf para a entidade
                 $this->videoBuilder->addThumbHalf($thumbHalfPath);
             }
-
             // armazenando o bannerFile
             if ($input->bannerFile) {
                 $bannerFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->bannerFile);
                 // cria o objeto de bannerFile para a entidade
                 $this->videoBuilder->addBannerFile($bannerFilePath);
             }
-
             // armazenando o trailerFile
             if ($input->trailerFile) {
                 $trailerFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->trailerFile);
                 // cria o objeto de trailerFile para a entidade
                 $this->videoBuilder->addTrailerFile($trailerFilePath, MediaStatus::PROCESSING);
             }
-
             // armazenando o videoFile
             if ($input->videoFile) {
                 $videoFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->videoFile);
@@ -77,13 +69,10 @@ class InsertVideoUseCase extends BaseVideoUseCase
                     $this->eventManager->dispatch(new VideoCreatedEvent($this->videoBuilder->getEntity()));
                 }
             }
-
             // atualizando o registro
             $this->repository->updateMedia($this->videoBuilder->getEntity());
-
             // lançando exception para testar o rollback
             if ($simulateTransactionException) throw new Exception('rollback test');
-
             // em caso de sucesso, comita
             $this->transactionDb->commit();
 

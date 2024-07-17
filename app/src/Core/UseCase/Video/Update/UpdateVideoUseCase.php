@@ -25,15 +25,29 @@ class UpdateVideoUseCase extends BaseVideoUseCase
         // o uso de transações é necessário
         // tratamento de exceções
         try {
-
             // validando as entidades informadas
             $this->validateAllEntitiesIds($input);
+            // buscando a entidade no BD com os dados do input
+            $video = $this->repository->findById($input->id);
 
-            // criando a entidade com os dados do input
-            $this->videoBuilder->createEntity($input);
+            // atualizando a entidade com os dados do input
+            $video->update(
+                title:  $input->title,
+                description:  $input->description,
+                yearLaunched:  $input->yearLaunched,
+                duration:  $input->duration,
+                opened:  $input->opened,
+                categoriesId:  $input->categoriesId,
+                genresId:  $input->genresId,
+                castMembersId:  $input->castMembersId,
+                rating:  $input->rating,
+            );
 
             // inserindo a entidade no BD utilizando o repository
-            $insertedVideo = $this->repository->update($this->videoBuilder->getEntity());
+            $updatedVideo = $this->repository->update($video);
+
+            // inserindo a entidade no builder
+            $this->videoBuilder->setEntity($video);
 
             // armazenando o thumbFile
             if ($input->thumbFile) {

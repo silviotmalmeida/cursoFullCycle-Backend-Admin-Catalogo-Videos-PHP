@@ -20,14 +20,14 @@ class UpdateVideoOutputDto
         public Rating $rating,
         public string $created_at,
         public string $updated_at,
-        public array $categoriesId = [],
-        public array $genresId = [],
-        public array $castMembersId = [],
-        public ?string $thumbFile = null,
-        public ?string $thumbHalf = null,
-        public ?string $bannerFile = null,
-        public ?string $trailerFile = null,
-        public ?string $videoFile = null,
+        public array $categoriesId,
+        public array $genresId,
+        public array $castMembersId,
+        public ?string $thumbFile,
+        public ?string $thumbHalf,
+        public ?string $bannerFile,
+        public ?string $trailerFile,
+        public ?string $videoFile,
     ) {
     }
 }

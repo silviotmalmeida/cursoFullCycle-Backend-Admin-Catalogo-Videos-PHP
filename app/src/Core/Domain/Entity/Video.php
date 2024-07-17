@@ -213,99 +213,83 @@ class Video extends Entity
         $this->castMembersId = array_unique($this->castMembersId);
     }
 
-    // // função de atualização dos atributos possíveis
-    // public function update(
-    //     ?string $title = null,
-    //     ?string $description = null,
-    //     ?int $yearLaunched = null,
-    //     ?int $duration = null,
-    //     ?bool $opened = null,
-    //     ?array $categoriesId = null,
-    //     ?array $genresId = null,
-    //     ?array $castMembersId = null,
-    //     ?Rating $rating = null,
-    //     ?Image $thumbFile = null,
-    //     ?Image $thumbHalf = null,
-    //     ?Image $bannerFile = null,
-    //     ?Media $trailerFile = null,
-    //     ?Media $videoFile = null,
-    // ): void {
-    //     // atualiza somente os atributos com valores recebidos
-    //     if (isset($title)) $this->title = $title;
-    //     if (isset($description)) $this->description = $description;
-    //     if (isset($yearLaunched)) $this->yearLaunched = $yearLaunched;
-    //     if (isset($duration)) $this->duration = $duration;
+    // função de atualização dos atributos possíveis
+    public function update(
+        ?string $title = null,
+        ?string $description = null,
+        ?int $yearLaunched = null,
+        ?int $duration = null,
+        ?bool $opened = null,
+        ?array $categoriesId = null,
+        ?array $genresId = null,
+        ?array $castMembersId = null,
+        ?Rating $rating = null,
+    ): void {
+        // atualiza somente os atributos com valores recebidos
+        if (isset($title)) $this->title = $title;
+        if (isset($description)) $this->description = $description;
+        if (isset($yearLaunched)) $this->yearLaunched = $yearLaunched;
+        if (isset($duration)) $this->duration = $duration;
 
-    //     if (isset($opened)) {
-    //         if ($opened === true) {
-    //             $this->open();
-    //         } else if ($opened === false) {
-    //             $this->close();
-    //         }
-    //     }
+        if (isset($opened)) {
+            if ($opened === true) {
+                $this->open();
+            } else if ($opened === false) {
+                $this->close();
+            }
+        }
 
-    //     if (isset($categoriesId)) {
-    //         // removendo as categorias previamente cadastradas
-    //         foreach ($this->categoriesId as $category) {
-    //             $this->removeCategory($category);
-    //         }
-    //         // inserindo as novas categorias
-    //         foreach ($categoriesId as $category) {
-    //             $this->addCategory($category);
-    //         }
-    //     }
+        if (isset($categoriesId)) {
+            // removendo as categorias previamente cadastradas
+            foreach ($this->categoriesId as $category) {
+                $this->removeCategoryId($category);
+            }
+            // inserindo as novas categorias
+            foreach ($categoriesId as $category) {
+                $this->addCategoryId($category);
+            }
+        }
 
-    //     if (isset($genresId)) {
-    //         // removendo os genres previamente cadastrados
-    //         foreach ($this->genresId as $genre) {
-    //             $this->removeCategory($genre);
-    //         }
-    //         // inserindo os novos genres
-    //         foreach ($genresId as $genre) {
-    //             $this->addCategory($genre);
-    //         }
-    //     }
+        if (isset($genresId)) {
+            // removendo os genres previamente cadastrados
+            foreach ($this->genresId as $genre) {
+                $this->removeGenreId($genre);
+            }
+            // inserindo os novos genres
+            foreach ($genresId as $genre) {
+                $this->addGenreId($genre);
+            }
+        }
 
-    //     if (isset($castMembersId)) {
-    //         // removendo os cast members previamente cadastrados
-    //         foreach ($this->castMembersId as $castMember) {
-    //             $this->removeCategory($castMember);
-    //         }
-    //         // inserindo os novos cast members
-    //         foreach ($castMembersId as $castMember) {
-    //             $this->addCategory($castMember);
-    //         }
-    //     }
+        if (isset($castMembersId)) {
+            // removendo os cast members previamente cadastrados
+            foreach ($this->castMembersId as $castMember) {
+                $this->removeCastMemberId($castMember);
+            }
+            // inserindo os novos cast members
+            foreach ($castMembersId as $castMember) {
+                $this->addCastMemberId($castMember);
+            }
+        }
 
-    //     if (isset($rating)) $this->rating = $rating;
-    //     if (isset($thumbFile)) $this->thumbFile = $thumbFile;
-    //     if (isset($thumbHalf)) $this->thumbHalf = $thumbHalf;
-    //     if (isset($bannerFile)) $this->bannerFile = $bannerFile;
-    //     if (isset($trailerFile)) $this->trailerFile = $trailerFile;
-    //     if (isset($videoFile)) $this->videoFile = $videoFile;
+        if (isset($rating)) $this->rating = $rating;
 
-    //     // atualiza o updatedAt com a data atual
-    //     if (
-    //         isset($title) or
-    //         isset($description) or
-    //         isset($yearLaunched) or
-    //         isset($duration) or
-    //         isset($opened) or
-    //         isset($categoriesId) or
-    //         isset($genresId) or
-    //         isset($castMembersId) or
-    //         isset($rating) or
-    //         isset($thumbFile) or
-    //         isset($thumbHalf) or
-    //         isset($thumbFile) or
-    //         isset($bannerFile) or
-    //         isset($trailerFile) or
-    //         isset($videoFile)
-    //     ) $this->updatedAt = new DateTime();
+        // atualiza o updatedAt com a data atual
+        if (
+            isset($title) or
+            isset($description) or
+            isset($yearLaunched) or
+            isset($duration) or
+            isset($opened) or
+            isset($categoriesId) or
+            isset($genresId) or
+            isset($castMembersId) or
+            isset($rating)
+        ) $this->updatedAt = new DateTime();
 
-    //     // validando os atributos
-    //     $this->validate();
-    // }
+        // validando os atributos
+        $this->validate();
+    }
 
     // função de validação dos atributos
     private function validate(): void

@@ -10,7 +10,7 @@ use Core\Domain\Entity\Video;
 class UpdateVideoBuilder extends CreateVideoBuilder
 {
     // método de atualização da entidade básica
-    public function createEntity(object $input): CreateVideoBuilder
+    public function createEntity(object $input): UpdateVideoBuilder
     {
         // criando a entidade com os dados do input
         $this->entity = new Video(
@@ -40,6 +40,14 @@ class UpdateVideoBuilder extends CreateVideoBuilder
 
             $this->entity->addCastMemberId($castMemberId);
         }
+
+        return $this;
+    }
+
+    // método de inclusão de entidade
+    public function setEntity(Video $video): UpdateVideoBuilder
+    {
+        $this->entity = $video;
 
         return $this;
     }

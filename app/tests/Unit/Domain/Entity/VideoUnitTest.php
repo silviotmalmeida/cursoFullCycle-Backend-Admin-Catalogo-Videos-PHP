@@ -370,6 +370,18 @@ class VideoUnitTest extends TestCase
             rating: Rating::RATE12,
         );
 
+        // verificando os atributos
+        $this->assertSame($uuid, $video->id());
+        $this->assertSame('Title', $video->title);
+        $this->assertSame('Description', $video->description);
+        $this->assertSame(2023, $video->yearLaunched);
+        $this->assertSame(50, $video->duration);
+        $this->assertSame(Rating::RATE12, $video->rating);
+        $this->assertCount(0, $video->categoriesId);
+        $this->assertCount(0, $video->genresId);
+        $this->assertCount(0, $video->castMembersId);
+        $this->assertSame($video->createdAt(), $video->updatedAt());
+
         // retardo na execução para permitir diferenciação do updatedAt
         sleep(1);
 
@@ -380,10 +392,10 @@ class VideoUnitTest extends TestCase
             yearLaunched: 2024,
             duration: 60,
             rating: Rating::RATE18,
+            categoriesId: [RamseyUuid::uuid4()->toString(), RamseyUuid::uuid4()->toString(), RamseyUuid::uuid4()->toString()],
+            genresId: [RamseyUuid::uuid4()->toString(), RamseyUuid::uuid4()->toString()],
+            castMembersId: [RamseyUuid::uuid4()->toString()]
         );
-
-        // memorizando a data da primeira atualização para comparar com a segunda
-        $firstUpdateDate = $video->updatedAt();
 
         // verificando os atributos
         $this->assertSame($uuid, $video->id());
@@ -392,6 +404,36 @@ class VideoUnitTest extends TestCase
         $this->assertSame(2024, $video->yearLaunched);
         $this->assertSame(60, $video->duration);
         $this->assertSame(Rating::RATE18, $video->rating);
+        $this->assertCount(3, $video->categoriesId);
+        $this->assertCount(2, $video->genresId);
+        $this->assertCount(1, $video->castMembersId);
+        $this->assertNotSame($video->createdAt(), $video->updatedAt());
+
+        // atualizando com valores novamente
+        $video->update(
+            title: 'New Title 2',
+            description: 'New Description 2',
+            yearLaunched: 2025,
+            duration: 70,
+            rating: Rating::RATE10,
+            categoriesId: [RamseyUuid::uuid4()->toString()],
+            genresId: [RamseyUuid::uuid4()->toString(), RamseyUuid::uuid4()->toString(), RamseyUuid::uuid4()->toString()],
+            castMembersId: [RamseyUuid::uuid4()->toString(), RamseyUuid::uuid4()->toString()]
+        );
+
+        // memorizando a data da segunda atualização para comparar com a terceira
+        $secondUpdateDate = $video->updatedAt();
+
+        // verificando os atributos
+        $this->assertSame($uuid, $video->id());
+        $this->assertSame('New Title 2', $video->title);
+        $this->assertSame('New Description 2', $video->description);
+        $this->assertSame(2025, $video->yearLaunched);
+        $this->assertSame(70, $video->duration);
+        $this->assertSame(Rating::RATE10, $video->rating);
+        $this->assertCount(1, $video->categoriesId);
+        $this->assertCount(3, $video->genresId);
+        $this->assertCount(2, $video->castMembersId);
         $this->assertNotSame($video->createdAt(), $video->updatedAt());
 
         // atualizando sem valores, o updatedAt não deve ser modificado
@@ -399,12 +441,15 @@ class VideoUnitTest extends TestCase
 
         // verificando os atributos
         $this->assertSame($uuid, $video->id());
-        $this->assertSame('New Title', $video->title);
-        $this->assertSame('New Description', $video->description);
-        $this->assertSame(2024, $video->yearLaunched);
-        $this->assertSame(60, $video->duration);
-        $this->assertSame(Rating::RATE18, $video->rating);
-        $this->assertSame($firstUpdateDate, $video->updatedAt());
+        $this->assertSame('New Title 2', $video->title);
+        $this->assertSame('New Description 2', $video->description);
+        $this->assertSame(2025, $video->yearLaunched);
+        $this->assertSame(70, $video->duration);
+        $this->assertSame(Rating::RATE10, $video->rating);
+        $this->assertCount(1, $video->categoriesId);
+        $this->assertCount(3, $video->genresId);
+        $this->assertCount(2, $video->castMembersId);
+        $this->assertSame($secondUpdateDate, $video->updatedAt());
     }
 
     // função que testa a função de validação de title válido

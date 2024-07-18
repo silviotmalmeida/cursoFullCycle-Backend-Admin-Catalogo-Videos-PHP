@@ -17,4 +17,5 @@ interface VideoBuilderInterface
     public function addTrailerFile(string $path, MediaStatus $mediaStatus): VideoBuilderInterface;
     public function addVideoFile(string $path, MediaStatus $mediaStatus): VideoBuilderInterface;
     public function getEntity(): Video;
+    public function setEntity(Video $video): VideoBuilderInterface;
 }

@@ -136,4 +136,12 @@ class CreateVideoBuilder implements VideoBuilderInterface
     {
         return $this->entity;
     }
+
+    // método de inclusão de entidade já criada
+    public function setEntity(Video $video): CreateVideoBuilder
+    {
+        $this->entity = $video;
+
+        return $this;
+    }
 }

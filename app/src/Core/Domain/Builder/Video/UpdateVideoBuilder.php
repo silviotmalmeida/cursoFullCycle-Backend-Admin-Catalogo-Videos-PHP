@@ -43,12 +43,4 @@ class UpdateVideoBuilder extends CreateVideoBuilder
 
         return $this;
     }
-
-    // método de inclusão de entidade
-    public function setEntity(Video $video): UpdateVideoBuilder
-    {
-        $this->entity = $video;
-
-        return $this;
-    }
 }

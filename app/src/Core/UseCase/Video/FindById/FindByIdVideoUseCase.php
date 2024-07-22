@@ -6,6 +6,7 @@ namespace Core\UseCase\Video\FindById;
 // importações
 use Core\Domain\Builder\Video\CreateVideoBuilder;
 use Core\Domain\Builder\Video\VideoBuilderInterface;
+use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\UseCase\Video\BaseVideoUseCase;
 use Core\UseCase\Video\FindById\DTO\FindByIdVideoInputDto;
 use Core\UseCase\Video\FindById\DTO\FindByIdVideoOutputDto;
@@ -13,10 +14,17 @@ use Core\UseCase\Video\FindById\DTO\FindByIdVideoOutputDto;
 // definindo o usecase
 class FindByIdVideoUseCase extends BaseVideoUseCase
 {
+    // construtor e atributos
+    public function __construct(
+        protected VideoRepositoryInterface $repository
+    ) {
+        // criando o builder da entidade video
+        $this->videoBuilder = $this->getBuilder();
+    }
+
     // método de execução do usecase
     // recebe um inputDto e retorna um outputDto
-    // o segundo argumento é para possibilitar o teste de rollback da transação
-    public function execute(FindByIdVideoInputDto $input, bool $simulateTransactionException = false): FindByIdVideoOutputDto
+    public function execute(FindByIdVideoInputDto $input): FindByIdVideoOutputDto
     {
         // buscando a entidade no BD com os dados do input
         $video = $this->repository->findById($input->id);
@@ -47,7 +55,7 @@ class FindByIdVideoUseCase extends BaseVideoUseCase
     }
 
     // método responsável por retornar o builder a ser utilizado pelo usecase
-    protected function getBuilder(): VideoBuilderInterface
+    protected function getBuilder(): ?VideoBuilderInterface
     {
         return new CreateVideoBuilder();
     }

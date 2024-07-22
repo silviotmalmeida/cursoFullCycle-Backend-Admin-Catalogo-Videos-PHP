@@ -39,6 +39,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
             duration: $input->duration,
             rating: $input->rating,
         );
+        
         if ($input->opened) $this->entity->open();
 
         // adicionando as categories

@@ -137,7 +137,7 @@ class UpdateVideoUseCase extends BaseVideoUseCase
     }
 
     // método responsável por retornar o builder a ser utilizado pelo usecase
-    protected function getBuilder(): VideoBuilderInterface
+    protected function getBuilder(): ?VideoBuilderInterface
     {
         return new UpdateVideoBuilder();
     }

@@ -19,10 +19,10 @@ use Core\UseCase\Video\Interfaces\VideoEventManagerInterface;
 abstract class BaseVideoUseCase
 {
     // atributos fora do construtor
-    protected VideoBuilderInterface $videoBuilder;
+    protected ?VideoBuilderInterface $videoBuilder;
 
     // métodos abstratos a serem implementados nas classes filhas
-    abstract protected function getBuilder() : VideoBuilderInterface;
+    abstract protected function getBuilder() : ?VideoBuilderInterface;
 
     // construtor e atributos
     public function __construct(

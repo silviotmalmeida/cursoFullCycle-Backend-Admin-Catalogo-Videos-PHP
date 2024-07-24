@@ -9,24 +9,25 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 // definindo a model
-class CastMember extends Model
+class Video extends Model
 {
     // traits a serem utilizadas
     use HasFactory, SoftDeletes;
 
     // definindo o nome da tabela no BD
-    protected $table = 'cast_members';
+    protected $table = 'videos';
 
     // definindo os atributos a serem informados
     protected $fillable = [
         'id',
         'name',
-        'type',
+        'is_active',
     ];
 
     // configurando os casts de tipagem a serem realizados
     protected $casts = [
         'id' => 'string',
+        'is_active' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime'
@@ -34,4 +35,10 @@ class CastMember extends Model
 
     // desativando o autoincremento
     public $incrementing = false;
+
+    // definindo o relacionamento muitos-para-muitos com category
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'category_video', 'video_id', 'category_id');
+    }
 }

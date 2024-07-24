@@ -21,6 +21,8 @@
     para criar um api request: php artisan make:request <namespace (StoreCategoryRequest)>
     para listar as rotas cadastradas: php artisan route:list
     para criar uma migration: php artisan make:migration <nome-da-migration>
+    para criar um provider: php artisan make:provider <nome-do-provider>
+    para criar um listener: php artisan make:listener <nome-do-listener>
 
 - ordem de implementação das classes
     - core

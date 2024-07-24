@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Listeners\SendVideoToMicroEncoder;
 use Core\Domain\Events\VideoCreatedEvent;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -20,9 +21,9 @@ class EventServiceProvider extends ServiceProvider
             SendEmailVerificationNotification::class,
         ],
         // incluindo os eventos a serem monitorados, bem como as ações a serem disparadas
-        // VideoCreatedEvent::class => [
-
-        // ]
+        VideoCreatedEvent::class => [
+            SendVideoToMicroEncoder::class,
+        ]
     ];
 
     /**

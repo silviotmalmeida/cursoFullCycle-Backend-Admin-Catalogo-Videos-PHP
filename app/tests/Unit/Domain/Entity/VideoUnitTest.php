@@ -5,7 +5,9 @@ namespace Tests\Unit\Domain\Entity;
 
 // importações
 use Core\Domain\Entity\Video;
+use Core\Domain\Enum\ImageType;
 use Core\Domain\Enum\MediaStatus;
+use Core\Domain\Enum\MediaType;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\EntityValidationException;
 use Core\Domain\Notification\NotificationException;
@@ -60,6 +62,7 @@ class VideoUnitTest extends TestCase
         // criando o thumbfile
         $thumbfile = new Image(
             filePath: 'path/thumbfile.png',
+            imageType: ImageType::THUMBFILE,
         );
         // setando o thumbfile
         $video->setThumbFile($thumbfile);
@@ -85,6 +88,7 @@ class VideoUnitTest extends TestCase
         // criando o thumbHalf
         $thumbHalf = new Image(
             filePath: 'path/thumbHalf.png',
+            imageType: ImageType::THUMBHALF,
         );
         // setando o thumbHalf
         $video->setThumbHalf($thumbHalf);
@@ -110,6 +114,7 @@ class VideoUnitTest extends TestCase
         // criando o bannerFile
         $bannerFile = new Image(
             filePath: 'path/bannerFile.png',
+            imageType: ImageType::BANNERFILE,
         );
         // setando o bannerFile
         $video->setBannerFile($bannerFile);
@@ -136,6 +141,7 @@ class VideoUnitTest extends TestCase
         $trailerFile = new Media(
             filePath: 'path/trailerFile.mp4',
             mediaStatus: MediaStatus::PENDING,
+            mediaType: MediaType::TRAILER,
             encodedPath: ''
         );
         // setando o trailerFile
@@ -163,6 +169,7 @@ class VideoUnitTest extends TestCase
         $videoFile = new Media(
             filePath: 'path/videoFile.mp4',
             mediaStatus: MediaStatus::PENDING,
+            mediaType: MediaType::VIDEO,
             encodedPath: ''
         );
         // setando o videoFile

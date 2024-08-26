@@ -4,6 +4,8 @@
 namespace Tests\Unit\Domain\ValueObject;
 
 // importações
+
+use Core\Domain\Enum\ImageType;
 use Core\Domain\Exception\EntityValidationException;
 use Core\Domain\ValueObject\Image;
 use PHPUnit\Framework\TestCase;
@@ -16,7 +18,8 @@ class ImageUnitTest extends TestCase
     {
         // criando o Image
         $image  = new Image(
-            filePath: 'path/para/image.png'
+            filePath: 'path/para/image.png',
+            imageType: ImageType::THUMBFILE,
         );
         
         // verificando os atributos
@@ -33,7 +36,8 @@ class ImageUnitTest extends TestCase
         try {
             // criando o Image
             $image  = new Image(
-                filePath: ''
+                filePath: '',
+                imageType: ImageType::THUMBFILE,
             );
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);
@@ -46,7 +50,35 @@ class ImageUnitTest extends TestCase
         try {
             // criando o Image
             $image  = new Image(
-                filePath: 'path/para/image.png'
+                filePath: 'path/para/image.png',
+                imageType: ImageType::THUMBFILE,
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        }
+
+        // 
+        // validando imageType
+        //
+        // validando imageType inválido
+        try {
+            // criando o Image
+            $image  = new Image(
+                filePath: 'path/para/image.png',
+                imageType: 0,
+            );
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando imageType válido
+        try {
+            // criando o Image
+            $image  = new Image(
+                filePath: 'path/para/image.png',
+                imageType: ImageType::THUMBFILE,
             );
         } catch (\Throwable $th) {
             // se lançar exceção o teste deve falhar

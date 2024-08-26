@@ -6,7 +6,9 @@ namespace Core\Domain\Validation;
 // importações
 
 use Core\Domain\Enum\CastMemberType;
+use Core\Domain\Enum\ImageType;
 use Core\Domain\Enum\MediaStatus;
+use Core\Domain\Enum\MediaType;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\EntityValidationException;
 
@@ -79,6 +81,22 @@ class DomainValidation
         // se não for compatível com a enumeração MediaStatus, lança exceção
         // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
         if (!MediaStatus::tryFrom($value)) throw new EntityValidationException($exceptMessage ?? "Type value {$value} not found for media status");
+    }
+
+    // valida se o valor é compatível com a enumeração MediaType
+    public static function isMediaTypeCompatible(int $value, string $exceptMessage = null): void
+    {
+        // se não for compatível com a enumeração MediaType, lança exceção
+        // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
+        if (!MediaType::tryFrom($value)) throw new EntityValidationException($exceptMessage ?? "Type value {$value} not found for media type");
+    }
+
+    // valida se o valor é compatível com a enumeração ImageType
+    public static function isImageTypeCompatible(int $value, string $exceptMessage = null): void
+    {
+        // se não for compatível com a enumeração ImageType, lança exceção
+        // envia a mensagem recebida caso seja válida, senão envia mensagem padrão
+        if (!ImageType::tryFrom($value)) throw new EntityValidationException($exceptMessage ?? "Type value {$value} not found for image type");
     }
 
     // valida se um valor não está nulo ou vazio

@@ -5,7 +5,9 @@ namespace Core\Domain\Builder\Video;
 
 // importações
 use Core\Domain\Entity\Video;
+use Core\Domain\Enum\ImageType;
 use Core\Domain\Enum\MediaStatus;
+use Core\Domain\Enum\MediaType;
 use Core\Domain\ValueObject\Image;
 use Core\Domain\ValueObject\Media;
 
@@ -69,6 +71,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de thumbFile para a entidade
         $thumbFile = new Image(
             filePath: $path,
+            imageType:ImageType::THUMBFILE,
         );
         // atualizando a entidade
         $this->entity->setThumbFile($thumbFile);
@@ -82,6 +85,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de thumbHalf para a entidade
         $thumbHalf = new Image(
             filePath: $path,
+            imageType:ImageType::THUMBHALF,
         );
         // atualizando a entidade
         $this->entity->setThumbHalf($thumbHalf);
@@ -95,6 +99,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de bannerFile para a entidade
         $bannerFile = new Image(
             filePath: $path,
+            imageType:ImageType::BANNERFILE,
         );
         // atualizando a entidade
         $this->entity->setBannerFile($bannerFile);
@@ -109,6 +114,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         $trailerFile = new Media(
             filePath: $path,
             mediaStatus: $mediaStatus,
+            mediaType: MediaType::TRAILER,
             encodedPath: ''
         );
         // atualizando a entidade
@@ -124,6 +130,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         $videoFile = new Media(
             filePath: $path,
             mediaStatus: $mediaStatus,
+            mediaType: MediaType::VIDEO,
             encodedPath: ''
         );
         // atualizando a entidade

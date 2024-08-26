@@ -5,6 +5,7 @@ namespace Tests\Unit\Domain\ValueObject;
 
 // importações
 use Core\Domain\Enum\MediaStatus;
+use Core\Domain\Enum\MediaType;
 use Core\Domain\Exception\EntityValidationException;
 use Core\Domain\ValueObject\Media;
 use PHPUnit\Framework\TestCase;
@@ -19,12 +20,14 @@ class MediaUnitTest extends TestCase
         $media = new Media(
             filePath: 'path/media.mp4',
             mediaStatus: MediaStatus::PENDING,
+            mediaType: MediaType::TRAILER,
             encodedPath: ''
         );
 
         // verificando os atributos
         $this->assertSame('path/media.mp4', $media->filePath());
         $this->assertSame(MediaStatus::PENDING, $media->mediaStatus());
+        $this->assertSame(MediaType::TRAILER, $media->mediaType());
         $this->assertSame('', $media->encodedPath());
     }
 
@@ -40,6 +43,7 @@ class MediaUnitTest extends TestCase
             $media = new Media(
                 filePath: '',
                 mediaStatus: MediaStatus::PENDING,
+                mediaType: MediaType::TRAILER,
                 encodedPath: ''
             );
             // se não lançar exceção o teste deve falhar
@@ -55,6 +59,7 @@ class MediaUnitTest extends TestCase
             $media = new Media(
                 filePath: 'path/media.mp4',
                 mediaStatus: MediaStatus::PENDING,
+                mediaType: MediaType::TRAILER,
                 encodedPath: ''
             );
         } catch (\Throwable $th) {
@@ -71,6 +76,7 @@ class MediaUnitTest extends TestCase
             $media = new Media(
                 filePath: 'path/media.mp4',
                 mediaStatus: 0,
+                mediaType: MediaType::TRAILER,
                 encodedPath: ''
             );
             // se não lançar exceção o teste deve falhar
@@ -86,6 +92,40 @@ class MediaUnitTest extends TestCase
             $media = new Media(
                 filePath: 'path/media.mp4',
                 mediaStatus: MediaStatus::PENDING,
+                mediaType: MediaType::TRAILER,
+                encodedPath: ''
+            );
+        } catch (\Throwable $th) {
+            // se lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        }
+
+        // 
+        // validando mediaType
+        //
+        // validando mediaType inválido
+        try {
+            // criando o Media
+            $media = new Media(
+                filePath: 'path/media.mp4',
+                mediaStatus: MediaStatus::PENDING,
+                mediaType: 0,
+                encodedPath: ''
+            );
+            // se não lançar exceção o teste deve falhar
+            $this->assertTrue(false);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção            
+            $this->assertInstanceOf(EntityValidationException::class, $th);
+        }
+
+        // validando mediaType válido
+        try {
+            // criando o Media
+            $media = new Media(
+                filePath: 'path/media.mp4',
+                mediaStatus: MediaStatus::PENDING,
+                mediaType: MediaType::TRAILER,
                 encodedPath: ''
             );
         } catch (\Throwable $th) {

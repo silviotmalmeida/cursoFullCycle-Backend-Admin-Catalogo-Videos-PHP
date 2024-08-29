@@ -23,6 +23,7 @@
     para criar uma migration: php artisan make:migration <nome-da-migration>
     para criar um provider: php artisan make:provider <nome-do-provider>
     para criar um listener: php artisan make:listener <nome-do-listener>
+    para testar uma factory com o tinker: php artisan tinker; <path-da-model(ex. \App\Models\Video)>::factory->count(10)->create();
 
 - ordem de implementação das classes
     - core

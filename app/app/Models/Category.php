@@ -42,4 +42,10 @@ class Category extends Model
     {
         return $this->belongsToMany(Genre::class, 'category_genre', 'category_id', 'genre_id');
     }
+
+    // definindo o relacionamento muitos-para-muitos com video
+    public function videos()
+    {
+        return $this->belongsToMany(Video::class, 'video_category', 'category_id', 'video_id');
+    }
 }

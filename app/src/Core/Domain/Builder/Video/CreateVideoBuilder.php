@@ -71,7 +71,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de thumbFile para a entidade
         $thumbFile = new Image(
             filePath: $path,
-            imageType:ImageType::THUMBFILE,
+            imageType:ImageType::THUMB,
         );
         // atualizando a entidade
         $this->entity->setThumbFile($thumbFile);
@@ -85,7 +85,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de thumbHalf para a entidade
         $thumbHalf = new Image(
             filePath: $path,
-            imageType:ImageType::THUMBHALF,
+            imageType:ImageType::THUMB_HALF,
         );
         // atualizando a entidade
         $this->entity->setThumbHalf($thumbHalf);
@@ -99,7 +99,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de bannerFile para a entidade
         $bannerFile = new Image(
             filePath: $path,
-            imageType:ImageType::BANNERFILE,
+            imageType:ImageType::BANNER,
         );
         // atualizando a entidade
         $this->entity->setBannerFile($bannerFile);

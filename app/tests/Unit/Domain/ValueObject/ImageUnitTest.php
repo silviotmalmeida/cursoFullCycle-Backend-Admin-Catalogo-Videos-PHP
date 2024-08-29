@@ -19,7 +19,7 @@ class ImageUnitTest extends TestCase
         // criando o Image
         $image  = new Image(
             filePath: 'path/para/image.png',
-            imageType: ImageType::THUMBFILE,
+            imageType: ImageType::THUMB,
         );
         
         // verificando os atributos
@@ -37,7 +37,7 @@ class ImageUnitTest extends TestCase
             // criando o Image
             $image  = new Image(
                 filePath: '',
-                imageType: ImageType::THUMBFILE,
+                imageType: ImageType::THUMB,
             );
             // se não lançar exceção o teste deve falhar
             $this->assertTrue(false);
@@ -51,7 +51,7 @@ class ImageUnitTest extends TestCase
             // criando o Image
             $image  = new Image(
                 filePath: 'path/para/image.png',
-                imageType: ImageType::THUMBFILE,
+                imageType: ImageType::THUMB,
             );
         } catch (\Throwable $th) {
             // se lançar exceção o teste deve falhar
@@ -78,7 +78,7 @@ class ImageUnitTest extends TestCase
             // criando o Image
             $image  = new Image(
                 filePath: 'path/para/image.png',
-                imageType: ImageType::THUMBFILE,
+                imageType: ImageType::THUMB,
             );
         } catch (\Throwable $th) {
             // se lançar exceção o teste deve falhar

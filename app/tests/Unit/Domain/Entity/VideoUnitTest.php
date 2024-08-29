@@ -62,7 +62,7 @@ class VideoUnitTest extends TestCase
         // criando o thumbfile
         $thumbfile = new Image(
             filePath: 'path/thumbfile.png',
-            imageType: ImageType::THUMBFILE,
+            imageType: ImageType::THUMB,
         );
         // setando o thumbfile
         $video->setThumbFile($thumbfile);
@@ -88,7 +88,7 @@ class VideoUnitTest extends TestCase
         // criando o thumbHalf
         $thumbHalf = new Image(
             filePath: 'path/thumbHalf.png',
-            imageType: ImageType::THUMBHALF,
+            imageType: ImageType::THUMB_HALF,
         );
         // setando o thumbHalf
         $video->setThumbHalf($thumbHalf);
@@ -114,7 +114,7 @@ class VideoUnitTest extends TestCase
         // criando o bannerFile
         $bannerFile = new Image(
             filePath: 'path/bannerFile.png',
-            imageType: ImageType::BANNERFILE,
+            imageType: ImageType::BANNER,
         );
         // setando o bannerFile
         $video->setBannerFile($bannerFile);

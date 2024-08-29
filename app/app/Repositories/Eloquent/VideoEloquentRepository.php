@@ -6,7 +6,6 @@ namespace App\Repositories\Eloquent;
 // importações
 use App\Models\Video as VideoModel;
 use App\Repositories\Presenters\PaginationPresenter;
-use Core\Domain\Builder\Video\CreateVideoBuilder;
 use Core\Domain\Entity\Video as VideoEntity;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\VideoRepositoryInterface;
@@ -17,67 +16,96 @@ use DateTime;
 // definindo o repository, que implementa a interface VideoRepositoryInterface
 class VideoEloquentRepository implements VideoRepositoryInterface
 {
+    // atributos
+    protected VideoBuilderInterface $videoBuilder;
+
     // construtor e atributos
     public function __construct(
-        protected $model = new VideoModel(),
-        protected VideoBuilderInterface $videoBuilder,
-    ) {
-    }
+        protected $model = new VideoModel()
+    ) {}
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
     private function toVideo(VideoModel $object): VideoEntity
     {
-        $this->videoBuilder = new CreateVideoBuilder();
 
-        $Video = $this->videoBuilder->createEntity($object);
+        $video = new VideoEntity(
+            id: $object->id,
+            title: $object->title,
+            description: $object->description,
+            yearLaunched: $object->year_launched,
+            duration: $object->duration,
+            rating: $object->rating,
+            createdAt: $object->created_at,
+            updatedAt: $object->updated_at
+        );
 
-        // if($object->thumbFile) $this->videoBuilder->addThumbFile($object->thumbFile);
-        // if($object->thumbHalf) $this->videoBuilder->addThumbHalf($object->thumbHalf);
-        // if($object->bannerFile) $this->videoBuilder->addBannerFile($object->bannerFile);
-        // if($object->trailerFile) $this->videoBuilder->addTrailerFile($object->trailerFile);
-        // if($object->videoFile) $this->videoBuilder->addVideoFile($object->videoFile);
+        ((bool) $object->opened) ? $video->open() : $video->close();
 
+        // adicionando as categories
+        if ($object->categoriesId) {
+            foreach ($object->categoriesId as $categoryId) {
 
-        // ((bool) $object->is_active) ? $Video->activate() : $Video->deactivate();
+                $video->addCategoryId($categoryId);
+            }
+        }
 
-        return $this->videoBuilder->getEntity();
+        // adicionando os genres
+        if ($object->genresId) {
+            foreach ($object->genresId as $genreId) {
+
+                $video->addGenreId($genreId);
+            }
+        }
+
+        // adicionando os cast members
+        if ($object->castMembersId) {
+            foreach ($object->castMembersId as $castMemberId) {
+
+                $video->addCastMemberId($castMemberId);
+            }
+        }
+
+        return $video;
     }
 
     // função de inserção no bd
-    public function insert(VideoEntity $Video): VideoEntity
+    public function insert(VideoEntity $video): VideoEntity
     {
         // inserindo os dados recebidos
         $response = $this->model->create(
             [
-                'id' => $Video->id(),
-                'name' => $Video->name,
-                'is_active' => $Video->isActive,
-                'created_at' => $Video->createdAt(),
-                'updated_at' => $Video->updatedAt(),
+                'id' => $video->id(),
+                'title' => $video->title,
+                'description' => $video->description,
+                'year_launched' => $video->yearLaunched,
+                'duration' => $video->duration,
+                'rating' => $video->rating->value,
+                'opened' => $video->opened,
+                'created_at' => $video->createdAt(),
+                'updated_at' => $video->updatedAt(),
             ]
         );
-
-        // sincronizando os relacionamentos
-        // convertendo os valores a serem inseridos em string
-        $arraySync = [];
-        for ($i = 0; $i < count($Video->categoriesId); $i++) {
-            array_push($arraySync, strval($Video->categoriesId[$i]));
-        }
-        $response->categories()->sync($arraySync);
+        // // sincronizando os relacionamentos
+        // // convertendo os valores a serem inseridos em string
+        // $arraySync = [];
+        // for ($i = 0; $i < count($video->categoriesId); $i++) {
+        //     array_push($arraySync, strval($video->categoriesId[$i]));
+        // }
+        // $response->categories()->sync($arraySync);
 
         // retornando a entidade populada com os dados inseridos
         return $this->toVideo($response);
     }
 
     // função de busca por id
-    public function findById(string $VideoId): VideoEntity
+    public function findById(string $videoId): VideoEntity
     {
         // buscando no bd
-        $VideoDb = $this->model->find($VideoId);
+        $videoDb = $this->model->find($videoId);
         // se não houver retorno, lança exceção
-        if (!$VideoDb) throw new NotFoundException('ID not found');
+        if (!$videoDb) throw new NotFoundException('ID not found');
         // retornando a entidade
-        return $this->toVideo($VideoDb);
+        return $this->toVideo($videoDb);
     }
 
     // função de busca múltipla, a partir de uma lista de id
@@ -88,8 +116,8 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         // buscando no bd a partir da lista recebida
         $genresDb = $this->model->whereIn('id', $listIds)->get();
         // convertendo os resultados para entidade
-        foreach ($genresDb as $VideoDb) {
-            array_push($response, $this->toVideo($VideoDb));
+        foreach ($genresDb as $videoDb) {
+            array_push($response, $this->toVideo($videoDb));
         }
         // retornando a lista de entidades
         return $response;
@@ -101,9 +129,9 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         // iniciando a busca
         $query = $this->model;
         // aplicando o filtro, se existir
-        if ($filter) $query = $query->where('name', 'LIKE', "%{$filter}%");
+        if ($filter) $query = $query->where('title', 'LIKE', "%{$filter}%");
         // ordenando
-        $query = $query->orderBy('name', $order);
+        $query = $query->orderBy('title', $order);
         // executando a busca
         $response = $query->get();
         // retornando os dados
@@ -116,7 +144,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         // iniciando a busca
         $query = $this->model;
         // aplicando o filtro, se existir
-        if ($filter) $query = $query->where('name', 'LIKE', "%{$filter}%");
+        if ($filter) $query = $query->where('title', 'LIKE', "%{$filter}%");
         // ordenando
         $query = $query->orderBy('id', $order);
         // executando a busca paginada
@@ -127,47 +155,48 @@ class VideoEloquentRepository implements VideoRepositoryInterface
     }
 
     // função de atualização
-    public function update(VideoEntity $Video): VideoEntity
+    public function update(VideoEntity $video): VideoEntity
     {
         // buscando no bd
-        $VideoDb = $this->model->find($Video->id());
+        $videoDb = $this->model->find($video->id());
         // se não houver retorno, lança exceção
-        if (!$VideoDb) throw new NotFoundException('ID not found');
+        if (!$videoDb) throw new NotFoundException('ID not found');
         // executando a atualização
-        $VideoDb->update([
-            'id' => $Video->id(),
-            'name' => $Video->name,
-            'is_active' => $Video->isActive,
+        $videoDb->update([
+            'id' => $video->id(),
+            'title' => $video->title,
+            'is_active' => $video->isActive,
             'updated_at' => new DateTime()
         ]);
 
         // sincronizando os relacionamentos
         // convertendo os valores a serem inseridos em string
         $arraySync = [];
-        for ($i = 0; $i < count($Video->categoriesId); $i++) {
-            array_push($arraySync, strval($Video->categoriesId[$i]));
+        for ($i = 0; $i < count($video->categoriesId); $i++) {
+            array_push($arraySync, strval($video->categoriesId[$i]));
         }
-        $VideoDb->categories()->sync($arraySync);
+        $videoDb->categories()->sync($arraySync);
 
         // forçando a atualização do registro
-        $VideoDb->refresh();
+        $videoDb->refresh();
         // retornando a entidade populada com os dados inseridos
-        return $this->toVideo($VideoDb);
+        return $this->toVideo($videoDb);
     }
 
     // função de remoção
-    public function deleteById(string $VideoId): bool
+    public function deleteById(string $videoId): bool
     {
         // buscando no bd
-        $VideoDb = $this->model->find($VideoId);
+        $videoDb = $this->model->find($videoId);
         // se não houver retorno, lança exceção
-        if (!$VideoDb) throw new NotFoundException('ID not found');
+        if (!$videoDb) throw new NotFoundException('ID not found');
         // removendo o registro
-        $VideoDb->delete();
+        $videoDb->delete();
         return true;
     }
 
-    public function updateMedia(VideoEntity $entity): VideoEntity{
+    public function updateMedia(VideoEntity $entity): VideoEntity
+    {
 
         return new VideoEntity();
     }

@@ -7,7 +7,7 @@ namespace Core\Domain\Enum;
 enum ImageType: int
 {
         // definindo os valores possíveis
-    case THUMBFILE = 1;
-    case THUMBHALF  = 2;
-    case BANNERFILE  = 3;
+    case THUMB = 1;
+    case THUMB_HALF  = 2;
+    case BANNER  = 3;
 }

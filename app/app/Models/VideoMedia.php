@@ -6,38 +6,43 @@ namespace App\Models;
 // importações
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 // definindo a model
-class CastMember extends Model
+class VideoMedia extends Model
 {
     // traits a serem utilizadas
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     // definindo o nome da tabela no BD
-    protected $table = 'cast_members';
+    protected $table = 'video_medias';
 
     // definindo os atributos a serem informados
     protected $fillable = [
-        'id',
-        'name',
+        'video_id',
+        'file_path',
+        'encoded_path',
+        'status',
         'type',
     ];
 
     // configurando os casts de tipagem a serem realizados
     protected $casts = [
-        'id' => 'string',
+        'video_id' => 'string',
+        'file_path' => 'string',
+        'encoded_path' => 'string',
+        'status' => 'int',
+        'type' => 'int',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
         'deleted_at' => 'datetime'
     ];
 
-    // desativando o autoincremento
-    public $incrementing = false;
+    // ativando o autoincremento
+    public $incrementing = true;
 
-    // definindo o relacionamento muitos-para-muitos com video
-    public function videos()
+    // definindo o relacionamento um-para-um com video
+    public function video()
     {
-        return $this->belongsToMany(Video::class, 'video_cast_member', 'cast_member_id', 'video_id');
+        return $this->belongsTo(Video::class, 'id', 'video_id');
     }
 }

@@ -1,8 +1,5 @@
 <?php
 
-use App\Models\MediaVideo;
-use Core\Domain\Enum\MediaStatus;
-use Core\Domain\Enum\MediaType;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -16,15 +13,12 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('medias_video', function (Blueprint $table) {
-            $table->uuid('id')->primary()->autoIncrement();
+        Schema::create('video_cast_member', function (Blueprint $table) {
+            $table->uuid('cast_member_id')->index();
+            $table->foreign('cast_member_id')->references('id')->on('cast_members')->onDelete('cascade');
             $table->uuid('video_id')->index();
             $table->foreign('video_id')->references('id')->on('videos')->onDelete('cascade');
-            $table->string('file_path');
-            $table->string('encoded_path')->nullable();
-            $table->enum('media_status', array_keys(MediaStatus::cases()));
-            $table->enum('media_type', array_keys(MediaType::cases()));
-            $table->timestamps();
+            $table->unique(['cast_member_id', 'video_id']);
         });
     }
 
@@ -35,6 +29,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('medias_video');
+        Schema::dropIfExists('video_cast_member');
     }
 };

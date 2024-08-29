@@ -23,7 +23,7 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toGenre(GenreModel $object): Entity
+    private function toGenre(object $object): Entity
     {
         $Genre = new GenreEntity(
             id: $object->id,

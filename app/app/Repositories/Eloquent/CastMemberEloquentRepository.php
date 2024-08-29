@@ -24,7 +24,7 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
     }
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toCastMember(CastMemberModel $object): Entity
+    private function toCastMember(object $object): Entity
     {
         $castMember = new CastMemberEntity(
             id: $object->id,

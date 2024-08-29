@@ -38,7 +38,7 @@ class Video extends Model
         'description' => 'string',
         'year_launched' => 'int',
         'duration' => 'int',
-        'rating' => 'int',
+        'rating' => 'string',
         'opened' => 'boolean',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',

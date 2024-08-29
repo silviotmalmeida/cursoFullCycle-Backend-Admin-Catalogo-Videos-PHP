@@ -16,16 +16,13 @@ use DateTime;
 // definindo o repository, que implementa a interface VideoRepositoryInterface
 class VideoEloquentRepository implements VideoRepositoryInterface
 {
-    // atributos
-    protected VideoBuilderInterface $videoBuilder;
-
     // construtor e atributos
     public function __construct(
         protected $model = new VideoModel()
     ) {}
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toVideo(VideoModel $object): VideoEntity
+    private function toVideo(object $object): VideoEntity
     {
 
         $video = new VideoEntity(
@@ -85,13 +82,31 @@ class VideoEloquentRepository implements VideoRepositoryInterface
                 'updated_at' => $video->updatedAt(),
             ]
         );
-        // // sincronizando os relacionamentos
-        // // convertendo os valores a serem inseridos em string
-        // $arraySync = [];
-        // for ($i = 0; $i < count($video->categoriesId); $i++) {
-        //     array_push($arraySync, strval($video->categoriesId[$i]));
-        // }
-        // $response->categories()->sync($arraySync);
+        // sincronizando os relacionamentos
+        // 
+        // relacionamentos com categories
+        // convertendo os valores a serem inseridos em string
+        $arraySync = [];
+        for ($i = 0; $i < count($video->categoriesId); $i++) {
+            array_push($arraySync, strval($video->categoriesId[$i]));
+        }
+        $response->categories()->sync($arraySync);
+        // 
+        // relacionamentos com genres
+        // convertendo os valores a serem inseridos em string
+        $arraySync = [];
+        for ($i = 0; $i < count($video->genresId); $i++) {
+            array_push($arraySync, strval($video->genresId[$i]));
+        }
+        $response->genres()->sync($arraySync);
+        // 
+        // relacionamentos com castMembers
+        // convertendo os valores a serem inseridos em string
+        $arraySync = [];
+        for ($i = 0; $i < count($video->castMembersId); $i++) {
+            array_push($arraySync, strval($video->castMembersId[$i]));
+        }
+        $response->castMembers()->sync($arraySync);
 
         // retornando a entidade populada com os dados inseridos
         return $this->toVideo($response);

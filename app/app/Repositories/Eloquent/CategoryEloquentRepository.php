@@ -23,7 +23,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     }
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toCategory(CategoryModel $object): Entity
+    private function toCategory(object $object): Entity
     {
         $category = new CategoryEntity(
             id: $object->id,

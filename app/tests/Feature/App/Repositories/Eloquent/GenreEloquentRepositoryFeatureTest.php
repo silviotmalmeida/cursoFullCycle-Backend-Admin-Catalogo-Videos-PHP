@@ -78,7 +78,7 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $entity = new GenreEntity(name: 'test with relationships');
         // adicionando as categorias
         foreach ($categories as $category) {
-            $entity->addCategory($category->id);
+            $entity->addCategoryId($category->id);
         }
         // inserindo no bd
         $response = $this->repository->insert($entity);
@@ -88,6 +88,7 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
             'id' => $entity->id()
         ]);
         $this->assertDatabaseCount('category_genre', $nCategories);
+        $this->assertCount($nCategories, $response->categoriesId);
     }
 
     // testando a função de busca por id no bd, com sucesso na busca
@@ -317,6 +318,8 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $response = $this->repository->deleteById($model->id);
         // verificando
         $this->assertTrue($response);
+        // soft-delete
+        $this->assertDatabaseCount('genres', 1);
     }
 
     // testando a função de delete por id no bd, sem sucesso na busca

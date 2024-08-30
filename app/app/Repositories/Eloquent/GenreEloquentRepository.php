@@ -23,55 +23,69 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toGenre(object $object): Entity
+    private function toGenre(GenreModel $model): Entity
     {
-        $Genre = new GenreEntity(
-            id: $object->id,
-            name: $object->name,
-            createdAt: $object->created_at,
-            updatedAt: $object->updated_at
+        $entity = new GenreEntity(
+            id: $model->id,
+            name: $model->name,
+            createdAt: $model->created_at,
+            updatedAt: $model->updated_at
         );
+        // atribuindo o is_active
+        ((bool) $model->is_active) ? $entity->activate() : $entity->deactivate();
+        // adicionando as categories
+        if ($model->categories) {
+            foreach ($model->categories as $category) {
 
-        ((bool) $object->is_active) ? $Genre->activate() : $Genre->deactivate();
+                $entity->addCategoryId($category->id);
+            }
+        }
+        
+        return $entity;
+    }
 
-        return $Genre;
+    // função auxiliar para sincronizar os relacionamentos
+    private function syncRelationships(Entity $entity, GenreModel $model)
+    {
+        // sincronizando os relacionamentos
+        // convertendo os valores a serem inseridos em string
+        $arraySync = [];
+        for ($i = 0; $i < count($entity->categoriesId); $i++) {
+            array_push($arraySync, strval($entity->categoriesId[$i]));
+        }
+        $model->categories()->sync($arraySync);
     }
 
     // função de inserção no bd
-    public function insert(Entity $Genre): Entity
+    public function insert(Entity $entity): GenreEntity
     {
         // inserindo os dados recebidos
-        $response = $this->model->create(
+        $model = $this->model->create(
             [
-                'id' => $Genre->id(),
-                'name' => $Genre->name,
-                'is_active' => $Genre->isActive,
-                'created_at' => $Genre->createdAt(),
-                'updated_at' => $Genre->updatedAt(),
+                'id' => $entity->id(),
+                'name' => $entity->name,
+                'is_active' => $entity->isActive,
+                'created_at' => $entity->createdAt(),
+                'updated_at' => $entity->updatedAt(),
             ]
         );
 
         // sincronizando os relacionamentos
-        // convertendo os valores a serem inseridos em string
-        $arraySync = [];
-        for ($i = 0; $i < count($Genre->categoriesId); $i++) {
-            array_push($arraySync, strval($Genre->categoriesId[$i]));
-        }
-        $response->categories()->sync($arraySync);
+        $this->syncRelationships($entity, $model);
 
         // retornando a entidade populada com os dados inseridos
-        return $this->toGenre($response);
+        return $this->toGenre($model);
     }
 
     // função de busca por id
     public function findById(string $GenreId): Entity
     {
         // buscando no bd
-        $GenreDb = $this->model->find($GenreId);
+        $model = $this->model->find($GenreId);
         // se não houver retorno, lança exceção
-        if (!$GenreDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // retornando a entidade
-        return $this->toGenre($GenreDb);
+        return $this->toGenre($model);
     }
 
     // função de busca múltipla, a partir de uma lista de id
@@ -80,10 +94,10 @@ class GenreEloquentRepository implements GenreRepositoryInterface
         // inicializando o array de saída
         $response = [];
         // buscando no bd a partir da lista recebida
-        $genresDb = $this->model->whereIn('id', $listIds)->get();
+        $models = $this->model->whereIn('id', $listIds)->get();
         // convertendo os resultados para entidade
-        foreach ($genresDb as $GenreDb) {
-            array_push($response, $this->toGenre($GenreDb));
+        foreach ($models as $model) {
+            array_push($response, $this->toGenre($model));
         }
         // retornando a lista de entidades
         return $response;
@@ -121,43 +135,38 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função de atualização
-    public function update(Entity $Genre): Entity
+    public function update(Entity $entity): Entity
     {
         // buscando no bd
-        $GenreDb = $this->model->find($Genre->id());
+        $model = $this->model->find($entity->id());
         // se não houver retorno, lança exceção
-        if (!$GenreDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // executando a atualização
-        $GenreDb->update([
-            'id' => $Genre->id(),
-            'name' => $Genre->name,
-            'is_active' => $Genre->isActive,
+        $model->update([
+            'id' => $entity->id(),
+            'name' => $entity->name,
+            'is_active' => $entity->isActive,
             'updated_at' => new DateTime()
         ]);
 
         // sincronizando os relacionamentos
-        // convertendo os valores a serem inseridos em string
-        $arraySync = [];
-        for ($i = 0; $i < count($Genre->categoriesId); $i++) {
-            array_push($arraySync, strval($Genre->categoriesId[$i]));
-        }
-        $GenreDb->categories()->sync($arraySync);
+        $this->syncRelationships($entity, $model);
 
         // forçando a atualização do registro
-        $GenreDb->refresh();
+        $model->refresh();
         // retornando a entidade populada com os dados inseridos
-        return $this->toGenre($GenreDb);
+        return $this->toGenre($model);
     }
 
     // função de remoção
     public function deleteById(string $GenreId): bool
     {
         // buscando no bd
-        $GenreDb = $this->model->find($GenreId);
+        $model = $this->model->find($GenreId);
         // se não houver retorno, lança exceção
-        if (!$GenreDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // removendo o registro
-        $GenreDb->delete();
+        $model->delete();
         return true;
     }
 }

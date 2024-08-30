@@ -9,7 +9,6 @@ use App\Repositories\Presenters\PaginationPresenter;
 use Core\Domain\Entity\Video as VideoEntity;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\VideoRepositoryInterface;
-use Core\Domain\Builder\Video\VideoBuilderInterface;
 use Core\Domain\Repository\PaginationInterface;
 use DateTime;
 
@@ -22,105 +21,108 @@ class VideoEloquentRepository implements VideoRepositoryInterface
     ) {}
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
-    private function toVideo(object $object): VideoEntity
+    private function toVideo(VideoModel $model): VideoEntity
     {
-
-        $video = new VideoEntity(
-            id: $object->id,
-            title: $object->title,
-            description: $object->description,
-            yearLaunched: $object->year_launched,
-            duration: $object->duration,
-            rating: $object->rating,
-            createdAt: $object->created_at,
-            updatedAt: $object->updated_at
+        // criando a entidade
+        $entity = new VideoEntity(
+            id: $model->id,
+            title: $model->title,
+            description: $model->description,
+            yearLaunched: $model->year_launched,
+            duration: $model->duration,
+            rating: $model->rating,
+            createdAt: $model->created_at,
+            updatedAt: $model->updated_at
         );
-
-        ((bool) $object->opened) ? $video->open() : $video->close();
-
+        // atribuindo o opened
+        ((bool) $model->opened) ? $entity->open() : $entity->close();
         // adicionando as categories
-        if ($object->categoriesId) {
-            foreach ($object->categoriesId as $categoryId) {
+        if ($model->categories) {
+            foreach ($model->categories as $category) {
 
-                $video->addCategoryId($categoryId);
+                $entity->addCategoryId($category->id);
             }
         }
-
         // adicionando os genres
-        if ($object->genresId) {
-            foreach ($object->genresId as $genreId) {
+        if ($model->genres) {
+            foreach ($model->genres as $genre) {
 
-                $video->addGenreId($genreId);
+                $entity->addGenreId($genre->id);
             }
         }
-
         // adicionando os cast members
-        if ($object->castMembersId) {
-            foreach ($object->castMembersId as $castMemberId) {
+        if ($model->castMembers) {
+            foreach ($model->castMembers as $castMember) {
 
-                $video->addCastMemberId($castMemberId);
+                $entity->addCastMemberId($castMember->id);
             }
         }
-
-        return $video;
+        return $entity;
     }
 
-    // função de inserção no bd
-    public function insert(VideoEntity $video): VideoEntity
+    // função auxiliar para sincronizar os relacionamentos
+    private function syncRelationships(VideoEntity $entity, VideoModel $model)
     {
-        // inserindo os dados recebidos
-        $response = $this->model->create(
-            [
-                'id' => $video->id(),
-                'title' => $video->title,
-                'description' => $video->description,
-                'year_launched' => $video->yearLaunched,
-                'duration' => $video->duration,
-                'rating' => $video->rating->value,
-                'opened' => $video->opened,
-                'created_at' => $video->createdAt(),
-                'updated_at' => $video->updatedAt(),
-            ]
-        );
         // sincronizando os relacionamentos
         // 
         // relacionamentos com categories
         // convertendo os valores a serem inseridos em string
         $arraySync = [];
-        for ($i = 0; $i < count($video->categoriesId); $i++) {
-            array_push($arraySync, strval($video->categoriesId[$i]));
+        for ($i = 0; $i < count($entity->categoriesId); $i++) {
+            array_push($arraySync, strval($entity->categoriesId[$i]));
         }
-        $response->categories()->sync($arraySync);
+        $model->categories()->sync($arraySync);
         // 
         // relacionamentos com genres
         // convertendo os valores a serem inseridos em string
         $arraySync = [];
-        for ($i = 0; $i < count($video->genresId); $i++) {
-            array_push($arraySync, strval($video->genresId[$i]));
+        for ($i = 0; $i < count($entity->genresId); $i++) {
+            array_push($arraySync, strval($entity->genresId[$i]));
         }
-        $response->genres()->sync($arraySync);
+        $model->genres()->sync($arraySync);
         // 
         // relacionamentos com castMembers
         // convertendo os valores a serem inseridos em string
         $arraySync = [];
-        for ($i = 0; $i < count($video->castMembersId); $i++) {
-            array_push($arraySync, strval($video->castMembersId[$i]));
+        for ($i = 0; $i < count($entity->castMembersId); $i++) {
+            array_push($arraySync, strval($entity->castMembersId[$i]));
         }
-        $response->castMembers()->sync($arraySync);
+        $model->castMembers()->sync($arraySync);
+    }
+
+    // função de inserção no bd
+    public function insert(VideoEntity $entity): VideoEntity
+    {
+        // inserindo os dados recebidos
+        $model = $this->model->create(
+            [
+                'id' => $entity->id(),
+                'title' => $entity->title,
+                'description' => $entity->description,
+                'year_launched' => $entity->yearLaunched,
+                'duration' => $entity->duration,
+                'rating' => $entity->rating->value,
+                'opened' => $entity->opened,
+                'created_at' => $entity->createdAt(),
+                'updated_at' => $entity->updatedAt(),
+            ]
+        );
+        // sincronizando os relacionamentos
+        $this->syncRelationships($entity, $model);
 
         // retornando a entidade populada com os dados inseridos
-        return $this->toVideo($response);
+        return $this->toVideo($model);
     }
 
     // função de busca por id
     public function findById(string $videoId): VideoEntity
     {
         // buscando no bd
-        $videoDb = $this->model->find($videoId);
+        $model = $this->model->find($videoId);
         // se não houver retorno, lança exceção
-        if (!$videoDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // retornando a entidade
-        return $this->toVideo($videoDb);
+        return $this->toVideo($model);
     }
 
     // função de busca múltipla, a partir de uma lista de id
@@ -129,10 +131,10 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         // inicializando o array de saída
         $response = [];
         // buscando no bd a partir da lista recebida
-        $genresDb = $this->model->whereIn('id', $listIds)->get();
+        $models = $this->model->whereIn('id', $listIds)->get();
         // convertendo os resultados para entidade
-        foreach ($genresDb as $videoDb) {
-            array_push($response, $this->toVideo($videoDb));
+        foreach ($models as $model) {
+            array_push($response, $this->toVideo($model));
         }
         // retornando a lista de entidades
         return $response;
@@ -170,49 +172,46 @@ class VideoEloquentRepository implements VideoRepositoryInterface
     }
 
     // função de atualização
-    public function update(VideoEntity $video): VideoEntity
+    public function update(VideoEntity $entity): VideoEntity
     {
         // buscando no bd
-        $videoDb = $this->model->find($video->id());
+        $model = $this->model->find($entity->id());
         // se não houver retorno, lança exceção
-        if (!$videoDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // executando a atualização
-        $videoDb->update([
-            'id' => $video->id(),
-            'title' => $video->title,
-            'is_active' => $video->isActive,
+        $model->update([
+            'id' => $entity->id(),
+            'title' => $entity->title,
+            'description' => $entity->description,
+            'year_launched' => $entity->yearLaunched,
+            'duration' => $entity->duration,
+            'rating' => $entity->rating->value,
+            'opened' => $entity->opened,
             'updated_at' => new DateTime()
         ]);
-
         // sincronizando os relacionamentos
-        // convertendo os valores a serem inseridos em string
-        $arraySync = [];
-        for ($i = 0; $i < count($video->categoriesId); $i++) {
-            array_push($arraySync, strval($video->categoriesId[$i]));
-        }
-        $videoDb->categories()->sync($arraySync);
+        $this->syncRelationships($entity, $model);
 
         // forçando a atualização do registro
-        $videoDb->refresh();
+        $model->refresh();
         // retornando a entidade populada com os dados inseridos
-        return $this->toVideo($videoDb);
+        return $this->toVideo($model);
     }
 
     // função de remoção
     public function deleteById(string $videoId): bool
     {
         // buscando no bd
-        $videoDb = $this->model->find($videoId);
+        $model = $this->model->find($videoId);
         // se não houver retorno, lança exceção
-        if (!$videoDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // removendo o registro
-        $videoDb->delete();
+        $model->delete();
         return true;
     }
 
     public function updateMedia(VideoEntity $entity): VideoEntity
     {
-
         return new VideoEntity();
     }
 }

@@ -70,7 +70,7 @@ class Genre extends Entity
     }
 
     // função de atribuição de category
-    public function addCategory(Uuid|string $categoryId): void
+    public function addCategoryId(Uuid|string $categoryId): void
     {
         // caso não seja uuid, valida a string informada
         if (!($categoryId instanceof Uuid)) $categoryId = new Uuid($categoryId);
@@ -113,7 +113,7 @@ class Genre extends Entity
             }
             // inserindo as novas categorias
             foreach ($categoriesId as $category) {
-                $this->addCategory($category);
+                $this->addCategoryId($category);
             }
         }
 

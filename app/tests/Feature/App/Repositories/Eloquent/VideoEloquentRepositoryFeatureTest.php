@@ -132,6 +132,9 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertDatabaseCount('video_category', $nCategories);
         $this->assertDatabaseCount('video_genre', $nGenres);
         $this->assertDatabaseCount('video_cast_member', $nCastMembers);
+        $this->assertCount($nCategories, $response->categoriesId);
+        $this->assertCount($nGenres, $response->genresId);
+        $this->assertCount($nCastMembers, $response->castMembersId);
     }
 
     // testando a função de busca por id no bd, com sucesso na busca
@@ -277,7 +280,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // buscando no bd
         $response = $this->repository->findAll();
         // verificando
-        $this->assertEquals($qtd*2, count($response));
+        $this->assertEquals($qtd * 2, count($response));
     }
 
     // testando a função de busca geral paginada no bd, com sucesso na busca
@@ -306,70 +309,175 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertSame(0, $response->total());
     }
 
-    // // testando a função de update no bd, com sucesso na busca
-    // public function testUpdate()
-    // {
-    //     // inserindo um registro no bd
-    //     $model = VideoModel::factory()->create();
-    //     // criando uma entidade equivalente ao registro, mas com name atualizado
-    //     $category = new VideoEntity(
-    //         id: $model->id,
-    //         name: "updated name"
-    //     );
-    //     // inserindo no bd
-    //     sleep(1);
-    //     $response = $this->repository->update($category);
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdate()
+    {
+        // criando os dados a serem considerados
+        $yearLaunched = rand(1111, 9999);
+        $duration = rand(60, 180);
+        $typeValues = array_column(Rating::cases(), 'value');
+        $rating = $typeValues[array_rand($typeValues)];
 
-    //     // verificando
-    //     $this->assertInstanceOf(VideoEntity::class, $response);
-    //     $this->assertSame($model->id, $response->id());
-    //     $this->assertSame("updated name", $response->name);
-    //     $this->assertNotEquals($model->name, $response->name);
-    //     $this->assertNotEquals($model->updated_at, $response->updatedAt);
-    // }
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        // criando uma entidade equivalente ao registro, mas com dados atualizados
+        $video = new VideoEntity(
+            id: $model->id,
+            title: 'updated title',
+            description: 'updated description',
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            rating: $rating
+        );
+        // atualizando no bd
+        sleep(1);
+        $response = $this->repository->update($video);
 
-    // // testando a função de update no bd, sem sucesso na busca
-    // public function testUpdateNotFound()
-    // {
-    //     try {
-    //         // criando uma entidade que não existe no bd
-    //         $category = new VideoEntity(name: "fake");
-    //         // buscando no bd
-    //         $this->repository->update($category);
-    //         // se não lançar exceção o teste deve falhar
-    //         $this->assertTrue(false);
-    //     } catch (\Throwable $th) {
-    //         // verificando o tipo da exceção
-    //         $this->assertInstanceOf(NotFoundException::class, $th);
-    //         // verificando a mensagem da exceção
-    //         $this->assertSame($th->getMessage(), 'ID not found');
-    //     }
-    // }
+        // verificando
+        $this->assertInstanceOf(VideoEntity::class, $response);
+        $this->assertSame($model->id, $response->id());
+        $this->assertSame("updated title", $response->title);
+        $this->assertSame("updated description", $response->description);
+        $this->assertSame($yearLaunched, $response->yearLaunched);
+        $this->assertSame($duration, $response->duration);
+        $this->assertSame($rating, $response->rating->value);
+        $this->assertNotEquals($model->updated_at, $response->updatedAt);
+    }
 
-    // // testando a função de delete por id no bd, com sucesso na busca
-    // public function testDeleteById()
-    // {
-    //     // inserindo um registro no bd
-    //     $model = VideoModel::factory()->create();
-    //     // deletando no bd
-    //     $response = $this->repository->deleteById($model->id);
-    //     // verificando
-    //     $this->assertTrue($response);
-    // }
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithRelationships()
+    {
+        // criando os dados a serem considerados
+        $yearLaunched = rand(1111, 9999);
+        $duration = rand(60, 180);
+        $typeValues = array_column(Rating::cases(), 'value');
+        $rating = $typeValues[array_rand($typeValues)];
+        $category1 = CategoryModel::factory()->create();
+        $category2 = CategoryModel::factory()->create();
+        $category3 = CategoryModel::factory()->create();
+        $genre1 = GenreModel::factory()->create();
+        $genre2 = GenreModel::factory()->create();
+        $genre3 = GenreModel::factory()->create();
+        $castMember1 = CastMemberModel::factory()->create();
+        $castMember2 = CastMemberModel::factory()->create();
+        $castMember3 = CastMemberModel::factory()->create();
 
-    // // testando a função de delete por id no bd, sem sucesso na busca
-    // public function testDeleteByIdNotFound()
-    // {
-    //     try {
-    //         // buscando no bd
-    //         $this->repository->deleteById('fake');
-    //         // se não lançar exceção o teste deve falhar
-    //         $this->assertTrue(false);
-    //     } catch (\Throwable $th) {
-    //         // verificando o tipo da exceção
-    //         $this->assertInstanceOf(NotFoundException::class, $th);
-    //         // verificando a mensagem da exceção
-    //         $this->assertSame($th->getMessage(), 'ID not found');
-    //     }
-    // }
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        // criando uma entidade equivalente ao registro, mas com dados atualizados
+        $video = new VideoEntity(
+            id: $model->id,
+            title: 'updated title',
+            description: 'updated description',
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            rating: $rating
+        );
+        // adicionando as categorias
+        $video->addCategoryId($category1->id);
+        $video->addCategoryId($category2->id);
+
+        // adicionando os genres
+        $video->addGenreId($genre1->id);
+        $video->addGenreId($genre2->id);
+
+        // adicionando os castMembers
+        $video->addCastMemberId($castMember1->id);
+        $video->addCastMemberId($castMember2->id);
+
+        // atualizando no bd
+        sleep(1);
+        $response = $this->repository->update($video);
+
+        // verificando
+        $this->assertInstanceOf(VideoEntity::class, $response);
+        $this->assertSame($model->id, $response->id());
+        $this->assertSame("updated title", $response->title);
+        $this->assertSame("updated description", $response->description);
+        $this->assertSame($yearLaunched, $response->yearLaunched);
+        $this->assertSame($duration, $response->duration);
+        $this->assertSame($rating, $response->rating->value);
+        $this->assertNotEquals($model->updated_at, $response->updatedAt);
+        $this->assertDatabaseCount('video_category', 2);
+        $this->assertDatabaseCount('video_genre', 2);
+        $this->assertDatabaseCount('video_cast_member', 2);
+
+        // atualizando novamente a entidade
+        $video = new VideoEntity(
+            id: $model->id,
+            title: 'updated title 2',
+            description: 'updated description 2',
+            yearLaunched: 2024,
+            duration: 50,
+            rating: Rating::L
+        );
+        // adicionando as categorias
+        $video->addCategoryId($category3->id);
+
+        // adicionando os genres
+        $video->addGenreId($genre3->id);
+
+        // adicionando os castMembers
+        $video->addCastMemberId($castMember3->id);
+
+        // atualizando no bd
+        sleep(1);
+        $response2 = $this->repository->update($video);
+
+        // verificando
+        $this->assertInstanceOf(VideoEntity::class, $response2);
+        $this->assertSame($model->id, $response2->id());
+        $this->assertSame("updated title 2", $response2->title);
+        $this->assertSame("updated description 2", $response2->description);
+        $this->assertSame(2024, $response2->yearLaunched);
+        $this->assertSame(50, $response2->duration);
+        $this->assertSame('L', $response2->rating->value);
+        $this->assertNotEquals($model->updated_at, $response2->updatedAt);
+        $this->assertDatabaseCount('video_category', 1);
+        $this->assertDatabaseCount('video_genre', 1);
+        $this->assertDatabaseCount('video_cast_member', 1);
+    }
+
+    // testando a função de update no bd, sem sucesso na busca
+    public function testUpdateNotFound()
+    {
+        // definindo as características da exceção a ser lançada
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage('ID not found');
+
+        // criando uma entidade que não existe no bd
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // buscando no bd
+        $this->repository->update($entity);
+    }
+
+    // testando a função de delete por id no bd, com sucesso na busca
+    public function testDeleteById()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        // deletando no bd
+        $response = $this->repository->deleteById($model->id);
+        // verificando
+        $this->assertTrue($response);
+        // soft-delete
+        $this->assertDatabaseCount('videos', 1);
+    }
+
+    // testando a função de delete por id no bd, sem sucesso na busca
+    public function testDeleteByIdNotFound()
+    {
+        // definindo as características da exceção a ser lançada
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage('ID not found');
+
+        // buscando no bd
+        $this->repository->deleteById('fake');
+    }
 }

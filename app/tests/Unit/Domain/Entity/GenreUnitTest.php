@@ -77,19 +77,19 @@ class GenreUnitTest extends TestCase
         $uuid3 = RamseyUuid::uuid4()->toString();
 
         // inserindo
-        $genre->addCategory($uuid1);
+        $genre->addCategoryId($uuid1);
 
         // verificando
         $this->assertCount(1, $genre->categoriesId);
 
         // inserindo duplicata
-        $genre->addCategory($uuid1);
+        $genre->addCategoryId($uuid1);
 
         // verificando
         $this->assertCount(1, $genre->categoriesId);
 
         // inserindo outra
-        $genre->addCategory($uuid2);
+        $genre->addCategoryId($uuid2);
 
         // verificando
         $this->assertCount(2, $genre->categoriesId);

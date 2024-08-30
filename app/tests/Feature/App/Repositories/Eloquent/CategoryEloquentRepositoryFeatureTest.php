@@ -289,6 +289,8 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $response = $this->repository->deleteById($model->id);
         // verificando
         $this->assertTrue($response);
+        // soft-delete
+        $this->assertDatabaseCount('categories', 1);
     }
 
     // testando a função de delete por id no bd, sem sucesso na busca

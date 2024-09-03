@@ -89,6 +89,18 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         ]);
         $this->assertDatabaseCount('category_genre', $nCategories);
         $this->assertCount($nCategories, $response->categoriesId);
+        $this->assertEquals($categories->pluck('id')->toArray(), $response->categoriesId);
+        $genreModel = GenreModel::find($entity->id());
+        $this->assertCount($nCategories, $genreModel->categories);
+        // verificando o relacionamento a partir de category
+        foreach ($categories as $category) {
+            $this->assertDatabaseHas('category_genre', [
+                'category_id' => $category->id,
+                'genre_id' => $entity->id(),
+            ]);
+            $categoryModel = CategoryModel::find($category->id);
+            $this->assertCount(1, $categoryModel->genres);
+        }
     }
 
     // testando a função de busca por id no bd, com sucesso na busca
@@ -279,7 +291,7 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
             id: $model->id,
             name: "updated name"
         );
-        // inserindo no bd
+        // atualizando no bd
         sleep(1);
         $response = $this->repository->update($genre);
 
@@ -289,6 +301,61 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertSame("updated name", $response->name);
         $this->assertNotEquals($model->name, $response->name);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithRelationships()
+    {
+        // criando os dados a serem considerados
+        $category1 = CategoryModel::factory()->create();
+        $category2 = CategoryModel::factory()->create();
+        $category3 = CategoryModel::factory()->create();
+
+        // inserindo um registro no bd
+        $model = GenreModel::factory()->create();
+        // criando uma entidade equivalente ao registro, mas com name atualizado
+        $genre = new GenreEntity(
+            id: $model->id,
+            name: "updated name"
+        );
+        // adicionando as categorias
+        $genre->addCategoryId($category1->id);
+        $genre->addCategoryId($category2->id);
+
+        // atualizando no bd
+        sleep(1);
+        $response = $this->repository->update($genre);
+
+        // verificando
+        $this->assertInstanceOf(GenreEntity::class, $response);
+        $this->assertSame($model->id, $response->id());
+        $this->assertSame("updated name", $response->name);
+        $this->assertNotEquals($model->name, $response->name);
+        $this->assertNotEquals($model->updated_at, $response->updatedAt);
+        $this->assertDatabaseCount('category_genre', 2);
+        $this->assertEquals([$category1->id, $category2->id], $response->categoriesId);
+
+        // atualizando novamente a entidade
+        $genre = new GenreEntity(
+            id: $model->id,
+            name: "updated name 2"
+        );
+        // adicionando as categorias
+        $genre->addCategoryId($category3->id);
+
+        // atualizando no bd
+        sleep(1);
+        $response2 = $this->repository->update($genre);
+
+        // verificando
+        $this->assertInstanceOf(GenreEntity::class, $response2);
+        $this->assertSame($model->id, $response2->id());
+        $this->assertSame("updated name 2", $response2->name);
+        $this->assertNotEquals($model->name, $response2->name);
+        $this->assertNotEquals($model->updated_at, $response2->updatedAt);
+        $this->assertDatabaseCount('category_genre', 1);
+        $this->assertEquals([$category3->id], $response2->categoriesId);
+
     }
 
     // testando a função de update no bd, sem sucesso na busca

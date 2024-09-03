@@ -124,6 +124,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         }
         // inserindo no bd
         $response = $this->repository->insert($entity);
+
         // verificando
         $this->assertInstanceOf(VideoEntity::class, $response);
         $this->assertDatabaseHas('videos', [
@@ -135,6 +136,42 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertCount($nCategories, $response->categoriesId);
         $this->assertCount($nGenres, $response->genresId);
         $this->assertCount($nCastMembers, $response->castMembersId);
+        $this->assertEquals($categories->pluck('id')->toArray(), $response->categoriesId);
+        $this->assertEquals($genres->pluck('id')->toArray(), $response->genresId);
+        $this->assertEquals($castMembers->pluck('id')->toArray(), $response->castMembersId);
+
+        $videoModel = VideoModel::find($entity->id());
+        $this->assertCount($nCategories, $videoModel->categories);
+        $this->assertCount($nGenres, $videoModel->genres);
+        $this->assertCount($nCastMembers, $videoModel->castMembers);
+
+        // verificando o relacionamento a partir de category
+        foreach ($categories as $category) {
+            $this->assertDatabaseHas('video_category', [
+                'video_id' => $entity->id(),
+                'category_id' => $category->id,
+            ]);
+            $categoryModel = CategoryModel::find($category->id);
+            $this->assertCount(1, $categoryModel->videos);
+        }
+        // verificando o relacionamento a partir de genre
+        foreach ($genres as $genre) {
+            $this->assertDatabaseHas('video_genre', [
+                'video_id' => $entity->id(),
+                'genre_id' => $genre->id,
+            ]);
+            $genreModel = GenreModel::find($genre->id);
+            $this->assertCount(1, $genreModel->videos);
+        }
+        // verificando o relacionamento a partir de castMember
+        foreach ($castMembers as $castMember) {
+            $this->assertDatabaseHas('video_cast_member', [
+                'video_id' => $entity->id(),
+                'cast_member_id' => $castMember->id,
+            ]);
+            $castMemberModel = CastMemberModel::find($castMember->id);
+            $this->assertCount(1, $castMemberModel->videos);
+        }
     }
 
     // testando a função de busca por id no bd, com sucesso na busca
@@ -401,6 +438,9 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertDatabaseCount('video_category', 2);
         $this->assertDatabaseCount('video_genre', 2);
         $this->assertDatabaseCount('video_cast_member', 2);
+        $this->assertEquals([$category1->id, $category2->id], $response->categoriesId);
+        $this->assertEquals([$genre1->id, $genre2->id], $response->genresId);
+        $this->assertEquals([$castMember1->id, $castMember2->id], $response->castMembersId);
 
         // atualizando novamente a entidade
         $video = new VideoEntity(
@@ -436,6 +476,9 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertDatabaseCount('video_category', 1);
         $this->assertDatabaseCount('video_genre', 1);
         $this->assertDatabaseCount('video_cast_member', 1);
+        $this->assertEquals([$category3->id], $response2->categoriesId);
+        $this->assertEquals([$genre3->id], $response2->genresId);
+        $this->assertEquals([$castMember3->id], $response2->castMembersId);
     }
 
     // testando a função de update no bd, sem sucesso na busca

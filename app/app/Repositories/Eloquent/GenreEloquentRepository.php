@@ -78,10 +78,10 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função de busca por id
-    public function findById(string $GenreId): Entity
+    public function findById(string $genreId): Entity
     {
         // buscando no bd
-        $model = $this->model->find($GenreId);
+        $model = $this->model->find($genreId);
         // se não houver retorno, lança exceção
         if (!$model) throw new NotFoundException('ID not found');
         // retornando a entidade
@@ -159,10 +159,10 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     }
 
     // função de remoção
-    public function deleteById(string $GenreId): bool
+    public function deleteById(string $genreId): bool
     {
         // buscando no bd
-        $model = $this->model->find($GenreId);
+        $model = $this->model->find($genreId);
         // se não houver retorno, lança exceção
         if (!$model) throw new NotFoundException('ID not found');
         // removendo o registro

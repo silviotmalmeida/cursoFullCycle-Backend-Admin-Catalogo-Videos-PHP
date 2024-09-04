@@ -26,7 +26,7 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
     private function toCastMember(CastMemberModel $model): Entity
     {
-        $castMember = new CastMemberEntity(
+        $entity = new CastMemberEntity(
             id: $model->id,
             name: $model->name,
             type: $model->type,
@@ -34,25 +34,25 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
             updatedAt: $model->updated_at
         );
 
-        return $castMember;
+        return $entity;
     }
 
     // função de inserção no bd
-    public function insert(Entity $castMember): Entity
+    public function insert(Entity $entity): Entity
     {
         // inserindo os dados recebidos
-        $response = $this->model->create(
+        $model = $this->model->create(
             [
-                'id' => $castMember->id(),
-                'name' => $castMember->name,
-                'type' => $castMember->type->value,
-                'created_at' => $castMember->createdAt(),
-                'updated_at' => $castMember->updatedAt(),
+                'id' => $entity->id(),
+                'name' => $entity->name,
+                'type' => $entity->type->value,
+                'created_at' => $entity->createdAt(),
+                'updated_at' => $entity->updatedAt(),
             ]
         );
 
         // retornando a entidade populada com os dados inseridos
-        return $this->toCastMember($response);
+        return $this->toCastMember($model);
     }
 
     // função de busca por id
@@ -113,23 +113,23 @@ class CastMemberEloquentRepository implements CastMemberRepositoryInterface
     }
 
     // função de atualização
-    public function update(Entity $castMember): Entity
+    public function update(Entity $entity): Entity
     {
         // buscando no bd
-        $castMemberDb = $this->model->find($castMember->id());
+        $model = $this->model->find($entity->id());
         // se não houver retorno, lança exceção
-        if (!$castMemberDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // executando a atualização
-        $castMemberDb->update([
-            'id' => $castMember->id(),
-            'name' => $castMember->name,
-            'type' => $castMember->type->value,
+        $model->update([
+            'id' => $entity->id(),
+            'name' => $entity->name,
+            'type' => $entity->type->value,
             'updated_at' => new DateTime()
         ]);
         // forçando a atualização do registro
-        $castMemberDb->refresh();
+        $model->refresh();
         // retornando a entidade populada com os dados inseridos
-        return $this->toCastMember($castMemberDb);
+        return $this->toCastMember($model);
     }
 
     // função de remoção

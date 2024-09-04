@@ -25,7 +25,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
     private function toCategory(CategoryModel $model): Entity
     {
-        $category = new CategoryEntity(
+        $entity = new CategoryEntity(
             id: $model->id,
             name: $model->name,
             description: $model->description,
@@ -33,38 +33,38 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
             updatedAt: $model->updated_at
         );
 
-        ((bool) $model->is_active) ? $category->activate() : $category->deactivate();
+        ((bool) $model->is_active) ? $entity->activate() : $entity->deactivate();
 
-        return $category;
+        return $entity;
     }
 
     // função de inserção no bd
-    public function insert(Entity $category): Entity
+    public function insert(Entity $entity): Entity
     {
         // inserindo os dados recebidos
-        $response = $this->model->create(
+        $model = $this->model->create(
             [
-                'id' => $category->id(),
-                'name' => $category->name,
-                'description' => $category->description,
-                'is_active' => $category->isActive,
-                'created_at' => $category->createdAt(),
-                'updated_at' => $category->updatedAt(),
+                'id' => $entity->id(),
+                'name' => $entity->name,
+                'description' => $entity->description,
+                'is_active' => $entity->isActive,
+                'created_at' => $entity->createdAt(),
+                'updated_at' => $entity->updatedAt(),
             ]
         );
         // retornando a entidade populada com os dados inseridos
-        return $this->toCategory($response);
+        return $this->toCategory($model);
     }
 
     // função de busca por id
     public function findById(string $categoryId): Entity
     {
         // buscando no bd
-        $categoryDb = $this->model->find($categoryId);
+        $model = $this->model->find($categoryId);
         // se não houver retorno, lança exceção
-        if (!$categoryDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // retornando a entidade
-        return $this->toCategory($categoryDb);
+        return $this->toCategory($model);
     }
 
     // função de busca múltipla, a partir de uma lista de id
@@ -114,24 +114,24 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
     }
 
     // função de atualização
-    public function update(Entity $category): Entity
+    public function update(Entity $entity): Entity
     {
         // buscando no bd
-        $categoryDb = $this->model->find($category->id());
+        $model = $this->model->find($entity->id());
         // se não houver retorno, lança exceção
-        if (!$categoryDb) throw new NotFoundException('ID not found');
+        if (!$model) throw new NotFoundException('ID not found');
         // executando a atualização
-        $categoryDb->update([
-            'id' => $category->id(),
-            'name' => $category->name,
-            'description' => $category->description,
-            'is_active' => $category->isActive,
+        $model->update([
+            'id' => $entity->id(),
+            'name' => $entity->name,
+            'description' => $entity->description,
+            'is_active' => $entity->isActive,
             'updated_at' => new DateTime()
         ]);
         // forçando a atualização do registro
-        $categoryDb->refresh();
+        $model->refresh();
         // retornando a entidade populada com os dados inseridos
-        return $this->toCategory($categoryDb);
+        return $this->toCategory($model);
     }
 
     // função de remoção

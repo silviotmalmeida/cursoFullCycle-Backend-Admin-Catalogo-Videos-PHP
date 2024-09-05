@@ -326,6 +326,7 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $this->assertTrue($response);
         // soft-delete
         $this->assertDatabaseCount('categories', 1);
+        $this->assertSoftDeleted(table: 'categories', data: ['id' => $model->id], deletedAtColumn: 'deleted_at');
     }
 
     // testando a função de delete por id no bd, sem sucesso na busca

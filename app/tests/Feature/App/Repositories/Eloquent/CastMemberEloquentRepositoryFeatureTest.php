@@ -318,6 +318,7 @@ class CastMemberEloquentRepositoryFeatureTest extends TestCase
         $this->assertTrue($response);
         // soft-delete
         $this->assertDatabaseCount('cast_members', 1);
+        $this->assertSoftDeleted(table: 'cast_members', data: ['id' => $model->id], deletedAtColumn: 'deleted_at');
     }
 
     // testando a função de delete por id no bd, sem sucesso na busca

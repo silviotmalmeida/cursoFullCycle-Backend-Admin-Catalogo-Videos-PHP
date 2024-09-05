@@ -422,6 +422,7 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertTrue($response);
         // soft-delete
         $this->assertDatabaseCount('genres', 1);
+        $this->assertSoftDeleted(table: 'genres', data: ['id' => $model->id], deletedAtColumn: 'deleted_at');
     }
 
     // testando a função de delete por id no bd, sem sucesso na busca

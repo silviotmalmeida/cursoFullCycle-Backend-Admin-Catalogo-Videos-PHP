@@ -107,7 +107,7 @@ class CategoryEloquentRepository implements CategoryRepositoryInterface
         // ordenando
         $query = $query->orderBy('id', $order);
         // executando a busca paginada
-        $paginator = $query->paginate($perPage);
+        $paginator = $query->paginate($perPage, ['*'], 'page', $page);
 
         // organizando os dados no formato estabelecido pela interface
         return new PaginationPresenter($paginator);

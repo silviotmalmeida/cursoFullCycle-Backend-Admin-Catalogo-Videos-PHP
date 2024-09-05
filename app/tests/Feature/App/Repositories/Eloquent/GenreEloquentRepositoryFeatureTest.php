@@ -255,19 +255,54 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertEquals($qtd * 2, count($response));
     }
 
-    // testando a função de busca geral paginada no bd, com sucesso na busca
-    public function testPaginate()
+    // provedor de dados do testPaginate
+    public function dataProviderTestPaginate(): array
     {
-        // definindo a quantidade de registros a serem criados
-        $qtd = rand(30, 60);
+        return [
+            [
+                'qtd' => 25,
+                'page' => 1,
+                'perPage' => 10,
+                'items' => 10
+            ],
+            [
+                'qtd' => 25,
+                'page' => 2,
+                'perPage' => 10,
+                'items' => 10
+            ],
+            [
+                'qtd' => 25,
+                'page' => 3,
+                'perPage' => 10,
+                'items' => 5
+            ],
+        ];
+    }
+    // testando a função de busca geral paginada no bd, com sucesso na busca
+    // utiliza o dataProvider dataProviderTestPaginate
+    /**
+     * @dataProvider dataProviderTestPaginate
+     */
+    public function testPaginate(
+        int $qtd,
+        int $page,
+        int $perPage,
+        int $items
+    ) {        
         // inserindo múltiplos registros no bd
         GenreModel::factory()->count($qtd)->create();
         // buscando no bd
-        $response = $this->repository->paginate();
+        $response = $this->repository->paginate(
+            page: $page,
+            perPage: $perPage
+        );
         // verificando
         $this->assertInstanceOf(PaginationInterface::class, $response);
-        $this->assertCount(15, $response->items());
         $this->assertSame($qtd, $response->total());
+        $this->assertSame($page, $response->currentPage());
+        $this->assertSame($perPage, $response->perPage());
+        $this->assertCount($items, $response->items());
     }
 
     // testando a função de busca geral paginada no bd, sem sucesso na busca

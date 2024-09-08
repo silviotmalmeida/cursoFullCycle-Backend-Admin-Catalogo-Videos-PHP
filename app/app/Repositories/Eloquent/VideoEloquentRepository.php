@@ -212,6 +212,22 @@ class VideoEloquentRepository implements VideoRepositoryInterface
 
     public function updateMedia(VideoEntity $entity): VideoEntity
     {
+        // buscando no bd
+        $model = $this->model->find($entity->id());
+        // se não houver retorno, lança exceção
+        if (!$model) throw new NotFoundException('ID not found');
+
+        // atualizando o trailer
+        $trailer = $entity->trailerFile();
+        if ($trailer) {
+            $model->trailer()->updateOrCreate([
+                'file_path' => $trailer->filePath(),
+                'encoded_path' => $trailer->encodedPath(),
+                'status' => $trailer->mediaStatus()->value,
+                'type' => $trailer->mediaType()->value,
+            ]);
+        }
+
         return new VideoEntity();
     }
 }

@@ -17,13 +17,13 @@ return new class extends Migration
     public function up()
     {
         Schema::create('video_medias', function (Blueprint $table) {
-            $table->uuid('id')->primary()->autoIncrement();
+            $table->uuid('id')->primary();
             $table->uuid('video_id')->index();
             $table->foreign('video_id')->references('id')->on('videos')->onDelete('cascade');
             $table->string('file_path');
             $table->string('encoded_path')->nullable();
-            $table->enum('status', array_keys(MediaStatus::cases()));
-            $table->enum('type', array_keys(MediaType::cases()));
+            $table->enum('status', array_column(MediaStatus::cases(), 'value'));
+            $table->enum('type', array_column(MediaType::cases(), 'value'));
             $table->timestamps();
         });
     }

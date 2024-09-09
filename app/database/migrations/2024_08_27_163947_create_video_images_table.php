@@ -15,11 +15,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('video_images', function (Blueprint $table) {
-            $table->uuid('id')->primary()->autoIncrement();
+            $table->uuid('id')->primary();
             $table->uuid('video_id')->index();
             $table->foreign('video_id')->references('id')->on('videos')->onDelete('cascade');
             $table->string('path');
-            $table->enum('type', array_keys(ImageType::cases()));
+            $table->enum('type', array_column(ImageType::cases(), 'value'));
             $table->timestamps();
         });
     }

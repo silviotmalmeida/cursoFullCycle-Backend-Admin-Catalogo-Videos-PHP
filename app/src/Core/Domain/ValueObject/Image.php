@@ -29,6 +29,12 @@ class Image extends ValueObject
         return $this->filePath;
     }
 
+    // função de obtenção do imageType
+    public function imageType(): ImageType
+    {
+        return $this->imageType;
+    }
+
     // função de validação dos atributos
     private function validate(): void
     {

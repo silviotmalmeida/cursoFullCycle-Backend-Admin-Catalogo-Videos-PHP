@@ -2,18 +2,18 @@
 
 namespace Tests\Unit\App\Models;
 
-use App\Models\VideoMedia as VideoMediaModel;
+use App\Models\VideoImage as VideoImageModel;
 use App\Models\Traits\UuidTrait;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-// testando a model VideoMedia
+// testando a model VideoImage
 // funções a serem utilizadas nos testes da ModelTestCase
-class VideoMediaUnitTest extends ModelTestCase
+class VideoImageUnitTest extends ModelTestCase
 {
     protected function model(): Model
     {
-        return new VideoMediaModel();
+        return new VideoImageModel();
     }
 
     protected function requiredTraits(): array
@@ -26,15 +26,13 @@ class VideoMediaUnitTest extends ModelTestCase
 
     protected function tableName(): string
     {
-        return 'video_medias';
+        return 'video_images';
     }
 
     protected function requiredFillable(): array
     {
         return [
-            'file_path',
-            'encoded_path',
-            'status',
+            'path',
             'type',
         ];
     }
@@ -42,11 +40,8 @@ class VideoMediaUnitTest extends ModelTestCase
     protected function requiredCasts(): array
     {
         return [
-            'id' => 'string',
             'video_id' => 'string',
-            'file_path' => 'string',
-            'encoded_path' => 'string',
-            'status' => 'int',
+            'path' => 'string',
             'type' => 'int',
             'created_at' => 'datetime',
             'updated_at' => 'datetime',

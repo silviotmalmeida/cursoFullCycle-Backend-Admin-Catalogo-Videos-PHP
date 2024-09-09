@@ -219,15 +219,112 @@ class VideoEloquentRepository implements VideoRepositoryInterface
 
         // atualizando o trailer
         $trailer = $entity->trailerFile();
+        // se estiver setado
         if ($trailer) {
-            $model->trailer()->updateOrCreate([
-                'file_path' => $trailer->filePath(),
-                'encoded_path' => $trailer->encodedPath(),
-                'status' => $trailer->mediaStatus()->value,
-                'type' => $trailer->mediaType()->value,
-            ]);
+            // se existir registro, atualiza
+            if ($model->trailer()->first()) {
+                $model->trailer()->update([
+                    'file_path' => $trailer->filePath(),
+                    'encoded_path' => $trailer->encodedPath(),
+                    'status' => $trailer->mediaStatus()->value,
+                    'type' => $trailer->mediaType()->value,
+                ]);
+            }
+            // senão, cria
+            else {
+                $model->trailer()->create([
+                    'file_path' => $trailer->filePath(),
+                    'encoded_path' => $trailer->encodedPath(),
+                    'status' => $trailer->mediaStatus()->value,
+                    'type' => $trailer->mediaType()->value,
+                ]);
+            }
         }
 
-        return new VideoEntity();
+        // atualizando o video
+        $video = $entity->videoFile();
+        // se estiver setado
+        if ($video) {
+            // se existir registro, atualiza
+            if ($model->video()->first()) {
+                $model->video()->update([
+                    'file_path' => $video->filePath(),
+                    'encoded_path' => $video->encodedPath(),
+                    'status' => $video->mediaStatus()->value,
+                    'type' => $video->mediaType()->value,
+                ]);
+            }
+            // senão, cria
+            else {
+                $model->video()->create([
+                    'file_path' => $video->filePath(),
+                    'encoded_path' => $video->encodedPath(),
+                    'status' => $video->mediaStatus()->value,
+                    'type' => $video->mediaType()->value,
+                ]);
+            }
+        }
+
+        // atualizando o thumb
+        $thumb = $entity->thumbFile();
+        // se estiver setado
+        if ($thumb) {
+            // se existir registro, atualiza
+            if ($model->thumb()->first()) {
+                $model->thumb()->update([
+                    'path' => $thumb->filePath(),
+                    'type' => $thumb->imageType()->value,
+                ]);
+            }
+            // senão, cria
+            else {
+                $model->thumb()->create([
+                    'path' => $thumb->filePath(),
+                    'type' => $thumb->imageType()->value,
+                ]);
+            }
+        }
+
+        // atualizando o thumbHalf
+        $thumbHalf = $entity->thumbHalf();
+        // se estiver setado
+        if ($thumbHalf) {
+            // se existir registro, atualiza
+            if ($model->thumbHalf()->first()) {
+                $model->thumbHalf()->update([
+                    'path' => $thumbHalf->filePath(),
+                    'type' => $thumbHalf->imageType()->value,
+                ]);
+            }
+            // senão, cria
+            else {
+                $model->thumbHalf()->create([
+                    'path' => $thumbHalf->filePath(),
+                    'type' => $thumbHalf->imageType()->value,
+                ]);
+            }
+        }
+
+        // atualizando o bannerFile
+        $bannerFile = $entity->bannerFile();
+        // se estiver setado
+        if ($bannerFile) {
+            // se existir registro, atualiza
+            if ($model->banner()->first()) {
+                $model->banner()->update([
+                    'path' => $bannerFile->filePath(),
+                    'type' => $bannerFile->imageType()->value,
+                ]);
+            }
+            // senão, cria
+            else {
+                $model->banner()->create([
+                    'path' => $bannerFile->filePath(),
+                    'type' => $bannerFile->imageType()->value,
+                ]);
+            }
+        }
+
+        return $entity;
     }
 }

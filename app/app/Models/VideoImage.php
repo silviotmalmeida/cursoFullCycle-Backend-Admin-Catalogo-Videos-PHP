@@ -4,6 +4,8 @@
 namespace App\Models;
 
 // importações
+
+use App\Models\Traits\UuidTrait;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -11,14 +13,13 @@ use Illuminate\Database\Eloquent\Model;
 class VideoImage extends Model
 {
     // traits a serem utilizadas
-    use HasFactory;
+    use HasFactory, UuidTrait;
 
     // definindo o nome da tabela no BD
     protected $table = 'video_images';
 
     // definindo os atributos a serem informados
     protected $fillable = [
-        'video_id',
         'path',
         'type',
     ];
@@ -33,8 +34,8 @@ class VideoImage extends Model
         'deleted_at' => 'datetime'
     ];
 
-    // ativando o autoincremento
-    public $incrementing = true;
+    // desativando o autoincremento
+    public $incrementing = false;
 
     // definindo o relacionamento um-para-um com video
     public function video()

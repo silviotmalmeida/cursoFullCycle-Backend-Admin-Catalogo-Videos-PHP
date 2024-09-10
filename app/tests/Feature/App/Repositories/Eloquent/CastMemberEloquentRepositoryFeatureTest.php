@@ -46,6 +46,8 @@ class CastMemberEloquentRepositoryFeatureTest extends TestCase
             'id' => $entity->id(),
             'name' => $entity->name,
             'type' => $entity->type->value,
+            'created_at' => $entity->createdAt(),
+            'updated_at' => $entity->updatedAt(),
         ]);
     }
 
@@ -287,6 +289,13 @@ class CastMemberEloquentRepositoryFeatureTest extends TestCase
         $this->assertNotEquals($model->name, $response->name);
         $this->assertNotEquals($model->type, $response->type->value);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
+        $this->assertDatabaseHas('cast_members', [
+            'id' => $castMember->id(),
+            'name' => $castMember->name,
+            'type' => $castMember->type->value,
+            'created_at' => $castMember->createdAt(),
+            'updated_at' => $response->updatedAt(),
+        ]);
     }
 
     // testando a função de update no bd, sem sucesso na busca

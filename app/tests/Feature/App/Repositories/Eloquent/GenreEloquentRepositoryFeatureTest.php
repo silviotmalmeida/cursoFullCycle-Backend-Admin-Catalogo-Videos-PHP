@@ -38,17 +38,18 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
     {
         // criando a entidade
         $entity = new GenreEntity(name: 'test');
-        try {
-            // inserindo no bd
-            $response = $this->repository->insert($entity);
-            // verificando
-            $this->assertInstanceOf(GenreEntity::class, $response);
-            $this->assertDatabaseHas('genres', [
-                'id' => $entity->id()
-            ]);
-        } catch (\Throwable $th) {
-            $this->assertDatabaseCount('genres', 0);
-        }
+
+        // inserindo no bd
+        $response = $this->repository->insert($entity);
+        // verificando
+        $this->assertInstanceOf(GenreEntity::class, $response);
+        $this->assertDatabaseHas('genres', [
+            'id' => $entity->id(),
+            'name' => $entity->name,
+            'is_active' => $entity->isActive,
+            'created_at' => $entity->createdAt(),
+            'updated_at' => $entity->updatedAt(),
+        ]);
     }
 
     // testando a função de inserção no bd
@@ -63,7 +64,10 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertInstanceOf(GenreEntity::class, $response);
         $this->assertDatabaseHas('genres', [
             'id' => $entity->id(),
+            'name' => $entity->name,
             'is_active' => false,
+            'created_at' => $entity->createdAt(),
+            'updated_at' => $entity->updatedAt(),
         ]);
     }
 
@@ -74,6 +78,8 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $nCategories = rand(1, 9);
         // criando categorias no bd para possibilitar os relacionamentos
         $categories = CategoryModel::factory()->count($nCategories)->create();
+        $this->assertDatabaseCount('categories', $nCategories);
+
         // criando a entidade
         $entity = new GenreEntity(name: 'test with relationships');
         // adicionando as categorias
@@ -82,6 +88,7 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         }
         // inserindo no bd
         $response = $this->repository->insert($entity);
+
         // verificando
         $this->assertInstanceOf(GenreEntity::class, $response);
         $this->assertDatabaseHas('genres', [
@@ -90,8 +97,10 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertDatabaseCount('category_genre', $nCategories);
         $this->assertCount($nCategories, $response->categoriesId);
         $this->assertEquals($categories->pluck('id')->toArray(), $response->categoriesId);
+
         $genreModel = GenreModel::find($entity->id());
         $this->assertCount($nCategories, $genreModel->categories);
+
         // verificando o relacionamento a partir de category
         foreach ($categories as $category) {
             $this->assertDatabaseHas('category_genre', [
@@ -289,7 +298,7 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         int $page,
         int $perPage,
         int $items
-    ) {        
+    ) {
         // inserindo múltiplos registros no bd
         GenreModel::factory()->count($qtd)->create();
         // buscando no bd
@@ -336,6 +345,13 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertSame("updated name", $response->name);
         $this->assertNotEquals($model->name, $response->name);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
+        $this->assertDatabaseHas('genres', [
+            'id' => $genre->id(),
+            'name' => $genre->name,
+            'is_active' => $genre->isActive,
+            'created_at' => $genre->createdAt(),
+            'updated_at' => $response->updatedAt(),
+        ]);
     }
 
     // testando a função de update no bd, com sucesso na busca
@@ -369,6 +385,13 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
         $this->assertDatabaseCount('category_genre', 2);
         $this->assertEquals([$category1->id, $category2->id], $response->categoriesId);
+        // verificando o relacionamento a partir de category
+        foreach ($genre->categoriesId as $categoryId) {
+            $this->assertDatabaseHas('category_genre', [
+                'genre_id' => $genre->id(),
+                'category_id' => $categoryId,
+            ]);
+        }
 
         // atualizando novamente a entidade
         $genre = new GenreEntity(
@@ -390,7 +413,13 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertNotEquals($model->updated_at, $response2->updatedAt);
         $this->assertDatabaseCount('category_genre', 1);
         $this->assertEquals([$category3->id], $response2->categoriesId);
-
+        // verificando o relacionamento a partir de category
+        foreach ($genre->categoriesId as $categoryId) {
+            $this->assertDatabaseHas('category_genre', [
+                'genre_id' => $genre->id(),
+                'category_id' => $categoryId,
+            ]);
+        }
     }
 
     // testando a função de update no bd, sem sucesso na busca
@@ -423,6 +452,36 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         // soft-delete
         $this->assertDatabaseCount('genres', 1);
         $this->assertSoftDeleted(table: 'genres', data: ['id' => $model->id], deletedAtColumn: 'deleted_at');
+    }
+
+    // testando a função de delete no bd com os relacionamentos
+    public function testDeleteByIdWithRelationships()
+    {
+        // definindo número randomico de categorias
+        $nCategories = rand(1, 9);
+        // criando categorias no bd para possibilitar os relacionamentos
+        $categories = CategoryModel::factory()->count($nCategories)->create();
+        $this->assertDatabaseCount('categories', $nCategories);
+
+        // criando a entidade
+        $entity = new GenreEntity(name: 'test with relationships');
+        // adicionando as categorias
+        foreach ($categories as $category) {
+            $entity->addCategoryId($category->id);
+        }
+        // inserindo no bd
+        $response = $this->repository->insert($entity);
+        $this->assertDatabaseCount('genres', 1);
+        $this->assertDatabaseCount('category_genre', $nCategories);
+
+        // deletando no bd
+        $response = $this->repository->deleteById($entity->id);
+        // verificando
+        $this->assertTrue($response);
+        // soft-delete
+        $this->assertSoftDeleted(table: 'genres', data: ['id' => $entity->id], deletedAtColumn: 'deleted_at');
+        $this->assertDatabaseCount('genres', 1);
+        $this->assertDatabaseCount('category_genre', $nCategories);
     }
 
     // testando a função de delete por id no bd, sem sucesso na busca

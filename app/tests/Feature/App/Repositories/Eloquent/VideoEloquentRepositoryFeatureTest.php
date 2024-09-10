@@ -235,14 +235,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // adicionando a media
         $entity->setTraileFile($media);
         // inserindo a entidade no bd
-        $response = $this->repository->insert($entity);
+        $this->repository->insert($entity);
         $this->assertDatabaseCount('videos', 1);
         $this->assertDatabaseCount('video_medias', 0);
         // inserindo a media
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         $this->assertDatabaseHas('video_medias', [
             'video_id' => $entity->id(),
@@ -280,14 +280,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // adicionando a media
         $entity->setVideoFile($media);
         // inserindo a entidade no bd
-        $response = $this->repository->insert($entity);
+        $this->repository->insert($entity);
         $this->assertDatabaseCount('videos', 1);
         $this->assertDatabaseCount('video_medias', 0);
         // inserindo a media
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         $this->assertDatabaseHas('video_medias', [
             'video_id' => $entity->id(),
@@ -321,14 +321,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // adicionando a image
         $entity->setThumbFile($image);
         // inserindo a entidade no bd
-        $response = $this->repository->insert($entity);
+        $this->repository->insert($entity);
         $this->assertDatabaseCount('videos', 1);
         $this->assertDatabaseCount('video_images', 0);
         // inserindo a media
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
             'video_id' => $entity->id(),
@@ -360,14 +360,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // adicionando a image
         $entity->setThumbHalf($image);
         // inserindo a entidade no bd
-        $response = $this->repository->insert($entity);
+        $this->repository->insert($entity);
         $this->assertDatabaseCount('videos', 1);
         $this->assertDatabaseCount('video_images', 0);
         // inserindo a media
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
             'video_id' => $entity->id(),
@@ -399,14 +399,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // adicionando a image
         $entity->setBannerFile($image);
         // inserindo a entidade no bd
-        $response = $this->repository->insert($entity);
+        $this->repository->insert($entity);
         $this->assertDatabaseCount('videos', 1);
         $this->assertDatabaseCount('video_images', 0);
         // inserindo a media
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
             'video_id' => $entity->id(),
@@ -730,6 +730,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertEquals([$category1->id, $category2->id], $response->categoriesId);
         $this->assertEquals([$genre1->id, $genre2->id], $response->genresId);
         $this->assertEquals([$castMember1->id, $castMember2->id], $response->castMembersId);
+        // verificando o relacionamento a partir de category
         foreach ($video->categoriesId as $categoryId) {
             $this->assertDatabaseHas('video_category', [
                 'video_id' => $video->id(),
@@ -788,6 +789,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertEquals([$category3->id], $response2->categoriesId);
         $this->assertEquals([$genre3->id], $response2->genresId);
         $this->assertEquals([$castMember3->id], $response2->castMembersId);
+        // verificando o relacionamento a partir de category
         foreach ($video->categoriesId as $categoryId) {
             $this->assertDatabaseHas('video_category', [
                 'video_id' => $video->id(),
@@ -837,9 +839,9 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // adicionando a media
         $entity->setTraileFile($media);
         // inserindo a entidade no bd
-        $response = $this->repository->insert($entity);
+        $this->repository->insert($entity);
         // inserindo a media
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
 
         // valores a serem considerados na atualização
         $filePath = 'path_do_trailer2.mp4';
@@ -858,12 +860,12 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $entity->setTraileFile($media2);
         // atualizando no bd
         sleep(1);
-        $response = $this->repository->update($entity);
+        $this->repository->update($entity);
         // atualizando a media
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $response = $this->repository->updateMedia($entity);
+        $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         $this->assertDatabaseHas('video_medias', [
             'video_id' => $entity->id(),
@@ -871,6 +873,232 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             'encoded_path' => $media2->encodedPath(),
             'status' => $media2->mediaStatus(),
             'type' => $media2->mediaType(),
+        ]);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithMediaVideo()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_video.mp4';
+        $mediaStatus = MediaStatus::PENDING;
+        $mediaType = MediaType::VIDEO;
+        $encodedPath = '';
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a media
+        $media = new Media(
+            filePath: $filePath,
+            mediaStatus: $mediaStatus,
+            mediaType: $mediaType,
+            encodedPath: $encodedPath,
+        );
+        // adicionando a media
+        $entity->setVideoFile($media);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a media
+        $this->repository->updateMedia($entity);
+
+        // valores a serem considerados na atualização
+        $filePath = 'path_do_video2.mp4';
+        $mediaStatus = MediaStatus::COMPLETE;
+        $mediaType = MediaType::VIDEO;
+        $encodedPath = 'encoded_path_do_video2.mp4';
+
+        // criando a media atualizada
+        $media2 = new Media(
+            filePath: $filePath,
+            mediaStatus: $mediaStatus,
+            mediaType: $mediaType,
+            encodedPath: $encodedPath,
+        );
+        // adicionando a media atualizada
+        $entity->setVideoFile($media2);
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a media
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_medias', 1);
+        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_medias', 1);
+        $this->assertDatabaseHas('video_medias', [
+            'video_id' => $entity->id(),
+            'file_path' => $media2->filePath(),
+            'encoded_path' => $media2->encodedPath(),
+            'status' => $media2->mediaStatus(),
+            'type' => $media2->mediaType(),
+        ]);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithImageThumb()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_thumb.mp4';
+        $imageType = ImageType::THUMB;
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a image
+        $image = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image
+        $entity->setThumbFile($image);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a media
+        $this->repository->updateMedia($entity);
+
+        // valores a serem considerados na atualização
+        $filePath = 'path_do_thumb2.mp4';
+        $imageType = ImageType::THUMB;
+
+        // criando a image atualizada
+        $image2 = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image atualizada
+        $entity->setThumbFile($image2);
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a media
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 1);
+        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 1);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $entity->id(),
+            'path' => $image2->filePath(),
+            'type' => $image2->imageType(),
+        ]);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithImageThumbHalf()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_thumbHalf.mp4';
+        $imageType = ImageType::THUMB_HALF;
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a image
+        $image = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image
+        $entity->setThumbHalf($image);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a media
+        $this->repository->updateMedia($entity);
+
+        // valores a serem considerados na atualização
+        $filePath = 'path_do_thumbHalf2.mp4';
+        $imageType = ImageType::THUMB_HALF;
+
+        // criando a image atualizada
+        $image2 = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image atualizada
+        $entity->setThumbHalf($image2);
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a media
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 1);
+        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 1);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $entity->id(),
+            'path' => $image2->filePath(),
+            'type' => $image2->imageType(),
+        ]);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithImageBanner()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_banner.mp4';
+        $imageType = ImageType::BANNER;
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a image
+        $image = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image
+        $entity->setBannerFile($image);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a media
+        $this->repository->updateMedia($entity);
+
+        // valores a serem considerados na atualização
+        $filePath = 'path_do_banner2.mp4';
+        $imageType = ImageType::BANNER;
+
+        // criando a image atualizada
+        $image2 = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image atualizada
+        $entity->setBannerFile($image2);
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a media
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 1);
+        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 1);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $entity->id(),
+            'path' => $image2->filePath(),
+            'type' => $image2->imageType(),
         ]);
     }
 
@@ -905,6 +1133,131 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // soft-delete
         $this->assertDatabaseCount('videos', 1);
         $this->assertSoftDeleted(table: 'videos', data: ['id' => $model->id], deletedAtColumn: 'deleted_at');
+    }
+
+    // testando a função de delete por id no bd, com sucesso na busca
+    public function testDeleteByIdWithRelationships()
+    {
+        // gerando massa de dados a serem utilizados nos relacionamentos
+        // 
+        // definindo número randomico de categorias
+        $nCategories = rand(1, 9);
+        // criando categorias no bd para possibilitar os relacionamentos
+        $categories = CategoryModel::factory()->count($nCategories)->create();
+        $this->assertDatabaseCount('categories', $nCategories);
+        // 
+        // definindo número randomico de genres
+        $nGenres = rand(1, 9);
+        // criando genres no bd para possibilitar os relacionamentos
+        $genres = GenreModel::factory()->count($nGenres)->create();
+        $this->assertDatabaseCount('genres', $nGenres);
+        // 
+        // definindo número randomico de castMembers
+        $nCastMembers = rand(1, 9);
+        // criando castMembers no bd para possibilitar os relacionamentos
+        $castMembers = CastMemberModel::factory()->count($nCastMembers)->create();
+        $this->assertDatabaseCount('cast_members', $nCastMembers);
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // adicionando as categorias
+        foreach ($categories as $category) {
+            $entity->addCategoryId($category->id);
+        }
+        // adicionando os genres
+        foreach ($genres as $genre) {
+            $entity->addGenreId($genre->id);
+        }
+        // adicionando os castMembers
+        foreach ($castMembers as $castMember) {
+            $entity->addCastMemberId($castMember->id);
+        }
+        // inserindo no bd
+        $response = $this->repository->insert($entity);
+        $this->assertDatabaseCount('videos', 1);
+        $this->assertDatabaseCount('video_category', $nCategories);
+        $this->assertDatabaseCount('video_genre', $nGenres);
+        $this->assertDatabaseCount('video_cast_member', $nCastMembers);
+
+        // deletando no bd
+        $response = $this->repository->deleteById($entity->id());
+        // verificando
+        $this->assertTrue($response);
+        // soft-delete
+        $this->assertSoftDeleted(table: 'videos', data: ['id' => $entity->id], deletedAtColumn: 'deleted_at');
+        $this->assertDatabaseCount('videos', 1);
+        $this->assertDatabaseCount('video_category', $nCategories);
+        $this->assertDatabaseCount('video_genre', $nGenres);
+        $this->assertDatabaseCount('video_cast_member', $nCastMembers);
+    }
+
+    // testando a função de delete no bd com a inclusão de medias
+    public function testDeleteWithMedias()
+    {
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando o trailer
+        $trailer = new Media(
+            filePath: 'path_do_trailer.mp4',
+            mediaStatus: MediaStatus::PENDING,
+            mediaType: MediaType::TRAILER,
+            encodedPath: '',
+        );
+        $entity->setTraileFile($trailer);
+        // criando o video
+        $videoFile = new Media(
+            filePath: 'path_do_video.mp4',
+            mediaStatus: MediaStatus::PENDING,
+            mediaType: MediaType::VIDEO,
+            encodedPath: '',
+        );
+        $entity->setVideoFile($videoFile);
+        // criando a thumb
+        $thumb = new Image(
+            filePath: 'path_do_thumb.mp4',
+            imageType: ImageType::THUMB,
+        );
+        $entity->setThumbFile($thumb);
+        // criando a thumbHalf
+        $thumbHalf = new Image(
+            filePath: 'path_do_thumbHalf.mp4',
+            imageType: ImageType::THUMB_HALF,
+        );
+        $entity->setThumbHalf($thumbHalf);
+        // criando o banner
+        $banner = new Image(
+            filePath: 'path_do_banner.mp4',
+            imageType: ImageType::BANNER,
+        );
+        $entity->setBannerFile($banner);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        $this->assertDatabaseCount('videos', 1);
+        // inserindo a media
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_medias', 2);
+        $this->assertDatabaseCount('video_images', 3);
+        // deletando no bd
+        $response = $this->repository->deleteById($entity->id());
+        // verificando
+        $this->assertTrue($response);
+        // soft-delete
+        $this->assertSoftDeleted(table: 'videos', data: ['id' => $entity->id], deletedAtColumn: 'deleted_at');
+        $this->assertDatabaseCount('videos', 1);
+        $this->assertDatabaseCount('video_medias', 2);
+        $this->assertDatabaseCount('video_images', 3);
     }
 
     // testando a função de delete por id no bd, sem sucesso na busca

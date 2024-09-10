@@ -42,7 +42,12 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         // verificando
         $this->assertInstanceOf(CategoryEntity::class, $response);
         $this->assertDatabaseHas('categories', [
-            'id' => $entity->id()
+            'id' => $entity->id(),
+            'name' => $entity->name,
+            'description' => $entity->description,
+            'is_active' => $entity->isActive,
+            'created_at' => $entity->createdAt(),
+            'updated_at' => $entity->updatedAt(),
         ]);
     }
 
@@ -58,7 +63,11 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $this->assertInstanceOf(CategoryEntity::class, $response);
         $this->assertDatabaseHas('categories', [
             'id' => $entity->id(),
+            'name' => $entity->name,
+            'description' => $entity->description,
             'is_active' => false,
+            'created_at' => $entity->createdAt(),
+            'updated_at' => $entity->updatedAt(),
         ]);
     }
 
@@ -295,6 +304,14 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $this->assertSame("updated name", $response->name);
         $this->assertNotEquals($model->name, $response->name);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
+        $this->assertDatabaseHas('categories', [
+            'id' => $category->id(),
+            'name' => $category->name,
+            'description' => $category->description,
+            'is_active' => $category->isActive,
+            'created_at' => $category->createdAt(),
+            'updated_at' => $response->updatedAt(),
+        ]);
     }
 
     // testando a função de update no bd, sem sucesso na busca

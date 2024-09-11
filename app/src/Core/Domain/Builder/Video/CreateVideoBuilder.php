@@ -118,7 +118,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
             encodedPath: ''
         );
         // atualizando a entidade
-        $this->entity->setTraileFile($trailerFile);
+        $this->entity->setTrailerFile($trailerFile);
 
         return $this;
     }

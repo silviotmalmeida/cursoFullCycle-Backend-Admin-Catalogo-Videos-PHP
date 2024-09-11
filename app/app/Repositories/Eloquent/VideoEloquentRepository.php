@@ -7,9 +7,11 @@ namespace App\Repositories\Eloquent;
 use App\Models\Video as VideoModel;
 use App\Repositories\Presenters\PaginationPresenter;
 use Core\Domain\Entity\Video as VideoEntity;
+use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\Domain\Repository\PaginationInterface;
+use Core\Domain\ValueObject\Media;
 use DateTime;
 
 // definindo o repository, que implementa a interface VideoRepositoryInterface
@@ -56,6 +58,17 @@ class VideoEloquentRepository implements VideoRepositoryInterface
 
                 $entity->addCastMemberId($castMember->id);
             }
+        }
+        // adicionando o trailer
+        if ($trailer = $model->trailer) {
+            $entity->setTrailerFile(
+                new Media(
+                    filePath: $trailer->file_path,
+                    mediaStatus: $trailer->status,
+                    mediaType: $trailer->type,
+                    encodedPath: $trailer->encoded_path,
+                )
+            );
         }
         return $entity;
     }
@@ -210,6 +223,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         return true;
     }
 
+    // função de atualização das medias
     public function updateMedia(VideoEntity $entity): VideoEntity
     {
         // buscando no bd
@@ -325,6 +339,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
             }
         }
 
-        return $entity;
+        // retornando a entidade populada com os dados inseridos
+        return $this->toVideo($model);
     }
 }

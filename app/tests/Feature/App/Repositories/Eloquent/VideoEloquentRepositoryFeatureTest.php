@@ -233,7 +233,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             encodedPath: $encodedPath,
         );
         // adicionando a media
-        $entity->setTraileFile($media);
+        $entity->setTrailerFile($media);
         // inserindo a entidade no bd
         $this->repository->insert($entity);
         $this->assertDatabaseCount('videos', 1);
@@ -242,7 +242,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $this->repository->updateMedia($entity);
+        $entityDb = $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         $this->assertDatabaseHas('video_medias', [
             'video_id' => $entity->id(),
@@ -251,6 +251,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             'status' => $media->mediaStatus(),
             'type' => $media->mediaType(),
         ]);
+        $this->assertNotNull($entityDb->trailerFile());
     }
 
     // testando a função de inserção no bd com a inclusão de video
@@ -287,7 +288,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $this->repository->updateMedia($entity);
+        $entityDb = $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_medias', 1);
         $this->assertDatabaseHas('video_medias', [
             'video_id' => $entity->id(),
@@ -296,6 +297,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             'status' => $media->mediaStatus(),
             'type' => $media->mediaType(),
         ]);
+        $this->assertNotNull($entityDb->videoFile());
     }
 
     // testando a função de inserção no bd com a inclusão de thumb
@@ -328,13 +330,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $this->repository->updateMedia($entity);
+        $entityDb = $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
             'video_id' => $entity->id(),
             'path' => $image->filePath(),
             'type' => $image->imageType(),
         ]);
+        $this->assertNotNull($entityDb->thumbFile());
     }
 
     // testando a função de inserção no bd com a inclusão de thumbHalf
@@ -367,13 +370,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $this->repository->updateMedia($entity);
+        $entityDb = $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
             'video_id' => $entity->id(),
             'path' => $image->filePath(),
             'type' => $image->imageType(),
         ]);
+        $this->assertNotNull($entityDb->thumbHalf());
     }
 
     // testando a função de inserção no bd com a inclusão de banner
@@ -406,13 +410,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
-        $this->repository->updateMedia($entity);
+        $entityDb = $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
             'video_id' => $entity->id(),
             'path' => $image->filePath(),
             'type' => $image->imageType(),
         ]);
+        $this->assertNotNull($entityDb->bannerFile());
     }
 
     // testando a função de busca por id no bd, com sucesso na busca
@@ -837,7 +842,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             encodedPath: $encodedPath,
         );
         // adicionando a media
-        $entity->setTraileFile($media);
+        $entity->setTrailerFile($media);
         // inserindo a entidade no bd
         $this->repository->insert($entity);
         // inserindo a media
@@ -857,7 +862,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             encodedPath: $encodedPath,
         );
         // adicionando a media atualizada
-        $entity->setTraileFile($media2);
+        $entity->setTrailerFile($media2);
         // atualizando no bd
         sleep(1);
         $this->repository->update($entity);
@@ -1215,7 +1220,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             mediaType: MediaType::TRAILER,
             encodedPath: '',
         );
-        $entity->setTraileFile($trailer);
+        $entity->setTrailerFile($trailer);
         // criando o video
         $videoFile = new Media(
             filePath: 'path_do_video.mp4',

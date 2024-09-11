@@ -118,7 +118,7 @@ class Video extends Entity
     }
 
     // função para set do trailerFile
-    public function setTraileFile(Media $trailerFile): void
+    public function setTrailerFile(Media $trailerFile): void
     {
         $this->trailerFile = $trailerFile;
     }

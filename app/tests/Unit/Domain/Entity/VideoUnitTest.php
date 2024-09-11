@@ -123,8 +123,8 @@ class VideoUnitTest extends TestCase
         $this->assertSame($bannerFile, $video->bannerFile());
     }
 
-    // função que testa a função setTraileFile
-    public function testSetTraileFile()
+    // função que testa a função setTrailerFile
+    public function testSetTrailerFile()
     {
         // criando o video
         $video = new Video(
@@ -145,7 +145,7 @@ class VideoUnitTest extends TestCase
             encodedPath: ''
         );
         // setando o trailerFile
-        $video->setTraileFile($trailerFile);
+        $video->setTrailerFile($trailerFile);
 
         // verificando
         $this->assertSame($trailerFile, $video->trailerFile());

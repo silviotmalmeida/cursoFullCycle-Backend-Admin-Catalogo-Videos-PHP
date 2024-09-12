@@ -7,10 +7,10 @@ namespace App\Repositories\Eloquent;
 use App\Models\Video as VideoModel;
 use App\Repositories\Presenters\PaginationPresenter;
 use Core\Domain\Entity\Video as VideoEntity;
-use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\Domain\Repository\PaginationInterface;
+use Core\Domain\ValueObject\Image;
 use Core\Domain\ValueObject\Media;
 use DateTime;
 
@@ -60,13 +60,52 @@ class VideoEloquentRepository implements VideoRepositoryInterface
             }
         }
         // adicionando o trailer
-        if ($trailer = $model->trailer) {
+        if ($trailer = $model->trailer()->first()) {
             $entity->setTrailerFile(
                 new Media(
                     filePath: $trailer->file_path,
                     mediaStatus: $trailer->status,
                     mediaType: $trailer->type,
                     encodedPath: $trailer->encoded_path,
+                )
+            );
+            
+        }
+        // adicionando o videoMedia
+        if ($videoMedia = $model->video()->first()) {
+            $entity->setVideoFile(
+                new Media(
+                    filePath: $videoMedia->file_path,
+                    mediaStatus: $videoMedia->status,
+                    mediaType: $videoMedia->type,
+                    encodedPath: $videoMedia->encoded_path,
+                )
+            );
+        }
+        // adicionando o thumb
+        if ($thumb = $model->thumb()->first()) {
+            $entity->setThumbFile(
+                new Image(
+                    filePath: $thumb->path,
+                    imageType: $thumb->type,
+                )
+            );
+        }
+        // adicionando o thumbHalf
+        if ($thumbHalf = $model->thumbHalf()->first()) {
+            $entity->setThumbHalf(
+                new Image(
+                    filePath: $thumbHalf->path,
+                    imageType: $thumbHalf->type,
+                )
+            );
+        }
+        // adicionando o banner
+        if ($banner = $model->banner()->first()) {
+            $entity->setBannerFile(
+                new Image(
+                    filePath: $banner->path,
+                    imageType: $banner->type,
                 )
             );
         }

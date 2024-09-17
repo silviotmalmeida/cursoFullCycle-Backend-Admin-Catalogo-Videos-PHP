@@ -5,7 +5,6 @@ namespace Tests\Unit\UseCase\Video;
 
 // importações
 use Core\Domain\Builder\Video\CreateVideoBuilder;
-use Core\Domain\Builder\Video\UpdateVideoBuilder;
 use Core\Domain\Entity\Video;
 use Core\Domain\Enum\CastMemberType;
 use Core\Domain\Enum\Rating;
@@ -128,7 +127,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
@@ -266,7 +265,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
@@ -397,7 +396,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
@@ -532,7 +531,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
@@ -663,7 +662,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new UpdateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository

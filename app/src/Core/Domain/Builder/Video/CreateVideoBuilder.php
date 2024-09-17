@@ -34,32 +34,52 @@ class CreateVideoBuilder implements VideoBuilderInterface
     public function createEntity(object $input): CreateVideoBuilder
     {
         // criando a entidade com os dados do input
-        $this->entity = new Video(
-            title: $input->title,
-            description: $input->description,
-            yearLaunched: $input->yearLaunched,
-            duration: $input->duration,
-            rating: $input->rating,
-        );
-        
+        // se já existir id definido, usa-o
+        if ($input->id) {
+            $this->entity = new Video(
+                id: $input->id,
+                title: $input->title,
+                description: $input->description,
+                yearLaunched: $input->yearLaunched,
+                duration: $input->duration,
+                rating: $input->rating,
+            );
+        }
+        // senão, será criado pela entidade
+        else {
+            $this->entity = new Video(
+                title: $input->title,
+                description: $input->description,
+                yearLaunched: $input->yearLaunched,
+                duration: $input->duration,
+                rating: $input->rating,
+            );
+        }
+
         if ($input->opened) $this->entity->open();
 
         // adicionando as categories
-        foreach ($input->categoriesId as $categoryId) {
+        if ($input->categoriesId) {
+            foreach ($input->categoriesId as $categoryId) {
 
-            $this->entity->addCategoryId($categoryId);
+                $this->entity->addCategoryId($categoryId);
+            }
         }
 
         // adicionando os genres
-        foreach ($input->genresId as $genreId) {
+        if ($input->genresId) {
+            foreach ($input->genresId as $genreId) {
 
-            $this->entity->addGenreId($genreId);
+                $this->entity->addGenreId($genreId);
+            }
         }
 
         // adicionando os cast members
-        foreach ($input->castMembersId as $castMemberId) {
+        if ($input->castMembersId) {
+            foreach ($input->castMembersId as $castMemberId) {
 
-            $this->entity->addCastMemberId($castMemberId);
+                $this->entity->addCastMemberId($castMemberId);
+            }
         }
 
         return $this;
@@ -71,7 +91,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de thumbFile para a entidade
         $thumbFile = new Image(
             filePath: $path,
-            imageType:ImageType::THUMB,
+            imageType: ImageType::THUMB,
         );
         // atualizando a entidade
         $this->entity->setThumbFile($thumbFile);
@@ -85,7 +105,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de thumbHalf para a entidade
         $thumbHalf = new Image(
             filePath: $path,
-            imageType:ImageType::THUMB_HALF,
+            imageType: ImageType::THUMB_HALF,
         );
         // atualizando a entidade
         $this->entity->setThumbHalf($thumbHalf);
@@ -99,7 +119,7 @@ class CreateVideoBuilder implements VideoBuilderInterface
         // cria o objeto de bannerFile para a entidade
         $bannerFile = new Image(
             filePath: $path,
-            imageType:ImageType::BANNER,
+            imageType: ImageType::BANNER,
         );
         // atualizando a entidade
         $this->entity->setBannerFile($bannerFile);
@@ -108,14 +128,14 @@ class CreateVideoBuilder implements VideoBuilderInterface
     }
 
     // método de inclusão do trailerFile
-    public function addTrailerFile(string $path, MediaStatus $mediaStatus): CreateVideoBuilder
+    public function addTrailerFile(string $filePath, MediaStatus|int $mediaStatus, string $encodedPath = ''): CreateVideoBuilder
     {
         // cria o objeto de trailerFile para a entidade
         $trailerFile = new Media(
-            filePath: $path,
+            filePath: $filePath,
             mediaStatus: $mediaStatus,
             mediaType: MediaType::TRAILER,
-            encodedPath: ''
+            encodedPath: $encodedPath
         );
         // atualizando a entidade
         $this->entity->setTrailerFile($trailerFile);
@@ -124,14 +144,14 @@ class CreateVideoBuilder implements VideoBuilderInterface
     }
 
     // método de inclusão do videoFile
-    public function addVideoFile(string $path, MediaStatus $mediaStatus): CreateVideoBuilder
+    public function addVideoFile(string $filePath, MediaStatus|int $mediaStatus, string $encodedPath = ''): CreateVideoBuilder
     {
         // cria o objeto de videoFile para a entidade
         $videoFile = new Media(
-            filePath: $path,
+            filePath: $filePath,
             mediaStatus: $mediaStatus,
             mediaType: MediaType::VIDEO,
-            encodedPath: ''
+            encodedPath: $encodedPath
         );
         // atualizando a entidade
         $this->entity->setVideoFile($videoFile);

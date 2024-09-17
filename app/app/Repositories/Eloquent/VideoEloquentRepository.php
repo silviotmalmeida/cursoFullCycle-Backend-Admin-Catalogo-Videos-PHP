@@ -6,12 +6,11 @@ namespace App\Repositories\Eloquent;
 // importações
 use App\Models\Video as VideoModel;
 use App\Repositories\Presenters\PaginationPresenter;
+use Core\Domain\Builder\Video\CreateVideoBuilder;
 use Core\Domain\Entity\Video as VideoEntity;
 use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\Domain\Repository\PaginationInterface;
-use Core\Domain\ValueObject\Image;
-use Core\Domain\ValueObject\Media;
 use DateTime;
 
 // definindo o repository, que implementa a interface VideoRepositoryInterface
@@ -19,97 +18,56 @@ class VideoEloquentRepository implements VideoRepositoryInterface
 {
     // construtor e atributos
     public function __construct(
-        protected $model = new VideoModel()
+        protected $model = new VideoModel(),
+        protected $videoBuilder = new CreateVideoBuilder()
     ) {}
 
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
     private function toVideo(VideoModel $model): VideoEntity
     {
-        // criando a entidade
-        $entity = new VideoEntity(
-            id: $model->id,
-            title: $model->title,
-            description: $model->description,
-            yearLaunched: $model->year_launched,
-            duration: $model->duration,
-            rating: $model->rating,
-            createdAt: $model->created_at,
-            updatedAt: $model->updated_at
+        // obtendo o array de id das categorias, genres e castMembers
+        $categoriesIds = $model->categories->pluck('id')->toArray();
+        $genresIds = $model->genres->pluck('id')->toArray();
+        $castMembersIds = $model->castMembers->pluck('id')->toArray();
+
+        $this->videoBuilder->createEntity(
+            (object) array(
+                'id' => $model->id,
+                'title' => $model->title,
+                'description' => $model->description,
+                'yearLaunched' => $model->year_launched,
+                'duration' => $model->duration,
+                'rating' => $model->rating,
+                'createdAt' => $model->created_at,
+                'updatedAt' => $model->updated_at,
+                'opened' => $model->opened,
+                'categoriesId' => $categoriesIds,
+                'genresId' => $genresIds,
+                'castMembersId' => $castMembersIds,
+            )
         );
-        // atribuindo o opened
-        ((bool) $model->opened) ? $entity->open() : $entity->close();
-        // adicionando as categories
-        if ($model->categories) {
-            foreach ($model->categories as $category) {
 
-                $entity->addCategoryId($category->id);
-            }
-        }
-        // adicionando os genres
-        if ($model->genres) {
-            foreach ($model->genres as $genre) {
-
-                $entity->addGenreId($genre->id);
-            }
-        }
-        // adicionando os cast members
-        if ($model->castMembers) {
-            foreach ($model->castMembers as $castMember) {
-
-                $entity->addCastMemberId($castMember->id);
-            }
-        }
         // adicionando o trailer
         if ($trailer = $model->trailer()->first()) {
-            $entity->setTrailerFile(
-                new Media(
-                    filePath: $trailer->file_path,
-                    mediaStatus: $trailer->status,
-                    mediaType: $trailer->type,
-                    encodedPath: $trailer->encoded_path,
-                )
-            );
-            
+            $this->videoBuilder->addTrailerFile($trailer->file_path, $trailer->status);
         }
         // adicionando o videoMedia
         if ($videoMedia = $model->video()->first()) {
-            $entity->setVideoFile(
-                new Media(
-                    filePath: $videoMedia->file_path,
-                    mediaStatus: $videoMedia->status,
-                    mediaType: $videoMedia->type,
-                    encodedPath: $videoMedia->encoded_path,
-                )
-            );
+            $this->videoBuilder->addVideoFile($videoMedia->file_path, $videoMedia->status);
         }
         // adicionando o thumb
         if ($thumb = $model->thumb()->first()) {
-            $entity->setThumbFile(
-                new Image(
-                    filePath: $thumb->path,
-                    imageType: $thumb->type,
-                )
-            );
+            $this->videoBuilder->addThumbFile($thumb->path);
         }
         // adicionando o thumbHalf
         if ($thumbHalf = $model->thumbHalf()->first()) {
-            $entity->setThumbHalf(
-                new Image(
-                    filePath: $thumbHalf->path,
-                    imageType: $thumbHalf->type,
-                )
-            );
+            $this->videoBuilder->addThumbHalf($thumbHalf->path);
         }
         // adicionando o banner
         if ($banner = $model->banner()->first()) {
-            $entity->setBannerFile(
-                new Image(
-                    filePath: $banner->path,
-                    imageType: $banner->type,
-                )
-            );
+            $this->videoBuilder->addBannerFile($banner->path);
         }
-        return $entity;
+        return $this->videoBuilder->getEntity();
     }
 
     // função auxiliar para sincronizar os relacionamentos

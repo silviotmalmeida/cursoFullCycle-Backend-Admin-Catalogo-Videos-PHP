@@ -4,7 +4,8 @@
 namespace Core\UseCase\Video\Update;
 
 // importações
-use Core\Domain\Builder\Video\UpdateVideoBuilder;
+
+use Core\Domain\Builder\Video\CreateVideoBuilder;
 use Core\Domain\Builder\Video\VideoBuilderInterface;
 use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Events\VideoCreatedEvent;
@@ -139,6 +140,6 @@ class UpdateVideoUseCase extends BaseVideoUseCase
     // método responsável por retornar o builder a ser utilizado pelo usecase
     protected function getBuilder(): ?VideoBuilderInterface
     {
-        return new UpdateVideoBuilder();
+        return new CreateVideoBuilder();
     }
 }

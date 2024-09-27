@@ -9,6 +9,9 @@ use Core\Domain\Enum\Rating;
 // definindo o dto de entrada do usecase (basicamente uma classe anêmica com atributos públicos)
 class InsertVideoInputDto
 {
+    // atributos fora do construtor
+    public ?string $id;
+
     // construtor e atributos
     public function __construct(
         public string $title,
@@ -26,5 +29,7 @@ class InsertVideoInputDto
         public ?array $trailerFile = null,
         public ?array $videoFile = null,
     ) {
+        // setando o id nulo
+        $this->id = null;
     }
 }

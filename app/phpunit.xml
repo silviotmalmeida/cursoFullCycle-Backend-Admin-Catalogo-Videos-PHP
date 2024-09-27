@@ -27,5 +27,9 @@
         <env name="QUEUE_CONNECTION" value="sync"/>
         <env name="SESSION_DRIVER" value="array"/>
         <env name="TELESCOPE_ENABLED" value="false"/>
+        <!-- definindo variáveis de ambiente a serem
+         consideradas para a execução dos testes, sobreescrevendo
+         as variáveis setadas no .env -->
+        <env name="FILESYSTEM_DISK" value="local"/>
     </php>
 </phpunit>

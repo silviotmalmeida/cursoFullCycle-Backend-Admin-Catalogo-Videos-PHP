@@ -225,6 +225,7 @@ class Video extends Entity
         ?array $castMembersId = null,
         ?Rating $rating = null,
     ): void {
+        
         // atualiza somente os atributos com valores recebidos
         if (isset($title)) $this->title = $title;
         if (isset($description)) $this->description = $description;

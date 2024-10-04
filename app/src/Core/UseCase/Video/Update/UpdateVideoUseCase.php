@@ -46,9 +46,9 @@ class UpdateVideoUseCase extends BaseVideoUseCase
 
             // inserindo a entidade no BD utilizando o repository
             $updatedVideo = $this->repository->update($video);
-
+         
             // inserindo a entidade no builder
-            $this->videoBuilder->setEntity($video);
+            $this->videoBuilder->setEntity($updatedVideo);
 
             // armazenando o thumbFile
             if ($input->thumbFile) {

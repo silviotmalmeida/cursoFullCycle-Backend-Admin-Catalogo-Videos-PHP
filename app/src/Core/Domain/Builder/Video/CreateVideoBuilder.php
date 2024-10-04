@@ -34,27 +34,16 @@ class CreateVideoBuilder implements VideoBuilderInterface
     public function createEntity(object $input): CreateVideoBuilder
     {
         // criando a entidade com os dados do input
-        // se já existir id definido, usa-o
-        if ($input->id) {
-            $this->entity = new Video(
-                id: $input->id,
-                title: $input->title,
-                description: $input->description,
-                yearLaunched: $input->yearLaunched,
-                duration: $input->duration,
-                rating: $input->rating,
-            );
-        }
-        // senão, será criado pela entidade
-        else {
-            $this->entity = new Video(
-                title: $input->title,
-                description: $input->description,
-                yearLaunched: $input->yearLaunched,
-                duration: $input->duration,
-                rating: $input->rating,
-            );
-        }
+        $this->entity = new Video(
+            id: isset($input->id) ? $input->id : '',
+            title: isset($input->title) ? $input->title : '',
+            description: isset($input->description) ? $input->description : '',
+            yearLaunched: isset($input->yearLaunched) ? $input->yearLaunched : 0,
+            duration: isset($input->duration) ? $input->duration : 0,
+            rating: isset($input->rating) ? $input->rating : '',
+            createdAt: isset($input->createdAt) ? $input->createdAt : '',
+            updatedAt: isset($input->updatedAt) ? $input->updatedAt : '',
+        );
 
         if ($input->opened) $this->entity->open();
 

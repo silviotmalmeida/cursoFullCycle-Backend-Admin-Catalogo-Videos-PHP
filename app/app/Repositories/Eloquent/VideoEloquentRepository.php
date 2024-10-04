@@ -197,7 +197,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
             'duration' => $entity->duration,
             'rating' => $entity->rating->value,
             'opened' => $entity->opened,
-            'updated_at' => new DateTime()
+            'updated_at' => $entity->updatedAt()
         ]);
         // sincronizando os relacionamentos
         $this->syncRelationships($entity, $model);

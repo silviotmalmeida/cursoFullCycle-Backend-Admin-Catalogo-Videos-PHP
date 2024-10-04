@@ -20,6 +20,7 @@ use Core\UseCase\Video\Interfaces\VideoEventManagerInterface;
 use Core\UseCase\Video\Update\DTO\UpdateVideoInputDto;
 use Core\UseCase\Video\Update\DTO\UpdateVideoOutputDto;
 use Core\UseCase\Video\Update\UpdateVideoUseCase;
+use DateTime;
 use Exception;
 use Mockery;
 use PHPUnit\Framework\TestCase;
@@ -106,6 +107,23 @@ class UpdateVideoUseCaseUnitTest extends TestCase
 
         // criando o video inicial
         $initialVideo = self::createInitialVideo();
+        sleep(1);
+
+        // criando o input para o builder
+        $input =  (object) array(
+            'id' => $initialVideo->id(),
+            'title' => $title,
+            'description' => $description,
+            'yearLaunched' => $yearLaunched,
+            'duration' => $duration,
+            'rating' => $rating,
+            'opened' => $opened,
+            'categoriesId' => $categoriesId,
+            'genresId' => $genresId,
+            'castMembersId' => $castMembersId,
+            'createdAt' => $initialVideo->createdAt(),
+            'updatedAt' => (new DateTime())->format('Y-m-d H:i:s'),
+        );
 
         // criando o inputDto
         $inputDto = self::createUpdateVideoInputDto(
@@ -123,11 +141,11 @@ class UpdateVideoUseCaseUnitTest extends TestCase
             $thumbHalf,
             $bannerFile,
             $trailerFile,
-            $videoFile
+            $videoFile,
         );
 
         // criando a entidade com os dados do input
-        $videoBuilder = (new CreateVideoBuilder)->createEntity($inputDto);
+        $videoBuilder = (new CreateVideoBuilder)->createEntity($input);
         $entity = $videoBuilder->getEntity();
 
         // criando o mock do repository
@@ -194,6 +212,7 @@ class UpdateVideoUseCaseUnitTest extends TestCase
         $this->assertEquals($castMembersId, $responseUseCase->castMembersId);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertNotSame($responseUseCase->created_at, $responseUseCase->updated_at);
     }
 
     // função que testa o método de execução, sem sucesso e com rollback

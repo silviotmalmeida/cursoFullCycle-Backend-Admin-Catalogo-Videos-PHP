@@ -14,7 +14,7 @@ class FileStorageFeatureTest extends TestCase
      *
      * @return void
      */
-    public function test_store_delete()
+    public function test_store()
     {
         // criando arquivo fake
         $fakeFile = UploadedFile::fake()->create('video.mp4', 1, 'video/mp4');

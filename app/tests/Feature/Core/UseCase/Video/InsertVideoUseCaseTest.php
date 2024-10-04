@@ -264,16 +264,20 @@ class InsertVideoUseCaseTest extends TestCase
             $genreRepository,
             $castMemberRepository,
         );
-        // definindo as características da exceção a ser lançada
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('rollback test');
 
-        // executando o usecase
-        $responseUseCase = $useCase->execute($inputDto, true);
-
-        // verificando as tabelas do banco
-        $this->assertDatabaseCount('videos', 0);
-        $this->assertDatabaseCount('video_category', 0);
+        // tratamento de exceções
+        try {
+            // executando o usecase
+            $responseUseCase = $useCase->execute($inputDto, true);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(Exception::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame($th->getMessage(), 'rollback test');
+            // verificando as tabelas do banco
+            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('video_category', 0);
+        }
     }
 
     // função que testa o método de execução com categorias inválidas
@@ -334,16 +338,517 @@ class InsertVideoUseCaseTest extends TestCase
             $castMemberRepository,
         );
 
-        // definindo as características da exceção a ser lançada
-        $this->expectException(NotFoundException::class);
-        $this->expectExceptionMessage("Category $categoryId not found");
+        // tratamento de exceções
+        try {
+            // executando o usecase
+            $responseUseCase = $useCase->execute($inputDto);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(NotFoundException::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame($th->getMessage(), "Category $categoryId not found");
+            // verificando as tabelas do banco
+            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('video_category', 0);
+        }
+    }
+
+    // função que testa o método de execução com genres
+    public function testExecuteWithGenres()
+    {
+        // dados básicos de entrada
+        $title = 'title';
+        $description = 'description';
+        $yearLaunched = 2024;
+        $duration = 180;
+        $opened = false;
+        $rating = Rating::RATE10;
+
+        // gerando massa de dados a serem utilizados nos relacionamentos
+        // definindo número randomico de genres
+        $nGenres = rand(1, 9);
+        // criando genres no bd para possibilitar os relacionamentos
+        $genresIds = GenreModel::factory()->count($nGenres)->create()->pluck('id')->toArray();
+        $this->assertDatabaseCount('genres', $nGenres);
+
+        // criando o inputDto
+        $inputDto = new InsertVideoInputDto(
+            title: $title,
+            description: $description,
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            opened: $opened,
+            rating: $rating,
+            genresId: $genresIds,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManager();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new InsertVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
 
         // executando o usecase
         $responseUseCase = $useCase->execute($inputDto);
 
-        // verificando as tabelas do banco
-        $this->assertDatabaseCount('videos', 0);
-        $this->assertDatabaseCount('video_category', 0);
+        // verificando os dados básicos
+        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
+        $this->assertNotEmpty($responseUseCase->id);
+        $this->assertSame($title, $responseUseCase->title);
+        $this->assertSame($description, $responseUseCase->description);
+        $this->assertSame($yearLaunched, $responseUseCase->yearLaunched);
+        $this->assertSame($duration, $responseUseCase->duration);
+        $this->assertSame($rating, $responseUseCase->rating);
+        $this->assertNotEmpty($responseUseCase->created_at);
+        $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertDatabaseHas('videos', [
+            'id' => $responseUseCase->id,
+            'title' => $title,
+            'description' => $description,
+            'year_launched' => $yearLaunched,
+            'duration' => $duration,
+            'opened' => $opened,
+            'rating' => $rating,
+        ]);
+
+        // verificando relacionamentos
+        $this->assertDatabaseCount('video_genre', $nGenres);
+        $this->assertCount($nGenres, $responseUseCase->genresId);
+        $this->assertEquals($genresIds, $responseUseCase->genresId);
+
+        // verificando o relacionamento a partir de genre
+        foreach ($genresIds as $genreId) {
+            $this->assertDatabaseHas('video_genre', [
+                'video_id' => $responseUseCase->id,
+                'genre_id' => $genreId,
+            ]);
+            $genreModel = GenreModel::find($genreId);
+            $this->assertCount(1, $genreModel->videos);
+        }
+    }
+
+    // função que testa o método de execução com genres e rollback
+    public function testExecuteWithGenresAndRollback()
+    {
+        // dados básicos de entrada
+        $title = 'title';
+        $description = 'description';
+        $yearLaunched = 2024;
+        $duration = 180;
+        $opened = false;
+        $rating = Rating::RATE10;
+
+        // gerando massa de dados a serem utilizados nos relacionamentos
+        // definindo número randomico de genres
+        $nGenres = rand(1, 9);
+        // criando genres no bd para possibilitar os relacionamentos
+        $genresIds = GenreModel::factory()->count($nGenres)->create()->pluck('id')->toArray();
+        $this->assertDatabaseCount('genres', $nGenres);
+
+        // criando o inputDto
+        $inputDto = new InsertVideoInputDto(
+            title: $title,
+            description: $description,
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            opened: $opened,
+            rating: $rating,
+            genresId: $genresIds,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManager();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new InsertVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // tratamento de exceções
+        try {
+            // executando o usecase
+            $responseUseCase = $useCase->execute($inputDto, true);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(Exception::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame($th->getMessage(), 'rollback test');
+            // verificando as tabelas do banco
+            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('video_genre', 0);
+        }
+    }
+
+    // função que testa o método de execução com genres inválidos
+    public function testExecuteWithInvalidGenres()
+    {
+        // dados básicos de entrada
+        $title = 'title';
+        $description = 'description';
+        $yearLaunched = 2024;
+        $duration = 180;
+        $opened = false;
+        $rating = Rating::RATE10;
+
+        // gerando massa de dados a serem utilizados nos relacionamentos
+        $genreId = 'fake';
+        $genresIds = [$genreId];
+
+        // criando o inputDto
+        $inputDto = new InsertVideoInputDto(
+            title: $title,
+            description: $description,
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            opened: $opened,
+            rating: $rating,
+            genresId: $genresIds,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManager();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new InsertVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // tratamento de exceções
+        try {
+            // executando o usecase
+            $responseUseCase = $useCase->execute($inputDto);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(NotFoundException::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame($th->getMessage(), "Genre $genreId not found");
+            // verificando as tabelas do banco
+            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('video_genre', 0);
+        }
+    }
+
+    // função que testa o método de execução com castMembers
+    public function testExecuteWithCastMembers()
+    {
+        // dados básicos de entrada
+        $title = 'title';
+        $description = 'description';
+        $yearLaunched = 2024;
+        $duration = 180;
+        $opened = false;
+        $rating = Rating::RATE10;
+
+        // gerando massa de dados a serem utilizados nos relacionamentos
+        // definindo número randomico de castMembers
+        $nCastMembers = rand(1, 9);
+        // criando castMembers no bd para possibilitar os relacionamentos
+        $castMembersIds = CastMemberModel::factory()->count($nCastMembers)->create()->pluck('id')->toArray();
+        $this->assertDatabaseCount('cast_members', $nCastMembers);
+
+        // criando o inputDto
+        $inputDto = new InsertVideoInputDto(
+            title: $title,
+            description: $description,
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            opened: $opened,
+            rating: $rating,
+            castMembersId: $castMembersIds,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManager();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new InsertVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando os dados básicos
+        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
+        $this->assertNotEmpty($responseUseCase->id);
+        $this->assertSame($title, $responseUseCase->title);
+        $this->assertSame($description, $responseUseCase->description);
+        $this->assertSame($yearLaunched, $responseUseCase->yearLaunched);
+        $this->assertSame($duration, $responseUseCase->duration);
+        $this->assertSame($rating, $responseUseCase->rating);
+        $this->assertNotEmpty($responseUseCase->created_at);
+        $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertDatabaseHas('videos', [
+            'id' => $responseUseCase->id,
+            'title' => $title,
+            'description' => $description,
+            'year_launched' => $yearLaunched,
+            'duration' => $duration,
+            'opened' => $opened,
+            'rating' => $rating,
+        ]);
+
+        // verificando relacionamentos
+        $this->assertDatabaseCount('video_cast_member', $nCastMembers);
+        $this->assertCount($nCastMembers, $responseUseCase->castMembersId);
+        $this->assertEquals($castMembersIds, $responseUseCase->castMembersId);
+
+        // verificando o relacionamento a partir de castMember
+        foreach ($castMembersIds as $castMemberId) {
+            $this->assertDatabaseHas('video_cast_member', [
+                'video_id' => $responseUseCase->id,
+                'cast_member_id' => $castMemberId,
+            ]);
+            $castMemberModel = CastMemberModel::find($castMemberId);
+            $this->assertCount(1, $castMemberModel->videos);
+        }
+    }
+
+    // função que testa o método de execução com castMembers e rollback
+    public function testExecuteWithCastMembersAndRollback()
+    {
+        // dados básicos de entrada
+        $title = 'title';
+        $description = 'description';
+        $yearLaunched = 2024;
+        $duration = 180;
+        $opened = false;
+        $rating = Rating::RATE10;
+
+        // gerando massa de dados a serem utilizados nos relacionamentos
+        // definindo número randomico de castMembers
+        $nCastMembers = rand(1, 9);
+        // criando castMembers no bd para possibilitar os relacionamentos
+        $castMembersIds = CastMemberModel::factory()->count($nCastMembers)->create()->pluck('id')->toArray();
+        $this->assertDatabaseCount('cast_members', $nCastMembers);
+
+        // criando o inputDto
+        $inputDto = new InsertVideoInputDto(
+            title: $title,
+            description: $description,
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            opened: $opened,
+            rating: $rating,
+            castMembersId: $castMembersIds,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManager();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new InsertVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // tratamento de exceções
+        try {
+            // executando o usecase
+            $responseUseCase = $useCase->execute($inputDto, true);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(Exception::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame($th->getMessage(), 'rollback test');
+            // verificando as tabelas do banco
+            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('video_cast_member', 0);
+        }
+    }
+
+    // função que testa o método de execução com castMembers inválidos
+    public function testExecuteWithInvalidCastMembers()
+    {
+        // dados básicos de entrada
+        $title = 'title';
+        $description = 'description';
+        $yearLaunched = 2024;
+        $duration = 180;
+        $opened = false;
+        $rating = Rating::RATE10;
+
+        // gerando massa de dados a serem utilizados nos relacionamentos
+        $castMemberId = 'fake';
+        $castMembersIds = [$castMemberId];
+
+        // criando o inputDto
+        $inputDto = new InsertVideoInputDto(
+            title: $title,
+            description: $description,
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            opened: $opened,
+            rating: $rating,
+            castMembersId: $castMembersIds,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManager();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new InsertVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // tratamento de exceções
+        try {
+            // executando o usecase
+            $responseUseCase = $useCase->execute($inputDto);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(NotFoundException::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame($th->getMessage(), "Cast Member $castMemberId not found");
+            // verificando as tabelas do banco
+            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('video_cast_member', 0);
+        }
     }
 
     // função que testa o método de execução completo

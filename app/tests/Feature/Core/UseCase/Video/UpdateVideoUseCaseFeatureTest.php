@@ -15,9 +15,9 @@ use App\Repositories\Transactions\TransactionDb;
 use App\Services\Storage\FileStorage;
 use Core\Domain\Enum\Rating;
 use Core\Domain\Exception\NotFoundException;
-use Core\UseCase\Video\Insert\DTO\InsertVideoInputDto;
-use Core\UseCase\Video\Insert\DTO\InsertVideoOutputDto;
-use Core\UseCase\Video\Insert\InsertVideoUseCase;
+use Core\UseCase\Video\Update\DTO\UpdateVideoInputDto;
+use Core\UseCase\Video\Update\DTO\UpdateVideoOutputDto;
+use Core\UseCase\Video\Update\UpdateVideoUseCase;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -25,11 +25,15 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
-class InsertVideoUseCaseTest extends TestCase
+class UpdateVideoUseCaseFeatureTest extends TestCase
 {
     // função que testa o método de execução sem relacionamentos
     public function testExecute()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -39,7 +43,8 @@ class InsertVideoUseCaseTest extends TestCase
         $rating = Rating::RATE10;
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -70,7 +75,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -84,7 +89,7 @@ class InsertVideoUseCaseTest extends TestCase
         $responseUseCase = $useCase->execute($inputDto);
 
         // verificando os dados básicos
-        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
         $this->assertNotEmpty($responseUseCase->id);
         $this->assertSame($title, $responseUseCase->title);
         $this->assertSame($description, $responseUseCase->description);
@@ -93,6 +98,7 @@ class InsertVideoUseCaseTest extends TestCase
         $this->assertSame($rating, $responseUseCase->rating);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertNotSame($responseUseCase->created_at, $responseUseCase->updated_at);
         $this->assertDatabaseHas('videos', [
             'id' => $responseUseCase->id,
             'title' => $title,
@@ -107,6 +113,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com categorias
     public function testExecuteWithCategories()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -123,7 +133,8 @@ class InsertVideoUseCaseTest extends TestCase
         $this->assertDatabaseCount('categories', $nCategories);
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -155,7 +166,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -169,7 +180,7 @@ class InsertVideoUseCaseTest extends TestCase
         $responseUseCase = $useCase->execute($inputDto);
 
         // verificando os dados básicos
-        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
         $this->assertNotEmpty($responseUseCase->id);
         $this->assertSame($title, $responseUseCase->title);
         $this->assertSame($description, $responseUseCase->description);
@@ -207,6 +218,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com categorias e rollback
     public function testExecuteWithCategoriesAndRollback()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -223,7 +238,8 @@ class InsertVideoUseCaseTest extends TestCase
         $this->assertDatabaseCount('categories', $nCategories);
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -255,7 +271,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -275,7 +291,7 @@ class InsertVideoUseCaseTest extends TestCase
             // verificando a mensagem da exceção
             $this->assertSame($th->getMessage(), 'rollback test');
             // verificando as tabelas do banco
-            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_category', 0);
         }
     }
@@ -283,6 +299,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com categorias inválidas
     public function testExecuteWithInvalidCategories()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -296,7 +316,8 @@ class InsertVideoUseCaseTest extends TestCase
         $categoriesIds = [$categoryId];
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -328,7 +349,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -348,7 +369,7 @@ class InsertVideoUseCaseTest extends TestCase
             // verificando a mensagem da exceção
             $this->assertSame($th->getMessage(), "Category $categoryId not found");
             // verificando as tabelas do banco
-            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_category', 0);
         }
     }
@@ -356,6 +377,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com genres
     public function testExecuteWithGenres()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -372,7 +397,8 @@ class InsertVideoUseCaseTest extends TestCase
         $this->assertDatabaseCount('genres', $nGenres);
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -404,7 +430,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -418,7 +444,7 @@ class InsertVideoUseCaseTest extends TestCase
         $responseUseCase = $useCase->execute($inputDto);
 
         // verificando os dados básicos
-        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
         $this->assertNotEmpty($responseUseCase->id);
         $this->assertSame($title, $responseUseCase->title);
         $this->assertSame($description, $responseUseCase->description);
@@ -456,6 +482,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com genres e rollback
     public function testExecuteWithGenresAndRollback()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -472,7 +502,8 @@ class InsertVideoUseCaseTest extends TestCase
         $this->assertDatabaseCount('genres', $nGenres);
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -504,7 +535,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -524,7 +555,7 @@ class InsertVideoUseCaseTest extends TestCase
             // verificando a mensagem da exceção
             $this->assertSame($th->getMessage(), 'rollback test');
             // verificando as tabelas do banco
-            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_genre', 0);
         }
     }
@@ -532,6 +563,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com genres inválidos
     public function testExecuteWithInvalidGenres()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -545,7 +580,8 @@ class InsertVideoUseCaseTest extends TestCase
         $genresIds = [$genreId];
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -577,7 +613,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -597,7 +633,7 @@ class InsertVideoUseCaseTest extends TestCase
             // verificando a mensagem da exceção
             $this->assertSame($th->getMessage(), "Genre $genreId not found");
             // verificando as tabelas do banco
-            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_genre', 0);
         }
     }
@@ -605,6 +641,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com castMembers
     public function testExecuteWithCastMembers()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -621,7 +661,8 @@ class InsertVideoUseCaseTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -653,7 +694,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -667,7 +708,7 @@ class InsertVideoUseCaseTest extends TestCase
         $responseUseCase = $useCase->execute($inputDto);
 
         // verificando os dados básicos
-        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
         $this->assertNotEmpty($responseUseCase->id);
         $this->assertSame($title, $responseUseCase->title);
         $this->assertSame($description, $responseUseCase->description);
@@ -705,6 +746,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com castMembers e rollback
     public function testExecuteWithCastMembersAndRollback()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -721,7 +766,8 @@ class InsertVideoUseCaseTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -753,7 +799,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -773,7 +819,7 @@ class InsertVideoUseCaseTest extends TestCase
             // verificando a mensagem da exceção
             $this->assertSame($th->getMessage(), 'rollback test');
             // verificando as tabelas do banco
-            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_cast_member', 0);
         }
     }
@@ -781,6 +827,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução com castMembers inválidos
     public function testExecuteWithInvalidCastMembers()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -794,7 +844,8 @@ class InsertVideoUseCaseTest extends TestCase
         $castMembersIds = [$castMemberId];
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -826,7 +877,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -846,7 +897,7 @@ class InsertVideoUseCaseTest extends TestCase
             // verificando a mensagem da exceção
             $this->assertSame($th->getMessage(), "Cast Member $castMemberId not found");
             // verificando as tabelas do banco
-            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_cast_member', 0);
         }
     }
@@ -854,6 +905,10 @@ class InsertVideoUseCaseTest extends TestCase
     // função que testa o método de execução completo
     public function testExecuteAll()
     {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -932,7 +987,8 @@ class InsertVideoUseCaseTest extends TestCase
         ];
 
         // criando o inputDto
-        $inputDto = new InsertVideoInputDto(
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
             title: $title,
             description: $description,
             yearLaunched: $yearLaunched,
@@ -971,7 +1027,7 @@ class InsertVideoUseCaseTest extends TestCase
         $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
 
         // criando o usecase
-        $useCase = new InsertVideoUseCase(
+        $useCase = new UpdateVideoUseCase(
             $repository,
             $transactionDb,
             $fileStorage,
@@ -985,8 +1041,8 @@ class InsertVideoUseCaseTest extends TestCase
         $responseUseCase = $useCase->execute($inputDto);
 
         // verificando os dados básicos
-        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
-        $this->assertNotEmpty($responseUseCase->id);
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
+        $this->assertSame($model->id, $responseUseCase->id);
         $this->assertSame($title, $responseUseCase->title);
         $this->assertSame($description, $responseUseCase->description);
         $this->assertSame($yearLaunched, $responseUseCase->yearLaunched);
@@ -994,6 +1050,7 @@ class InsertVideoUseCaseTest extends TestCase
         $this->assertSame($rating, $responseUseCase->rating);
         $this->assertNotEmpty($responseUseCase->created_at);
         $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertNotSame($responseUseCase->created_at, $responseUseCase->updated_at);
         $this->assertDatabaseHas('videos', [
             'id' => $responseUseCase->id,
             'title' => $title,
@@ -1042,6 +1099,32 @@ class InsertVideoUseCaseTest extends TestCase
             $castMemberModel = CastMemberModel::find($castMemberId);
             $this->assertCount(1, $castMemberModel->videos);
         }
+
+        // verificando se os arquivos de image foram registrados no bd
+        $this->assertDatabaseCount('video_images', 3);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $responseUseCase->id,
+            'path' => $responseUseCase->thumbFile,
+        ]);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $responseUseCase->id,
+            'path' => $responseUseCase->thumbHalf,
+        ]);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $responseUseCase->id,
+            'path' => $responseUseCase->bannerFile,
+        ]);
+
+        // verificando se os arquivos de media foram registrados no bd
+        $this->assertDatabaseCount('video_medias', 2);
+        $this->assertDatabaseHas('video_medias', [
+            'video_id' => $responseUseCase->id,
+            'file_path' => $responseUseCase->trailerFile,
+        ]);
+        $this->assertDatabaseHas('video_medias', [
+            'video_id' => $responseUseCase->id,
+            'file_path' => $responseUseCase->videoFile,
+        ]);
 
         // verificando se os arquivos foram armazenados
         Storage::assertExists($responseUseCase->thumbFile);

@@ -62,9 +62,9 @@ class Video extends Entity
         }
 
         // processamento do updatedAt
-        // se o updatedAt for vazio, atribui a data atual
+        // se o updatedAt for vazio, atribui a data de criação
         if ($this->updatedAt == '') {
-            $this->updatedAt = new DateTime();
+            $this->updatedAt = $this->createdAt;
         }
         // senão, converte a string recebida para um Datetime
         else {

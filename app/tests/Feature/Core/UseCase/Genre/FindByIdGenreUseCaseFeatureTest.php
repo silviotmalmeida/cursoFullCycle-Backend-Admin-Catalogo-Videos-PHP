@@ -34,7 +34,7 @@ class FindByIdGenreUseCaseFeatureTest extends TestCase
         $this->assertSame($model->id, $responseUseCase->id);
         $this->assertSame($model->name, $responseUseCase->name);
         $this->assertSame($model->is_active, $responseUseCase->is_active);
-        $this->assertNotEmpty($responseUseCase->created_at);
-        $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertEquals($model->created_at, $responseUseCase->created_at);
+        $this->assertEquals($model->updated_at, $responseUseCase->updated_at); 
     }
 }

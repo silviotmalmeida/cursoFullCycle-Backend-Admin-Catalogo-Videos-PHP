@@ -661,6 +661,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertSame($yearLaunched, $response->yearLaunched);
         $this->assertSame($duration, $response->duration);
         $this->assertSame($rating, $response->rating->value);
+        $this->assertNotEquals($response->createdAt, $response->updatedAt);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
         $this->assertDatabaseHas('videos', [
             'id' => $video->id(),
@@ -728,6 +729,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertSame($yearLaunched, $response->yearLaunched);
         $this->assertSame($duration, $response->duration);
         $this->assertSame($rating, $response->rating->value);
+        $this->assertNotEquals($response->createdAt, $response->updatedAt);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
         $this->assertDatabaseCount('video_category', 2);
         $this->assertDatabaseCount('video_genre', 2);
@@ -787,6 +789,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertSame(2024, $response2->yearLaunched);
         $this->assertSame(50, $response2->duration);
         $this->assertSame('L', $response2->rating->value);
+        $this->assertNotEquals($response->createdAt, $response->updatedAt);
         $this->assertNotEquals($model->updated_at, $response2->updatedAt);
         $this->assertDatabaseCount('video_category', 1);
         $this->assertDatabaseCount('video_genre', 1);

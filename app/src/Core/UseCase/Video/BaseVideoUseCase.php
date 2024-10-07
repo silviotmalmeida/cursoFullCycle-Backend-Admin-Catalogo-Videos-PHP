@@ -22,7 +22,7 @@ abstract class BaseVideoUseCase
     protected ?VideoBuilderInterface $videoBuilder;
 
     // métodos abstratos a serem implementados nas classes filhas
-    abstract protected function getBuilder() : ?VideoBuilderInterface;
+    abstract protected function getBuilder(): ?VideoBuilderInterface;
 
     // construtor e atributos
     public function __construct(
@@ -69,28 +69,34 @@ abstract class BaseVideoUseCase
     protected function validateAllEntitiesIds(object $input): void
     {
         // validando as categories informadas
-        $this->validateEntitiesIds(
-            listIds: $input->categoriesId,
-            repository: $this->categoryRepository,
-            entityNameSingular: 'Category',
-            entityNamePlural: 'Categories'
-        );
+        if ($input->categoriesId) {
+            $this->validateEntitiesIds(
+                listIds: $input->categoriesId,
+                repository: $this->categoryRepository,
+                entityNameSingular: 'Category',
+                entityNamePlural: 'Categories'
+            );
+        }
 
         // validando os genres informados
-        $this->validateEntitiesIds(
-            listIds: $input->genresId,
-            repository: $this->genreRepository,
-            entityNameSingular: 'Genre',
-            entityNamePlural: 'Genres'
-        );
+        if ($input->genresId) {
+            $this->validateEntitiesIds(
+                listIds: $input->genresId,
+                repository: $this->genreRepository,
+                entityNameSingular: 'Genre',
+                entityNamePlural: 'Genres'
+            );
+        }
 
         // validando os cast members informados
-        $this->validateEntitiesIds(
-            listIds: $input->castMembersId,
-            repository: $this->castMemberRepository,
-            entityNameSingular: 'Cast Member',
-            entityNamePlural: 'Cast Members'
-        );
+        if ($input->castMembersId) {
+            $this->validateEntitiesIds(
+                listIds: $input->castMembersId,
+                repository: $this->castMemberRepository,
+                entityNameSingular: 'Cast Member',
+                entityNamePlural: 'Cast Members'
+            );
+        }
     }
 
     // método auxiliar para armazenar um arquivo

@@ -151,6 +151,40 @@ class VideoUnitTest extends TestCase
         $this->assertSame($trailerFile, $video->trailerFile());
     }
 
+    // função que testa a função removeTrailerFile
+    public function testRemoveTrailerFile()
+    {
+        // criando o video
+        $video = new Video(
+            title: 'New Title',
+            description: 'New Description',
+            yearLaunched: 2024,
+            duration: 60,
+            rating: Rating::RATE12,
+        );
+        // verificando
+        $this->assertNull($video->trailerFile());
+
+        // criando o trailerFile
+        $trailerFile = new Media(
+            filePath: 'path/trailerFile.mp4',
+            mediaStatus: MediaStatus::PENDING,
+            mediaType: MediaType::TRAILER,
+            encodedPath: ''
+        );
+        // setando o trailerFile
+        $video->setTrailerFile($trailerFile);
+
+        // verificando
+        $this->assertSame($trailerFile, $video->trailerFile());
+
+        // removendo o trailerFile
+        $video->removeTrailerFile();
+
+        // verificando
+        $this->assertNull($video->trailerFile());     
+    }
+
     // função que testa a função setVideoFile
     public function testSetVideoFile()
     {

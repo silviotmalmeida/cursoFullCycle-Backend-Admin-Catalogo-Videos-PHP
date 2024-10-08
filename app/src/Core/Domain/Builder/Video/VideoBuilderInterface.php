@@ -15,6 +15,7 @@ interface VideoBuilderInterface
     public function addThumbHalf(string $path): VideoBuilderInterface;
     public function addBannerFile(string $path): VideoBuilderInterface;
     public function addTrailerFile(string $path, MediaStatus $mediaStatus, string $encodedPath = ''): VideoBuilderInterface;
+    public function removeTrailerFile(): VideoBuilderInterface;
     public function addVideoFile(string $path, MediaStatus $mediaStatus, string $encodedPath = ''): VideoBuilderInterface;
     public function getEntity(): Video;
     public function setEntity(Video $video): VideoBuilderInterface;

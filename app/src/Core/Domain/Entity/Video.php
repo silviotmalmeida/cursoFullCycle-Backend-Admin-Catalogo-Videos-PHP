@@ -123,6 +123,12 @@ class Video extends Entity
         $this->trailerFile = $trailerFile;
     }
 
+    // função para remoção do trailerFile
+    public function removeTrailerFile(): void
+    {
+        $this->trailerFile = null;
+    }
+
     // função para retorno do videoFile
     public function videoFile(): ?Media
     {
@@ -225,7 +231,7 @@ class Video extends Entity
         ?array $castMembersId = null,
         ?Rating $rating = null,
     ): void {
-        
+
         // atualiza somente os atributos com valores recebidos
         if (isset($title)) $this->title = $title;
         if (isset($description)) $this->description = $description;

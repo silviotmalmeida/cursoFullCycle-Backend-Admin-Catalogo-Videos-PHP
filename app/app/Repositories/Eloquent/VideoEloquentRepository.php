@@ -228,29 +228,37 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         // se não houver retorno, lança exceção
         if (!$model) throw new NotFoundException('ID not found');
 
-        // atualizando o trailer
+        // obtendo o trailer
         $trailer = $entity->trailerFile();
-        // se estiver setado
-        if ($trailer) {
-            // se existir registro, atualiza
-            if ($model->trailer()->first()) {
-                $model->trailer()->update([
-                    'file_path' => $trailer->filePath(),
-                    'encoded_path' => $trailer->encodedPath(),
-                    'status' => $trailer->mediaStatus()->value,
-                    'type' => $trailer->mediaType()->value,
-                ]);
-            }
-            // senão, cria
-            else {
-                $model->trailer()->create([
-                    'file_path' => $trailer->filePath(),
-                    'encoded_path' => $trailer->encodedPath(),
-                    'status' => $trailer->mediaStatus()->value,
-                    'type' => $trailer->mediaType()->value,
-                ]);
-            }
+        // obtendo o registro no bd
+        $trailerBD = $model->trailer()->first();
+        // se estiver setado e existir registro no BD, atualiza o registro
+        if ($trailer and $trailerBD) {
+            $model->trailer()->update([
+                'file_path' => $trailer->filePath(),
+                'encoded_path' => $trailer->encodedPath(),
+                'status' => $trailer->mediaStatus()->value,
+                'type' => $trailer->mediaType()->value,
+            ]);
         }
+        // se estiver setado e não existir registro no BD, cria o registro
+        else if ($trailer and !$trailerBD) {
+            $model->trailer()->create([
+                'file_path' => $trailer->filePath(),
+                'encoded_path' => $trailer->encodedPath(),
+                'status' => $trailer->mediaStatus()->value,
+                'type' => $trailer->mediaType()->value,
+            ]);
+        }
+        // se não estiver setado e existir registro no BD, apaga o registro
+        else if (!$trailer and $trailerBD) {
+            $trailerBD->delete();
+        }
+        // senão, não faz nada
+        else {
+        }
+
+
 
         // atualizando o video
         $video = $entity->videoFile();

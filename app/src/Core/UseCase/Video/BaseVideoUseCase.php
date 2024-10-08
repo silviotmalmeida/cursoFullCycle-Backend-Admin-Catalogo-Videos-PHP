@@ -113,4 +113,19 @@ abstract class BaseVideoUseCase
 
         return null;
     }
+
+    // método auxiliar para remover um arquivo
+    protected function removeFile(string $path): bool
+    {
+        // se existir path
+        if ($path) {
+
+            // removendo o arquivo
+            $videoFilePath = $this->fileStorage->delete($path);
+
+            return true;
+        }
+
+        return false;
+    }
 }

@@ -885,6 +885,53 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
     }
 
     // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithRemovingMediaTrailer()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_trailer.mp4';
+        $mediaStatus = MediaStatus::PENDING;
+        $mediaType = MediaType::TRAILER;
+        $encodedPath = '';
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a media
+        $media = new Media(
+            filePath: $filePath,
+            mediaStatus: $mediaStatus,
+            mediaType: $mediaType,
+            encodedPath: $encodedPath,
+        );
+        // adicionando a media
+        $entity->setTrailerFile($media);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a media
+        $this->repository->updateMedia($entity);
+        // evidenciando o cadastro no bd
+        $this->assertDatabaseCount('video_medias', 1);
+
+        // removendo a media
+        $entity->removeTrailerFile();
+       
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a media
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_medias', 0);
+        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_medias', 0);        
+    }
+
+    // testando a função de update no bd, com sucesso na busca
     public function testUpdateWithMediaVideo()
     {
         // valores a serem considerados inicialmente

@@ -33,20 +33,20 @@ class UpdateVideoUseCase extends BaseVideoUseCase
 
             // atualizando a entidade com os dados do input
             $video->update(
-                title:  $input->title,
-                description:  $input->description,
-                yearLaunched:  $input->yearLaunched,
-                duration:  $input->duration,
-                opened:  $input->opened,
-                categoriesId:  $input->categoriesId,
-                genresId:  $input->genresId,
-                castMembersId:  $input->castMembersId,
-                rating:  $input->rating,
+                title: $input->title,
+                description: $input->description,
+                yearLaunched: $input->yearLaunched,
+                duration: $input->duration,
+                opened: $input->opened,
+                categoriesId: $input->categoriesId,
+                genresId: $input->genresId,
+                castMembersId: $input->castMembersId,
+                rating: $input->rating,
             );
 
             // inserindo a entidade no BD utilizando o repository
             $updatedVideo = $this->repository->update($video);
-         
+
             // inserindo a entidade no builder
             $this->videoBuilder->setEntity($updatedVideo);
 
@@ -72,10 +72,33 @@ class UpdateVideoUseCase extends BaseVideoUseCase
             }
 
             // armazenando o trailerFile
-            if ($input->trailerFile) {
+            // se estiver setado e já existir registro no bd, atualiza a entidade e o arquivo, apagando o arquivo anterior
+            if ($input->trailerFile and $video->trailerFile()) {
+                // removendo arquivos obsoletos
+                $this->removeFile($video->trailerFile()->filePath());
+                $this->removeFile($video->trailerFile()->encodedPath());
+                // armazenando o novo arquivo
                 $trailerFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->trailerFile);
                 // cria o objeto de trailerFile para a entidade
                 $this->videoBuilder->addTrailerFile($trailerFilePath, MediaStatus::PROCESSING);
+            }
+            // se estiver setado e não existir registro no bd, atualiza a entidade e o armazena o arquivo
+            else if ($input->trailerFile and !$video->trailerFile()) {
+                // armazenando o novo arquivo
+                $trailerFilePath = $this->storeFile($this->videoBuilder->getEntity()->id(), $input->trailerFile);
+                // cria o objeto de trailerFile para a entidade
+                $this->videoBuilder->addTrailerFile($trailerFilePath, MediaStatus::PROCESSING);
+            }
+            // se não estiver setado e já existir registro no bd, atualiza a entidade e apaga o arquivo anterior
+            else if (!$input->trailerFile and $video->trailerFile()) {
+                // removendo arquivos obsoletos
+                $this->removeFile($video->trailerFile()->filePath());
+                $this->removeFile($video->trailerFile()->encodedPath());
+                // remove o objeto de trailerFile para a entidade
+                $this->videoBuilder->removeTrailerFile();
+            }
+            // senão, não faz nada
+            else {
             }
 
             // armazenando o videoFile

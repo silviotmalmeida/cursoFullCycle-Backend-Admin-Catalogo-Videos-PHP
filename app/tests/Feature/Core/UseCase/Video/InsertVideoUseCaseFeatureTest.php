@@ -1077,7 +1077,12 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         Storage::assertExists($responseUseCase->trailerFile);
         Storage::assertExists($responseUseCase->videoFile);
 
-        // apagando a pasta com os arquivos criados
-        Storage::deleteDirectory(explode('/', $responseUseCase->thumbFile)[0]);
+        // apagando os arquivos criados
+        Storage::delete($responseUseCase->thumbFile);
+        Storage::delete($responseUseCase->thumbHalf);
+        Storage::delete($responseUseCase->bannerFile);
+        Storage::delete($responseUseCase->trailerFile);
+        Storage::delete($responseUseCase->videoFile);
+        Storage::deleteDirectory(explode('/',$responseUseCase->videoFile)[0]);
     }
 }

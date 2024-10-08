@@ -34,8 +34,9 @@ class FileStorageFeatureTest extends TestCase
         // verificando
         Storage::assertExists($filePath);
 
-        // apagando a pasta com os arquivos criados
-        Storage::deleteDirectory(explode('/', $filePath)[0]);
+        // apagando os arquivos criados
+        Storage::delete($filePath);
+        Storage::deleteDirectory(explode('/',$filePath)[0]);
     }
 
     public function test_delete()
@@ -65,7 +66,8 @@ class FileStorageFeatureTest extends TestCase
         Storage::assertMissing($filePath);
         $this->assertTrue($delete);
 
-        // apagando a pasta com os arquivos criados
-        Storage::deleteDirectory(explode('/', $filePath)[0]);
+        // apagando os arquivos criados
+        Storage::delete($filePath);
+        Storage::deleteDirectory(explode('/',$filePath)[0]);
     }
 }

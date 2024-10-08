@@ -132,6 +132,15 @@ class CreateVideoBuilder implements VideoBuilderInterface
         return $this;
     }
 
+    // método de remoção do trailerFile
+    public function removeTrailerFile(): CreateVideoBuilder
+    {
+        // atualizando a entidade
+        $this->entity->removeTrailerFile();
+
+        return $this;
+    }
+
     // método de inclusão do videoFile
     public function addVideoFile(string $filePath, MediaStatus|int $mediaStatus, string $encodedPath = ''): CreateVideoBuilder
     {

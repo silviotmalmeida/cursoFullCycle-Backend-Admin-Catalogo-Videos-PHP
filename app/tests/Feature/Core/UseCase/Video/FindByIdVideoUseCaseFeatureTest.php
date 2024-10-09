@@ -4,6 +4,7 @@ namespace Tests\Feature\Core\UseCase\Video;
 
 use App\Models\Video as VideoModel;
 use App\Repositories\Eloquent\VideoEloquentRepository;
+use Core\Domain\Exception\NotFoundException;
 use Core\UseCase\Video\FindById\DTO\FindByIdVideoInputDto;
 use Core\UseCase\Video\FindById\DTO\FindByIdVideoOutputDto;
 use Core\UseCase\Video\FindById\FindByIdVideoUseCase;
@@ -39,5 +40,25 @@ class FindByIdVideoUseCaseFeatureTest extends TestCase
         $this->assertSame($model->rating, $responseUseCase->rating->value);
         $this->assertEquals($model->created_at, $responseUseCase->created_at);
         $this->assertEquals($model->updated_at, $responseUseCase->updated_at);  
+    }
+
+    // função que testa o método de execução
+    public function testExecuteWithInvalidId()
+    {
+        // definindo as características da exceção a ser lançada
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage('ID not found');
+
+        // criando o inputDto
+        $inputDto =  new FindByIdVideoInputDto('fake');
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o usecase
+        $useCase = new FindByIdVideoUseCase($repository);
+
+        // executando o usecase
+        $useCase->execute($inputDto);
     }
 }

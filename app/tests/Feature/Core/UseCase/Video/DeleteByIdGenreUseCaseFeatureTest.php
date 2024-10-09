@@ -4,6 +4,7 @@ namespace Tests\Feature\Core\UseCase\Video;
 
 use App\Models\Video as VideoModel;
 use App\Repositories\Eloquent\VideoEloquentRepository;
+use Core\Domain\Exception\NotFoundException;
 use Core\UseCase\Video\DeleteById\DeleteByIdVideoUseCase;
 use Core\UseCase\Video\DeleteById\DTO\DeleteByIdVideoInputDto;
 use Core\UseCase\Video\DeleteById\DTO\DeleteByIdVideoOutputDto;
@@ -36,5 +37,25 @@ class DeleteByIdVideoUseCaseFeatureTest extends TestCase
         $this->assertSoftDeleted('videos', [
             'id' => $model->id
         ]);
+    }
+
+    // função que testa o método de execução
+    public function testExecuteWithInvalidId()
+    {
+        // definindo as características da exceção a ser lançada
+        $this->expectException(NotFoundException::class);
+        $this->expectExceptionMessage('ID not found');
+
+        // criando o inputDto
+        $inputDto =  new DeleteByIdVideoInputDto('fake');
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o usecase
+        $useCase = new DeleteByIdVideoUseCase($repository);
+
+        // executando o usecase
+        $useCase->execute($inputDto);
     }
 }

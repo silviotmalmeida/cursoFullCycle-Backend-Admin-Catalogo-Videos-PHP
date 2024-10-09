@@ -289,7 +289,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
             // verificando o tipo da exceção
             $this->assertInstanceOf(Exception::class, $th);
             // verificando a mensagem da exceção
-            $this->assertSame($th->getMessage(), 'rollback test');
+            $this->assertSame(explode(':', $th->getMessage())[0], 'rollback test id');
             // verificando as tabelas do banco
             $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_category', 0);
@@ -553,7 +553,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
             // verificando o tipo da exceção
             $this->assertInstanceOf(Exception::class, $th);
             // verificando a mensagem da exceção
-            $this->assertSame($th->getMessage(), 'rollback test');
+            $this->assertSame(explode(':', $th->getMessage())[0], 'rollback test id');
             // verificando as tabelas do banco
             $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_genre', 0);
@@ -817,7 +817,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
             // verificando o tipo da exceção
             $this->assertInstanceOf(Exception::class, $th);
             // verificando a mensagem da exceção
-            $this->assertSame($th->getMessage(), 'rollback test');
+            $this->assertSame(explode(':', $th->getMessage())[0], 'rollback test id');
             // verificando as tabelas do banco
             $this->assertDatabaseCount('videos', 1);
             $this->assertDatabaseCount('video_cast_member', 0);
@@ -979,7 +979,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
 
         // apagando o arquivo armazenado
         Storage::delete($responseUseCase->trailerFile);
-        Storage::deleteDirectory(explode('/',$responseUseCase->trailerFile)[0]);        
+        Storage::deleteDirectory(explode('/', $responseUseCase->trailerFile)[0]);
     }
 
     // função que testa o método de execução com remoção do trailerFile
@@ -1064,7 +1064,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
 
         // apagando o arquivo armazenado
         Storage::delete($responseUseCase->trailerFile);
-        Storage::deleteDirectory(explode('/',$responseUseCase->trailerFile)[0]);
+        Storage::deleteDirectory(explode('/', $responseUseCase->trailerFile)[0]);
     }
 
     // função que testa o método de execução completo
@@ -1304,6 +1304,167 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         Storage::delete($responseUseCase->bannerFile);
         Storage::delete($responseUseCase->trailerFile);
         Storage::delete($responseUseCase->videoFile);
-        Storage::deleteDirectory(explode('/',$responseUseCase->videoFile)[0]);
+        Storage::deleteDirectory(explode('/', $responseUseCase->videoFile)[0]);
+    }
+
+    // função que testa o método de execução completo e rollback
+    public function testExecuteAllAndRollback()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados básicos de entrada
+        $title = 'title';
+        $description = 'description';
+        $yearLaunched = 2024;
+        $duration = 180;
+        $opened = false;
+        $rating = Rating::RATE10;
+
+        // gerando massa de dados a serem utilizados nos relacionamentos
+        // definindo número randomico de categorias
+        $nCategories = rand(1, 9);
+        // criando categorias no bd para possibilitar os relacionamentos
+        $categoriesIds = CategoryModel::factory()->count($nCategories)->create()->pluck('id')->toArray();
+        $this->assertDatabaseCount('categories', $nCategories);
+        // 
+        // definindo número randomico de genres
+        $nGenres = rand(1, 9);
+        // criando genres no bd para possibilitar os relacionamentos
+        $genresIds = GenreModel::factory()->count($nGenres)->create()->pluck('id')->toArray();
+        $this->assertDatabaseCount('genres', $nGenres);
+        // 
+        // definindo número randomico de castMembers
+        $nCastMembers = rand(1, 9);
+        // criando castMembers no bd para possibilitar os relacionamentos
+        $castMembersIds = CastMemberModel::factory()->count($nCastMembers)->create()->pluck('id')->toArray();
+        $this->assertDatabaseCount('cast_members', $nCastMembers);
+
+        // dados do thumbFile
+        $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
+        $thumbFile = [
+            'name' => $fakeThumbFile->getFilename(),
+            'type' => $fakeThumbFile->getMimeType(),
+            'tmp_name' => $fakeThumbFile->getPathname(),
+            'error' => $fakeThumbFile->getError(),
+            'size' => $fakeThumbFile->getSize(),
+        ];
+
+        // dados do thumbHalf
+        $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
+        $thumbHalf = [
+            'name' => $fakeThumbHalf->getFilename(),
+            'type' => $fakeThumbHalf->getMimeType(),
+            'tmp_name' => $fakeThumbHalf->getPathname(),
+            'error' => $fakeThumbHalf->getError(),
+            'size' => $fakeThumbHalf->getSize(),
+        ];
+
+        // dados do bannerFile
+        $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
+        $bannerFile = [
+            'name' => $fakeBannerFile->getFilename(),
+            'type' => $fakeBannerFile->getMimeType(),
+            'tmp_name' => $fakeBannerFile->getPathname(),
+            'error' => $fakeBannerFile->getError(),
+            'size' => $fakeBannerFile->getSize(),
+        ];
+
+        // dados do trailerFile
+        $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
+        $trailerFile = [
+            'name' => $fakeTrailerFile->getFilename(),
+            'type' => $fakeTrailerFile->getMimeType(),
+            'tmp_name' => $fakeTrailerFile->getPathname(),
+            'error' => $fakeTrailerFile->getError(),
+            'size' => $fakeTrailerFile->getSize(),
+        ];
+
+        // dados do videoFile
+        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+        $videoFile = [
+            'name' => $fakeVideoFile->getFilename(),
+            'type' => $fakeVideoFile->getMimeType(),
+            'tmp_name' => $fakeVideoFile->getPathname(),
+            'error' => $fakeVideoFile->getError(),
+            'size' => $fakeVideoFile->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            title: $title,
+            description: $description,
+            yearLaunched: $yearLaunched,
+            duration: $duration,
+            opened: $opened,
+            rating: $rating,
+            categoriesId: $categoriesIds,
+            genresId: $genresIds,
+            castMembersId: $castMembersIds,
+            thumbFile: $thumbFile,
+            thumbHalf: $thumbHalf,
+            bannerFile: $bannerFile,
+            trailerFile: $trailerFile,
+            videoFile: $videoFile,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManager();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // tratamento de exceções
+        try {
+            // executando o usecase
+            $responseUseCase = $useCase->execute($inputDto, true);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(Exception::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame(explode(':', $th->getMessage())[0], 'rollback test id');
+
+            // verificando as tabelas do banco
+            $this->assertDatabaseCount('videos', 1);
+            $this->assertDatabaseCount('video_category', 0);
+            $this->assertDatabaseCount('video_genre', 0);
+            $this->assertDatabaseCount('video_cast_member', 0);
+            $this->assertDatabaseCount('video_images', 0);
+            $this->assertDatabaseCount('video_medias', 0);
+
+            // verificando se os arquivos não foram armazenados no storage
+            Storage::assertDirectoryEmpty(explode(':', $th->getMessage())[1]);
+
+            // apagando os arquivos criados
+            Storage::deleteDirectory(explode(':', $th->getMessage())[1]);
+        }
     }
 }

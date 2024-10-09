@@ -290,10 +290,10 @@ class CastMemberEloquentRepositoryFeatureTest extends TestCase
         $this->assertNotEquals($model->type, $response->type->value);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
         $this->assertDatabaseHas('cast_members', [
-            'id' => $castMember->id(),
+            'id' => $model->id,
             'name' => $castMember->name,
             'type' => $castMember->type->value,
-            'created_at' => $castMember->createdAt(),
+            'created_at' => $model->created_at,
             'updated_at' => $response->updatedAt(),
         ]);
     }

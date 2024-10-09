@@ -119,7 +119,7 @@ class UpdateVideoUseCase extends BaseVideoUseCase
             $this->repository->updateMedia($this->videoBuilder->getEntity());
 
             // lançando exception para testar o rollback
-            if ($simulateTransactionException) throw new Exception('rollback test');
+            if ($simulateTransactionException) throw new Exception("rollback test id:" . $this->videoBuilder->getEntity()->id());
 
             // em caso de sucesso, comita
             $this->transactionDb->commit();

@@ -346,10 +346,10 @@ class GenreEloquentRepositoryFeatureTest extends TestCase
         $this->assertNotEquals($model->name, $response->name);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
         $this->assertDatabaseHas('genres', [
-            'id' => $genre->id(),
+            'id' => $model->id,
             'name' => $genre->name,
             'is_active' => $genre->isActive,
-            'created_at' => $genre->createdAt(),
+            'created_at' => $model->created_at,
             'updated_at' => $response->updatedAt(),
         ]);
     }

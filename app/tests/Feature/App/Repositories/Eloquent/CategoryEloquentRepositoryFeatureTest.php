@@ -305,11 +305,11 @@ class CategoryEloquentRepositoryFeatureTest extends TestCase
         $this->assertNotEquals($model->name, $response->name);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
         $this->assertDatabaseHas('categories', [
-            'id' => $category->id(),
+            'id' => $model->id,
             'name' => $category->name,
             'description' => $category->description,
             'is_active' => $category->isActive,
-            'created_at' => $category->createdAt(),
+            'created_at' => $model->created_at,
             'updated_at' => $response->updatedAt(),
         ]);
     }

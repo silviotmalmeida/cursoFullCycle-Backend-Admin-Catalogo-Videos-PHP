@@ -664,14 +664,14 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertNotEquals($response->createdAt, $response->updatedAt);
         $this->assertNotEquals($model->updated_at, $response->updatedAt);
         $this->assertDatabaseHas('videos', [
-            'id' => $video->id(),
+            'id' => $model->id,
             'title' => $video->title,
             'description' => $video->description,
             'year_launched' => $video->yearLaunched,
             'duration' => $video->duration,
             'rating' => $video->rating,
             'opened' => $video->opened,
-            'created_at' => $video->createdAt(),
+            'created_at' => $model->created_at,
             'updated_at' => $response->updatedAt(),
         ]);
     }

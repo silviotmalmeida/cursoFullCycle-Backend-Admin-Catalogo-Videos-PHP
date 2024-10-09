@@ -274,7 +274,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
             // verificando o tipo da exceção
             $this->assertInstanceOf(Exception::class, $th);
             // verificando a mensagem da exceção
-            $this->assertSame($th->getMessage(), 'rollback test');
+            $this->assertSame(explode(':', $th->getMessage())[0], 'rollback test id');
             // verificando as tabelas do banco
             $this->assertDatabaseCount('videos', 0);
             $this->assertDatabaseCount('video_category', 0);
@@ -523,7 +523,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
             // verificando o tipo da exceção
             $this->assertInstanceOf(Exception::class, $th);
             // verificando a mensagem da exceção
-            $this->assertSame($th->getMessage(), 'rollback test');
+            $this->assertSame(explode(':', $th->getMessage())[0], 'rollback test id');
             // verificando as tabelas do banco
             $this->assertDatabaseCount('videos', 0);
             $this->assertDatabaseCount('video_genre', 0);
@@ -772,7 +772,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
             // verificando o tipo da exceção
             $this->assertInstanceOf(Exception::class, $th);
             // verificando a mensagem da exceção
-            $this->assertSame($th->getMessage(), 'rollback test');
+            $this->assertSame(explode(':', $th->getMessage())[0], 'rollback test id');
             // verificando as tabelas do banco
             $this->assertDatabaseCount('videos', 0);
             $this->assertDatabaseCount('video_cast_member', 0);
@@ -852,8 +852,8 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         }
     }
 
-    // função que testa o método de execução completo
-    public function testExecuteAll()
+    // função que testa o método de execução completo e rollback
+    public function testExecuteAllAndRollback()
     {
         // dados básicos de entrada
         $title = 'title';
@@ -982,107 +982,29 @@ class InsertVideoUseCaseFeatureTest extends TestCase
             $castMemberRepository,
         );
 
-        // executando o usecase
-        $responseUseCase = $useCase->execute($inputDto);
+        // tratamento de exceções
+        try {
+            // executando o usecase
+            $responseUseCase = $useCase->execute($inputDto, true);
+        } catch (\Throwable $th) {
+            // verificando o tipo da exceção
+            $this->assertInstanceOf(Exception::class, $th);
+            // verificando a mensagem da exceção
+            $this->assertSame(explode(':', $th->getMessage())[0], 'rollback test id');
 
-        // verificando os dados básicos
-        $this->assertInstanceOf(InsertVideoOutputDto::class, $responseUseCase);
-        $this->assertNotEmpty($responseUseCase->id);
-        $this->assertSame($title, $responseUseCase->title);
-        $this->assertSame($description, $responseUseCase->description);
-        $this->assertSame($yearLaunched, $responseUseCase->yearLaunched);
-        $this->assertSame($duration, $responseUseCase->duration);
-        $this->assertSame($rating, $responseUseCase->rating);
-        $this->assertNotEmpty($responseUseCase->created_at);
-        $this->assertNotEmpty($responseUseCase->updated_at);
-        $this->assertDatabaseHas('videos', [
-            'id' => $responseUseCase->id,
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-        ]);
+            // verificando as tabelas do banco
+            $this->assertDatabaseCount('videos', 0);
+            $this->assertDatabaseCount('video_category', 0);
+            $this->assertDatabaseCount('video_genre', 0);
+            $this->assertDatabaseCount('video_cast_member', 0);
+            $this->assertDatabaseCount('video_images', 0);
+            $this->assertDatabaseCount('video_medias', 0);
 
-        // verificando relacionamentos
-        $this->assertDatabaseCount('video_category', $nCategories);
-        $this->assertDatabaseCount('video_genre', $nGenres);
-        $this->assertDatabaseCount('video_cast_member', $nCastMembers);
-        $this->assertCount($nCategories, $responseUseCase->categoriesId);
-        $this->assertCount($nGenres, $responseUseCase->genresId);
-        $this->assertCount($nCastMembers, $responseUseCase->castMembersId);
-        $this->assertEquals($categoriesIds, $responseUseCase->categoriesId);
-        $this->assertEquals($genresIds, $responseUseCase->genresId);
-        $this->assertEquals($castMembersIds, $responseUseCase->castMembersId);
+            // verificando se os arquivos não foram armazenados no storage
+            Storage::assertDirectoryEmpty(explode(':', $th->getMessage())[1]);
 
-        // verificando o relacionamento a partir de category
-        foreach ($categoriesIds as $categoryId) {
-            $this->assertDatabaseHas('video_category', [
-                'video_id' => $responseUseCase->id,
-                'category_id' => $categoryId,
-            ]);
-            $categoryModel = CategoryModel::find($categoryId);
-            $this->assertCount(1, $categoryModel->videos);
+            // apagando os arquivos criados
+            Storage::deleteDirectory(explode(':', $th->getMessage())[1]);
         }
-        // verificando o relacionamento a partir de genre
-        foreach ($genresIds as $genreId) {
-            $this->assertDatabaseHas('video_genre', [
-                'video_id' => $responseUseCase->id,
-                'genre_id' => $genreId,
-            ]);
-            $genreModel = GenreModel::find($genreId);
-            $this->assertCount(1, $genreModel->videos);
-        }
-        // verificando o relacionamento a partir de castMember
-        foreach ($castMembersIds as $castMemberId) {
-            $this->assertDatabaseHas('video_cast_member', [
-                'video_id' => $responseUseCase->id,
-                'cast_member_id' => $castMemberId,
-            ]);
-            $castMemberModel = CastMemberModel::find($castMemberId);
-            $this->assertCount(1, $castMemberModel->videos);
-        }
-
-        // verificando se os arquivos de image foram registrados no bd
-        $this->assertDatabaseCount('video_images', 3);
-        $this->assertDatabaseHas('video_images', [
-            'video_id' => $responseUseCase->id,
-            'path' => $responseUseCase->thumbFile,
-        ]);
-        $this->assertDatabaseHas('video_images', [
-            'video_id' => $responseUseCase->id,
-            'path' => $responseUseCase->thumbHalf,
-        ]);
-        $this->assertDatabaseHas('video_images', [
-            'video_id' => $responseUseCase->id,
-            'path' => $responseUseCase->bannerFile,
-        ]);
-
-        // verificando se os arquivos de media foram registrados no bd
-        $this->assertDatabaseCount('video_medias', 2);
-        $this->assertDatabaseHas('video_medias', [
-            'video_id' => $responseUseCase->id,
-            'file_path' => $responseUseCase->trailerFile,
-        ]);
-        $this->assertDatabaseHas('video_medias', [
-            'video_id' => $responseUseCase->id,
-            'file_path' => $responseUseCase->videoFile,
-        ]);
-        
-        // verificando se os arquivos foram armazenados no storage
-        Storage::assertExists($responseUseCase->thumbFile);
-        Storage::assertExists($responseUseCase->thumbHalf);
-        Storage::assertExists($responseUseCase->bannerFile);
-        Storage::assertExists($responseUseCase->trailerFile);
-        Storage::assertExists($responseUseCase->videoFile);
-
-        // apagando os arquivos criados
-        Storage::delete($responseUseCase->thumbFile);
-        Storage::delete($responseUseCase->thumbHalf);
-        Storage::delete($responseUseCase->bannerFile);
-        Storage::delete($responseUseCase->trailerFile);
-        Storage::delete($responseUseCase->videoFile);
-        Storage::deleteDirectory(explode('/',$responseUseCase->videoFile)[0]);
     }
 }

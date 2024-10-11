@@ -4,7 +4,6 @@
 namespace Core\UseCase\Video\Update;
 
 // importações
-
 use Core\Domain\Builder\Video\CreateVideoBuilder;
 use Core\Domain\Builder\Video\VideoBuilderInterface;
 use Core\Domain\Enum\MediaStatus;

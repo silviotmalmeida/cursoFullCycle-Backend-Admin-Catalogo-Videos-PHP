@@ -1,8 +1,9 @@
 <?php
 
+// definindo o namespace, referente ao caminho das pastas
 namespace Tests\Feature\Core\UseCase\Video;
 
-use App\Events\VideoEventManager;
+// importações
 use App\Models\CastMember as CastMemberModel;
 use App\Models\Category as CategoryModel;
 use App\Models\Genre as GenreModel;
@@ -22,7 +23,9 @@ use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
+use Tests\Stubs\VideoEventManagerStub;
 use Tests\TestCase;
 
 class UpdateVideoUseCaseFeatureTest extends TestCase
@@ -63,7 +66,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -154,7 +157,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -259,7 +262,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -337,7 +340,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -418,7 +421,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -523,7 +526,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -601,7 +604,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -682,7 +685,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -787,7 +790,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -865,7 +868,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -935,7 +938,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -1015,7 +1018,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -1070,6 +1073,11 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
     // função que testa o método de execução completo
     public function testExecuteAll()
     {
+        // fakeando o listener o evento que será disparado no armazenameno do videoFile
+        Event::fake([
+            VideoEventManagerStub::class,
+        ]);
+
         // inserindo um registro no bd
         $model = VideoModel::factory()->create();
         sleep(1);
@@ -1180,7 +1188,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
@@ -1297,6 +1305,9 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         Storage::assertExists($responseUseCase->bannerFile);
         Storage::assertExists($responseUseCase->trailerFile);
         Storage::assertExists($responseUseCase->videoFile);
+
+        // verificando que o evento de armazenamento do videoFile foi disparado
+        Event::assertDispatched(VideoEventManagerStub::class);
 
         // apagando os arquivos armazenados
         Storage::delete($responseUseCase->thumbFile);
@@ -1420,7 +1431,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         $fileStorage = new FileStorage();
 
         // criando o gerenciador de eventos
-        $eventManager = new VideoEventManager();
+        $eventManager = new VideoEventManagerStub();
 
         // criando o repository de Category
         $categoryRepository = new CategoryEloquentRepository(new CategoryModel());

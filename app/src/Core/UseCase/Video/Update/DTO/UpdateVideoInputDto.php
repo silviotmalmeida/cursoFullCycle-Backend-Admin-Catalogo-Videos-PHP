@@ -17,7 +17,7 @@ class UpdateVideoInputDto
         public ?int $yearLaunched = null,
         public ?int $duration = null,
         public ?bool $opened = null,
-        public ?Rating $rating = null,
+        public Rating|string|null $rating = null,
         public ?array $categoriesId = null,
         public ?array $genresId = null,
         public ?array $castMembersId = null,

@@ -19,7 +19,7 @@ class InsertVideoInputDto
         public int $yearLaunched,
         public int $duration,
         public bool $opened,
-        public Rating $rating,
+        public Rating|string $rating,
         public array $categoriesId = [],
         public array $genresId = [],
         public array $castMembersId = [],

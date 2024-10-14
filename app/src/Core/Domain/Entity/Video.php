@@ -154,10 +154,8 @@ class Video extends Entity
     }
 
     // função de atribuição de categoryId
-    public function addCategoryId(Uuid|string $categoryId): void
+    public function addCategoryId(string $categoryId): void
     {
-        // caso não seja uuid, valida a string informada
-        if (!($categoryId instanceof Uuid)) $categoryId = new Uuid($categoryId);
         // adicionando no array de categories
         if (!(in_array($categoryId, $this->categoriesId))) array_push($this->categoriesId, $categoryId);
         // removendo duplicatas
@@ -165,10 +163,8 @@ class Video extends Entity
     }
 
     // função de remoção de categoryId
-    public function removeCategoryId(Uuid|string $categoryId): void
+    public function removeCategoryId(string $categoryId): void
     {
-        // caso não seja uuid, valida a string informada
-        if (!($categoryId instanceof Uuid)) $categoryId = new Uuid($categoryId);
         // removendo do array de categories
         if (in_array($categoryId, $this->categoriesId)) $this->categoriesId = array_diff($this->categoriesId, [$categoryId]);
         // removendo duplicatas
@@ -176,10 +172,8 @@ class Video extends Entity
     }
 
     // função de atribuição de genreId
-    public function addGenreId(Uuid|string $genreId): void
+    public function addGenreId(string $genreId): void
     {
-        // caso não seja uuid, valida a string informada
-        if (!($genreId instanceof Uuid)) $genreId = new Uuid($genreId);
         // adicionando no array de genres
         if (!(in_array($genreId, $this->genresId))) array_push($this->genresId, $genreId);
         // removendo duplicatas
@@ -187,10 +181,8 @@ class Video extends Entity
     }
 
     // função de remoção de genreId
-    public function removeGenreId(Uuid|string $genreId): void
+    public function removeGenreId(string $genreId): void
     {
-        // caso não seja uuid, valida a string informada
-        if (!($genreId instanceof Uuid)) $genreId = new Uuid($genreId);
         // removendo do array de genres
         if (in_array($genreId, $this->genresId)) $this->genresId = array_diff($this->genresId, [$genreId]);
         // removendo duplicatas
@@ -198,10 +190,8 @@ class Video extends Entity
     }
 
     // função de atribuição de castMemberId
-    public function addCastMemberId(Uuid|string $castMemberId): void
+    public function addCastMemberId(string $castMemberId): void
     {
-        // caso não seja uuid, valida a string informada
-        if (!($castMemberId instanceof Uuid)) $castMemberId = new Uuid($castMemberId);
         // adicionando no array de cast members
         if (!(in_array($castMemberId, $this->castMembersId))) array_push($this->castMembersId, $castMemberId);
         // removendo duplicatas
@@ -209,10 +199,8 @@ class Video extends Entity
     }
 
     // função de remoção de castMemberId
-    public function removeCastMemberId(Uuid|string $castMemberId): void
+    public function removeCastMemberId(string $castMemberId): void
     {
-        // caso não seja uuid, valida a string informada
-        if (!($castMemberId instanceof Uuid)) $castMemberId = new Uuid($castMemberId);
         // removendo do array de cast members
         if (in_array($castMemberId, $this->castMembersId)) $this->castMembersId = array_diff($this->castMembersId, [$castMemberId]);
         // removendo duplicatas
@@ -229,7 +217,7 @@ class Video extends Entity
         ?array $categoriesId = null,
         ?array $genresId = null,
         ?array $castMembersId = null,
-        ?Rating $rating = null,
+        Rating|string|null $rating = null,
     ): void {
 
         // atualiza somente os atributos com valores recebidos

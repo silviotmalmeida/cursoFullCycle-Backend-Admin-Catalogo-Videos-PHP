@@ -14,7 +14,7 @@ class GenreApiFeatureTest extends TestCase
     private $endpoint = '/api/genres';
 
     // testando o método index com retorno vazio
-    public function testIndexWithNoCategories()
+    public function testIndexWithNoGenres()
     {
         // fazendo o request
         $response = $this->getJson($this->endpoint);

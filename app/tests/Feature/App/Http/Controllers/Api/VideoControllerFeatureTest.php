@@ -409,6 +409,9 @@ class VideoControllerFeatureTest extends TestCase
     // testando o método update
     public function testUpdate()
     {
+        // inserindo um registro no bd
+        $video = VideoModel::factory()->create();
+
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -416,9 +419,6 @@ class VideoControllerFeatureTest extends TestCase
         $duration = 180;
         $opened = false;
         $rating = Rating::RATE10;
-
-        // inserindo um registro no bd
-        $video = VideoModel::factory()->create();
 
         // instanciando o usecase
         $usecase = new UpdateVideoUseCase(
@@ -471,249 +471,268 @@ class VideoControllerFeatureTest extends TestCase
             VideoEventManagerStub::class,
         ]);
 
-        // gerando massa de dados a serem utilizados nos relacionamentos
-        // definindo número randomico de categorias
-        $nCategories = rand(1, 9);
-        // criando categorias no bd para possibilitar os relacionamentos
-        $categoriesIds = CategoryModel::factory()->count($nCategories)->create()->pluck('id')->toArray();
-        $this->assertDatabaseCount('categories', $nCategories);
-        // 
-        // definindo número randomico de genres
-        $nGenres = rand(1, 9);
-        // criando genres no bd para possibilitar os relacionamentos
-        $genresIds = GenreModel::factory()->count($nGenres)->create()->pluck('id')->toArray();
-        $this->assertDatabaseCount('genres', $nGenres);
-        // 
-        // definindo número randomico de castMembers
-        $nCastMembers = rand(1, 9);
-        // criando castMembers no bd para possibilitar os relacionamentos
-        $castMembersIds = CastMemberModel::factory()->count($nCastMembers)->create()->pluck('id')->toArray();
-        $this->assertDatabaseCount('cast_members', $nCastMembers);
+        // inserindo um registro no bd
+        $video = VideoModel::factory()->create();
 
-        // dados do thumbFile
-        $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
-        $thumbFile = [
-            'name' => $fakeThumbFile->getFilename(),
-            'type' => $fakeThumbFile->getMimeType(),
-            'tmp_name' => $fakeThumbFile->getPathname(),
-            'error' => $fakeThumbFile->getError(),
-            'size' => $fakeThumbFile->getSize(),
-        ];
+        // contadores relativos às tabelas associadas
+        $categoriesCount = 0;
+        $genresCount = 0;
+        $castMembersCount = 0;
 
-        // dados do thumbHalf
-        $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
-        $thumbHalf = [
-            'name' => $fakeThumbHalf->getFilename(),
-            'type' => $fakeThumbHalf->getMimeType(),
-            'tmp_name' => $fakeThumbHalf->getPathname(),
-            'error' => $fakeThumbHalf->getError(),
-            'size' => $fakeThumbHalf->getSize(),
-        ];
+        // realizando a atualização duas vezes
+        for ($i = 0; $i < 2; $i++) {
 
-        // dados do bannerFile
-        $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
-        $bannerFile = [
-            'name' => $fakeBannerFile->getFilename(),
-            'type' => $fakeBannerFile->getMimeType(),
-            'tmp_name' => $fakeBannerFile->getPathname(),
-            'error' => $fakeBannerFile->getError(),
-            'size' => $fakeBannerFile->getSize(),
-        ];
+            // gerando massa de dados a serem utilizados nos relacionamentos
+            // definindo número randomico de categorias
+            $nCategories = rand(1, 9);
+            // criando categorias no bd para possibilitar os relacionamentos
+            $categoriesIds = CategoryModel::factory()->count($nCategories)->create()->pluck('id')->toArray();
+            $categoriesCount += $nCategories;
+            $this->assertDatabaseCount('categories', $categoriesCount);
+            // 
+            // definindo número randomico de genres
+            $nGenres = rand(1, 9);
+            // criando genres no bd para possibilitar os relacionamentos
+            $genresIds = GenreModel::factory()->count($nGenres)->create()->pluck('id')->toArray();
+            $genresCount += $nGenres;
+            $this->assertDatabaseCount('genres', $genresCount);
+            // 
+            // definindo número randomico de castMembers
+            $nCastMembers = rand(1, 9);
+            // criando castMembers no bd para possibilitar os relacionamentos
+            $castMembersIds = CastMemberModel::factory()->count($nCastMembers)->create()->pluck('id')->toArray();
+            $castMembersCount += $nCastMembers;
+            $this->assertDatabaseCount('cast_members', $castMembersCount);
 
-        // dados do trailerFile
-        $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
-        $trailerFile = [
-            'name' => $fakeTrailerFile->getFilename(),
-            'type' => $fakeTrailerFile->getMimeType(),
-            'tmp_name' => $fakeTrailerFile->getPathname(),
-            'error' => $fakeTrailerFile->getError(),
-            'size' => $fakeTrailerFile->getSize(),
-        ];
+            // dados do thumbFile
+            $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
+            $thumbFile = [
+                'name' => $fakeThumbFile->getFilename(),
+                'type' => $fakeThumbFile->getMimeType(),
+                'tmp_name' => $fakeThumbFile->getPathname(),
+                'error' => $fakeThumbFile->getError(),
+                'size' => $fakeThumbFile->getSize(),
+            ];
 
-        // dados do videoFile
-        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
-        $videoFile = [
-            'name' => $fakeVideoFile->getFilename(),
-            'type' => $fakeVideoFile->getMimeType(),
-            'tmp_name' => $fakeVideoFile->getPathname(),
-            'error' => $fakeVideoFile->getError(),
-            'size' => $fakeVideoFile->getSize(),
-        ];
+            // dados do thumbHalf
+            $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
+            $thumbHalf = [
+                'name' => $fakeThumbHalf->getFilename(),
+                'type' => $fakeThumbHalf->getMimeType(),
+                'tmp_name' => $fakeThumbHalf->getPathname(),
+                'error' => $fakeThumbHalf->getError(),
+                'size' => $fakeThumbHalf->getSize(),
+            ];
 
-        // dados básicos de entrada
-        $title = 'title';
-        $description = 'description';
-        $yearLaunched = 2024;
-        $duration = 180;
-        $opened = false;
-        $rating = Rating::RATE10;
+            // dados do bannerFile
+            $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
+            $bannerFile = [
+                'name' => $fakeBannerFile->getFilename(),
+                'type' => $fakeBannerFile->getMimeType(),
+                'tmp_name' => $fakeBannerFile->getPathname(),
+                'error' => $fakeBannerFile->getError(),
+                'size' => $fakeBannerFile->getSize(),
+            ];
 
+            // dados do trailerFile
+            $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
+            $trailerFile = [
+                'name' => $fakeTrailerFile->getFilename(),
+                'type' => $fakeTrailerFile->getMimeType(),
+                'tmp_name' => $fakeTrailerFile->getPathname(),
+                'error' => $fakeTrailerFile->getError(),
+                'size' => $fakeTrailerFile->getSize(),
+            ];
+
+            // dados do videoFile
+            $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+            $videoFile = [
+                'name' => $fakeVideoFile->getFilename(),
+                'type' => $fakeVideoFile->getMimeType(),
+                'tmp_name' => $fakeVideoFile->getPathname(),
+                'error' => $fakeVideoFile->getError(),
+                'size' => $fakeVideoFile->getSize(),
+            ];
+
+            // dados básicos de entrada
+            $title = 'title';
+            $description = 'description';
+            $yearLaunched = 2024;
+            $duration = 180;
+            $opened = false;
+            $rating = Rating::RATE10;
+
+            // instanciando o usecase
+            $usecase = new UpdateVideoUseCase(
+                $this->repository,
+                $this->transactionDb,
+                $this->fileStorage,
+                $this->eventManager,
+                $this->categoryRepository,
+                $this->genreRepository,
+                $this->castMemberRepository
+            );
+
+            // instanciando o controller
+            $controller = new VideoController();
+            // configurando o request com validação específica
+            $updateRequest = new UpdateVideoRequest();
+            $updateRequest->headers->set('content-type', 'application/json');
+            $updateRequest->setJson(new ParameterBag([
+                'title' => $title,
+                'description' => $description,
+                'year_launched' => $yearLaunched,
+                'duration' => $duration,
+                'rating' => $rating,
+                'opened' => $opened,
+                'categories_id' => $categoriesIds,
+                'genres_id' => $genresIds,
+                'cast_members_id' => $castMembersIds,
+                'thumbfile' => $thumbFile,
+                'thumbhalf' => $thumbHalf,
+                'bannerfile' => $bannerFile,
+                'trailerfile' => $trailerFile,
+                'videofile' => $videoFile,
+            ]));
+
+            // executando o update
+            $response = $controller->update($video->id, $updateRequest, $usecase);
+
+            // decodificando a resposta para um array
+            $decodedResponse = (json_decode($response->content(), true));
+
+            // verificando os dados
+            $this->assertInstanceOf(JsonResponse::class, $response);
+            $this->assertSame(Response::HTTP_OK, $response->status());
+
+            $this->assertNotEmpty($decodedResponse['data']['id']);
+            $this->assertSame($title, $decodedResponse['data']['title']);
+            $this->assertSame($description, $decodedResponse['data']['description']);
+            $this->assertSame($yearLaunched, $decodedResponse['data']['year_launched']);
+            $this->assertSame($duration, $decodedResponse['data']['duration']);
+            $this->assertSame($rating->value, $decodedResponse['data']['rating']);
+            $this->assertSame($opened, $decodedResponse['data']['opened']);
+            $this->assertNotEmpty($decodedResponse['data']['created_at']);
+            $this->assertNotEmpty($decodedResponse['data']['updated_at']);
+
+            $this->assertDatabaseHas('videos', [
+                'id' => $video->id,
+                'title' => $title,
+                'description' => $description,
+                'year_launched' => $yearLaunched,
+                'duration' => $duration,
+                'rating' => $rating,
+                'opened' => $opened,
+            ]);
+
+            // verificando relacionamentos
+            $this->assertDatabaseCount('video_category', $nCategories);
+            $this->assertDatabaseCount('video_genre', $nGenres);
+            $this->assertDatabaseCount('video_cast_member', $nCastMembers);
+            $this->assertCount($nCategories, $decodedResponse['data']['categories_id']);
+            $this->assertCount($nGenres, $decodedResponse['data']['genres_id']);
+            $this->assertCount($nCastMembers, $decodedResponse['data']['cast_members_id']);
+            $this->assertEquals($categoriesIds, $decodedResponse['data']['categories_id']);
+            $this->assertEquals($genresIds, $decodedResponse['data']['genres_id']);
+            $this->assertEquals($castMembersIds, $decodedResponse['data']['cast_members_id']);
+
+            // verificando o relacionamento a partir de category
+            foreach ($categoriesIds as $categoryId) {
+                $this->assertDatabaseHas('video_category', [
+                    'video_id' => $decodedResponse['data']['id'],
+                    'category_id' => $categoryId,
+                ]);
+                $categoryModel = CategoryModel::find($categoryId);
+                $this->assertCount(1, $categoryModel->videos);
+            }
+            // verificando o relacionamento a partir de genre
+            foreach ($genresIds as $genreId) {
+                $this->assertDatabaseHas('video_genre', [
+                    'video_id' => $decodedResponse['data']['id'],
+                    'genre_id' => $genreId,
+                ]);
+                $genreModel = GenreModel::find($genreId);
+                $this->assertCount(1, $genreModel->videos);
+            }
+            // verificando o relacionamento a partir de castMember
+            foreach ($castMembersIds as $castMemberId) {
+                $this->assertDatabaseHas('video_cast_member', [
+                    'video_id' => $decodedResponse['data']['id'],
+                    'cast_member_id' => $castMemberId,
+                ]);
+                $castMemberModel = CastMemberModel::find($castMemberId);
+                $this->assertCount(1, $castMemberModel->videos);
+            }
+
+            // verificando se os arquivos de image foram registrados no bd
+            $this->assertDatabaseCount('video_images', 3);
+            $this->assertDatabaseHas('video_images', [
+                'video_id' => $decodedResponse['data']['id'],
+                'path' => $decodedResponse['data']['thumbfile'],
+            ]);
+            $this->assertDatabaseHas('video_images', [
+                'video_id' => $decodedResponse['data']['id'],
+                'path' => $decodedResponse['data']['thumbhalf'],
+            ]);
+            $this->assertDatabaseHas('video_images', [
+                'video_id' => $decodedResponse['data']['id'],
+                'path' => $decodedResponse['data']['bannerfile'],
+            ]);
+
+            // verificando se os arquivos de media foram registrados no bd
+            $this->assertDatabaseCount('video_medias', 2);
+            $this->assertDatabaseHas('video_medias', [
+                'video_id' => $decodedResponse['data']['id'],
+                'file_path' => $decodedResponse['data']['trailerfile'],
+            ]);
+            $this->assertDatabaseHas('video_medias', [
+                'video_id' => $decodedResponse['data']['id'],
+                'file_path' => $decodedResponse['data']['videofile'],
+            ]);
+
+            // verificando se os arquivos foram armazenados
+            Storage::assertExists($decodedResponse['data']['thumbfile']);
+            Storage::assertExists($decodedResponse['data']['thumbhalf']);
+            Storage::assertExists($decodedResponse['data']['bannerfile']);
+            Storage::assertExists($decodedResponse['data']['trailerfile']);
+            Storage::assertExists($decodedResponse['data']['videofile']);
+
+            // apagando os arquivos criados
+            Storage::delete($decodedResponse['data']['thumbfile']);
+            Storage::delete($decodedResponse['data']['thumbhalf']);
+            Storage::delete($decodedResponse['data']['bannerfile']);
+            Storage::delete($decodedResponse['data']['trailerfile']);
+            Storage::delete($decodedResponse['data']['videofile']);
+            Storage::assertDirectoryEmpty($decodedResponse['data']['id']);
+
+            // verificando que o evento de armazenamento do videoFile foi disparado
+            Event::assertDispatched(VideoEventManagerStub::class);
+        }
+        // apagando a pasta de arquivos criada
+        Storage::deleteDirectory($decodedResponse['data']['id']);
+    }
+
+    // testando o método destroy
+    public function testDestroy()
+    {
         // inserindo um registro no bd
         $video = VideoModel::factory()->create();
 
         // instanciando o usecase
-        $usecase = new UpdateVideoUseCase(
-            $this->repository,
-            $this->transactionDb,
-            $this->fileStorage,
-            $this->eventManager,
-            $this->categoryRepository,
-            $this->genreRepository,
-            $this->castMemberRepository
-        );
+        $usecase = new DeleteByIdVideoUseCase($this->repository);
 
         // instanciando o controller
         $controller = new VideoController();
-        // configurando o request com validação específica
-        $updateRequest = new UpdateVideoRequest();
-        $updateRequest->headers->set('content-type', 'application/json');
-        $updateRequest->setJson(new ParameterBag([
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'rating' => $rating,
-            'opened' => $opened,
-            'categories_id' => $categoriesIds,
-            'genres_id' => $genresIds,
-            'cast_members_id' => $castMembersIds,
-            'thumbfile' => $thumbFile,
-            'thumbhalf' => $thumbHalf,
-            'bannerfile' => $bannerFile,
-            'trailerfile' => $trailerFile,
-            'videofile' => $videoFile,
-        ]));
 
-        // executando o update
-        $response = $controller->update($video->id, $updateRequest, $usecase);
+        // executando o destroy
+        $response = $controller->destroy($video->id, $usecase);
 
-        // decodificando a resposta para um array
-        $decodedResponse = (json_decode($response->content(), true));
-        
         // verificando os dados
-        $this->assertInstanceOf(JsonResponse::class, $response);
-        $this->assertSame(Response::HTTP_OK, $response->status());
+        $this->assertInstanceOf(Response::class, $response);
+        $this->assertSame(Response::HTTP_NO_CONTENT, $response->status());
 
-        $this->assertNotEmpty($decodedResponse['data']['id']);
-        $this->assertSame($title, $decodedResponse['data']['title']);
-        $this->assertSame($description, $decodedResponse['data']['description']);
-        $this->assertSame($yearLaunched, $decodedResponse['data']['year_launched']);
-        $this->assertSame($duration, $decodedResponse['data']['duration']);
-        $this->assertSame($rating->value, $decodedResponse['data']['rating']);
-        $this->assertSame($opened, $decodedResponse['data']['opened']);
-        $this->assertNotEmpty($decodedResponse['data']['created_at']);
-        $this->assertNotEmpty($decodedResponse['data']['updated_at']);
-
-        $this->assertDatabaseHas('videos', [
-            'id' => $video->id,
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'rating' => $rating,
-            'opened' => $opened,
+        $this->assertSoftDeleted('videos', [
+            'id' => $video->id
         ]);
-
-        // verificando relacionamentos
-        $this->assertDatabaseCount('video_category', $nCategories);
-        $this->assertDatabaseCount('video_genre', $nGenres);
-        $this->assertDatabaseCount('video_cast_member', $nCastMembers);
-        $this->assertCount($nCategories, $decodedResponse['data']['categories_id']);
-        $this->assertCount($nGenres, $decodedResponse['data']['genres_id']);
-        $this->assertCount($nCastMembers, $decodedResponse['data']['cast_members_id']);
-        $this->assertEquals($categoriesIds, $decodedResponse['data']['categories_id']);
-        $this->assertEquals($genresIds, $decodedResponse['data']['genres_id']);
-        $this->assertEquals($castMembersIds, $decodedResponse['data']['cast_members_id']);
-
-        // verificando o relacionamento a partir de category
-        foreach ($categoriesIds as $categoryId) {
-            $this->assertDatabaseHas('video_category', [
-                'video_id' => $decodedResponse['data']['id'],
-                'category_id' => $categoryId,
-            ]);
-            $categoryModel = CategoryModel::find($categoryId);
-            $this->assertCount(1, $categoryModel->videos);
-        }
-        // verificando o relacionamento a partir de genre
-        foreach ($genresIds as $genreId) {
-            $this->assertDatabaseHas('video_genre', [
-                'video_id' => $decodedResponse['data']['id'],
-                'genre_id' => $genreId,
-            ]);
-            $genreModel = GenreModel::find($genreId);
-            $this->assertCount(1, $genreModel->videos);
-        }
-        // verificando o relacionamento a partir de castMember
-        foreach ($castMembersIds as $castMemberId) {
-            $this->assertDatabaseHas('video_cast_member', [
-                'video_id' => $decodedResponse['data']['id'],
-                'cast_member_id' => $castMemberId,
-            ]);
-            $castMemberModel = CastMemberModel::find($castMemberId);
-            $this->assertCount(1, $castMemberModel->videos);
-        }
-
-        // verificando se os arquivos de image foram registrados no bd
-        $this->assertDatabaseCount('video_images', 3);
-        $this->assertDatabaseHas('video_images', [
-            'video_id' => $decodedResponse['data']['id'],
-            'path' => $decodedResponse['data']['thumbfile'],
-        ]);
-        $this->assertDatabaseHas('video_images', [
-            'video_id' => $decodedResponse['data']['id'],
-            'path' => $decodedResponse['data']['thumbhalf'],
-        ]);
-        $this->assertDatabaseHas('video_images', [
-            'video_id' => $decodedResponse['data']['id'],
-            'path' => $decodedResponse['data']['bannerfile'],
-        ]);
-
-        // verificando se os arquivos de media foram registrados no bd
-        $this->assertDatabaseCount('video_medias', 2);
-        $this->assertDatabaseHas('video_medias', [
-            'video_id' => $decodedResponse['data']['id'],
-            'file_path' => $decodedResponse['data']['trailerfile'],
-        ]);
-        $this->assertDatabaseHas('video_medias', [
-            'video_id' => $decodedResponse['data']['id'],
-            'file_path' => $decodedResponse['data']['videofile'],
-        ]);
-
-        // verificando se os arquivos foram armazenados
-        Storage::assertExists($decodedResponse['data']['thumbfile']);
-        Storage::assertExists($decodedResponse['data']['thumbhalf']);
-        Storage::assertExists($decodedResponse['data']['bannerfile']);
-        Storage::assertExists($decodedResponse['data']['trailerfile']);
-        Storage::assertExists($decodedResponse['data']['videofile']);
-
-        // verificando que o evento de armazenamento do videoFile foi disparado
-        Event::assertDispatched(VideoEventManagerStub::class);
-
-        // apagando a pasta com os arquivos criados
-        Storage::deleteDirectory($decodedResponse['data']['id']);
     }
-
-    // // testando o método destroy
-    // public function testDestroy()
-    // {
-    //     // inserindo um registro no bd
-    //     $genre = VideoModel::factory()->create();
-
-    //     // instanciando o usecase
-    //     $usecase = new DeleteByIdVideoUseCase($this->repository);
-
-    //     // instanciando o controller
-    //     $controller = new VideoController();
-
-    //     // executando o destroy
-    //     $response = $controller->destroy($genre->id, $usecase);
-
-    //     // verificando os dados
-    //     $this->assertInstanceOf(Response::class, $response);
-    //     $this->assertSame(Response::HTTP_NO_CONTENT, $response->status());
-
-    //     $this->assertSoftDeleted('genres', [
-    //         'id' => $genre->id
-    //     ]);
-    // }
 }

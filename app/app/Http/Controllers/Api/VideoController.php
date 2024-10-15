@@ -141,20 +141,20 @@ class VideoController extends Controller
         return $response;
     }
 
-    // // função responsável pela exclusão das categorias
-    // public function destroy(string $id, DeleteByIdVideoUseCase $usecase): Response
-    // {
-    //     // definindo o inputDto
-    //     $inputDto = new DeleteByIdVideoInputDto(
-    //         id: $id,
-    //     );
+    // função responsável pela exclusão das categorias
+    public function destroy(string $id, DeleteByIdVideoUseCase $usecase): Response
+    {
+        // definindo o inputDto
+        $inputDto = new DeleteByIdVideoInputDto(
+            id: $id,
+        );
 
-    //     // executando o usecase
-    //     $usecase->execute($inputDto);
+        // executando o usecase
+        $usecase->execute($inputDto);
 
-    //     // organizando a response
-    //     $response = response()->noContent();
+        // organizando a response
+        $response = response()->noContent();
 
-    //     return $response;
-    // }
+        return $response;
+    }
 }

@@ -479,6 +479,13 @@ class VideoControllerFeatureTest extends TestCase
         $genresCount = 0;
         $castMembersCount = 0;
 
+        // variáveis relacionadas aos arquivos obsoletos
+        $thumbfileOld = '';
+        $thumbhalfOld = '';
+        $bannerfileOld = '';
+        $trailerfileOld = '';
+        $videofileOld = '';
+
         // realizando a atualização duas vezes
         for ($i = 0; $i < 2; $i++) {
 
@@ -596,6 +603,7 @@ class VideoControllerFeatureTest extends TestCase
             ]));
 
             // executando o update
+            sleep(1);
             $response = $controller->update($video->id, $updateRequest, $usecase);
 
             // decodificando a resposta para um array
@@ -605,7 +613,7 @@ class VideoControllerFeatureTest extends TestCase
             $this->assertInstanceOf(JsonResponse::class, $response);
             $this->assertSame(Response::HTTP_OK, $response->status());
 
-            $this->assertNotEmpty($decodedResponse['data']['id']);
+            $this->assertSame($video->id, $decodedResponse['data']['id']);
             $this->assertSame($title, $decodedResponse['data']['title']);
             $this->assertSame($description, $decodedResponse['data']['description']);
             $this->assertSame($yearLaunched, $decodedResponse['data']['year_launched']);
@@ -697,13 +705,19 @@ class VideoControllerFeatureTest extends TestCase
             Storage::assertExists($decodedResponse['data']['trailerfile']);
             Storage::assertExists($decodedResponse['data']['videofile']);
 
-            // apagando os arquivos criados
-            Storage::delete($decodedResponse['data']['thumbfile']);
-            Storage::delete($decodedResponse['data']['thumbhalf']);
-            Storage::delete($decodedResponse['data']['bannerfile']);
-            Storage::delete($decodedResponse['data']['trailerfile']);
-            Storage::delete($decodedResponse['data']['videofile']);
-            Storage::assertDirectoryEmpty($decodedResponse['data']['id']);
+            // verificando se os arquivos obsoletos foram apagados
+            if ($thumbfileOld) Storage::assertMissing($thumbfileOld);
+            if ($thumbhalfOld) Storage::assertMissing($thumbhalfOld);
+            if ($bannerfileOld) Storage::assertMissing($bannerfileOld);
+            if ($trailerfileOld) Storage::assertMissing($trailerfileOld);
+            if ($videofileOld) Storage::assertMissing($videofileOld);
+
+            // armazenando os paths dos arquivos obsoletos
+            $thumbfileOld = $decodedResponse['data']['thumbfile'];
+            $thumbhalfOld = $decodedResponse['data']['thumbhalf'];
+            $bannerfileOld = $decodedResponse['data']['bannerfile'];
+            $trailerfileOld = $decodedResponse['data']['trailerfile'];
+            $videofileOld = $decodedResponse['data']['videofile'];
 
             // verificando que o evento de armazenamento do videoFile foi disparado
             Event::assertDispatched(VideoEventManagerStub::class);

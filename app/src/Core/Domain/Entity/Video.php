@@ -87,6 +87,12 @@ class Video extends Entity
         $this->thumbFile = $thumbFile;
     }
 
+    // função para remoção do thumbFile
+    public function removeThumbFile(): void
+    {
+        $this->thumbFile = null;
+    }
+
     // função para retorno do thumbHalf
     public function thumbHalf(): ?Image
     {
@@ -99,6 +105,12 @@ class Video extends Entity
         $this->thumbHalf = $thumbHalf;
     }
 
+    // função para remoção do thumbHalf
+    public function removeThumbHalf(): void
+    {
+        $this->thumbHalf = null;
+    }
+
     // função para retorno do bannerFile
     public function bannerFile(): ?Image
     {
@@ -109,6 +121,12 @@ class Video extends Entity
     public function setBannerFile(Image $bannerFile): void
     {
         $this->bannerFile = $bannerFile;
+    }
+
+    // função para remoção do bannerFile
+    public function removeBannerFile(): void
+    {
+        $this->bannerFile = null;
     }
 
     // função para retorno do trailerFile
@@ -133,6 +151,12 @@ class Video extends Entity
     public function videoFile(): ?Media
     {
         return $this->videoFile;
+    }
+
+    // função para remoção do videoFile
+    public function removeVideoFile(): void
+    {
+        $this->videoFile = null;
     }
 
     // função para set do videoFile

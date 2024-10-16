@@ -1063,7 +1063,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         Event::assertDispatched(VideoEventManagerStub::class);
 
         // apagando a pasta com os arquivos criados
-        Storage::deleteDirectory(explode('/', $responseUseCase->thumbFile)[0]);
+        Storage::deleteDirectory($responseUseCase->id);
     }
 
     // função que testa o método de execução completo e rollback

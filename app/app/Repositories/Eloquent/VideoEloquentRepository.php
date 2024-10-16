@@ -228,44 +228,53 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         // se não houver retorno, lança exceção
         if (!$model) throw new NotFoundException('ID not found');
 
+        // atualizando o trailer
         // obtendo o trailer
         $trailer = $entity->trailerFile();
         // obtendo o registro no bd
         $trailerBD = $model->trailer()->first();
-        // se estiver setado e existir registro no BD, atualiza o registro
-        if ($trailer and $trailerBD) {
-            $model->trailer()->update([
-                'file_path' => $trailer->filePath(),
-                'encoded_path' => $trailer->encodedPath(),
-                'status' => $trailer->mediaStatus()->value,
-                'type' => $trailer->mediaType()->value,
-            ]);
+        // se estiver setado,
+        if ($trailer) {
+            // se já existir registro no bd, atualiza o registro
+            if ($trailerBD) {
+                // atualizando o registro
+                $model->trailer()->update([
+                    'file_path' => $trailer->filePath(),
+                    'encoded_path' => $trailer->encodedPath(),
+                    'status' => $trailer->mediaStatus()->value,
+                    'type' => $trailer->mediaType()->value,
+                ]);
+            }
+            // se não existir registro no BD, cria o registro
+            else {
+                // criando o registro
+                $model->trailer()->create([
+                    'file_path' => $trailer->filePath(),
+                    'encoded_path' => $trailer->encodedPath(),
+                    'status' => $trailer->mediaStatus()->value,
+                    'type' => $trailer->mediaType()->value,
+                ]);
+            }
         }
-        // se estiver setado e não existir registro no BD, cria o registro
-        else if ($trailer and !$trailerBD) {
-            $model->trailer()->create([
-                'file_path' => $trailer->filePath(),
-                'encoded_path' => $trailer->encodedPath(),
-                'status' => $trailer->mediaStatus()->value,
-                'type' => $trailer->mediaType()->value,
-            ]);
-        }
-        // se não estiver setado e existir registro no BD, apaga o registro
-        else if (!$trailer and $trailerBD) {
-            $trailerBD->delete();
-        }
-        // senão, não faz nada
+        // se não estiver setado
         else {
+            // se já existir registro no bd, apaga o registro
+            if ($trailerBD) {
+                // apagando o registro
+                $trailerBD->delete();
+            }
         }
-
-
 
         // atualizando o video
+        // obtendo o video
         $video = $entity->videoFile();
-        // se estiver setado
+        // obtendo o registro no bd
+        $videoBD = $model->video()->first();
+        // se estiver setado,
         if ($video) {
-            // se existir registro, atualiza
-            if ($model->video()->first()) {
+            // se já existir registro no bd, atualiza o registro
+            if ($videoBD) {
+                // atualizando o registro
                 $model->video()->update([
                     'file_path' => $video->filePath(),
                     'encoded_path' => $video->encodedPath(),
@@ -273,8 +282,9 @@ class VideoEloquentRepository implements VideoRepositoryInterface
                     'type' => $video->mediaType()->value,
                 ]);
             }
-            // senão, cria
+            // se não existir registro no BD, cria o registro
             else {
+                // criando o registro
                 $model->video()->create([
                     'file_path' => $video->filePath(),
                     'encoded_path' => $video->encodedPath(),
@@ -283,64 +293,111 @@ class VideoEloquentRepository implements VideoRepositoryInterface
                 ]);
             }
         }
+        // se não estiver setado
+        else {
+            // se já existir registro no bd, apaga o registro
+            if ($videoBD) {
+                // apagando o registro
+                $videoBD->delete();
+            }
+        }
 
-        // atualizando o thumb
-        $thumb = $entity->thumbFile();
-        // se estiver setado
-        if ($thumb) {
-            // se existir registro, atualiza
-            if ($model->thumb()->first()) {
+        // atualizando o thumbFile
+        // obtendo o thumbFile
+        $thumbFile = $entity->thumbFile();
+        // obtendo o registro no bd
+        $thumbFileBD = $model->thumb()->first();
+        // se estiver setado,
+        if ($thumbFile) {
+            // se já existir registro no bd, atualiza o registro
+            if ($thumbFileBD) {
+                // atualizando o registro
                 $model->thumb()->update([
-                    'path' => $thumb->filePath(),
-                    'type' => $thumb->imageType()->value,
+                    'path' => $thumbFile->filePath(),
+                    'type' => $thumbFile->imageType()->value,
                 ]);
             }
-            // senão, cria
+            // se não existir registro no BD, cria o registro
             else {
+                // criando o registro
                 $model->thumb()->create([
-                    'path' => $thumb->filePath(),
-                    'type' => $thumb->imageType()->value,
+                    'path' => $thumbFile->filePath(),
+                    'type' => $thumbFile->imageType()->value,
                 ]);
+            }
+        }
+        // se não estiver setado
+        else {
+            // se já existir registro no bd, apaga o registro
+            if ($thumbFileBD) {
+                // apagando o registro
+                $thumbFileBD->delete();
             }
         }
 
         // atualizando o thumbHalf
+        // obtendo o thumbHalf
         $thumbHalf = $entity->thumbHalf();
-        // se estiver setado
+        // obtendo o registro no bd
+        $thumbHalfBD = $model->thumbHalf()->first();
+        // se estiver setado,
         if ($thumbHalf) {
-            // se existir registro, atualiza
-            if ($model->thumbHalf()->first()) {
+            // se já existir registro no bd, atualiza o registro
+            if ($thumbHalfBD) {
+                // atualizando o registro
                 $model->thumbHalf()->update([
                     'path' => $thumbHalf->filePath(),
                     'type' => $thumbHalf->imageType()->value,
                 ]);
             }
-            // senão, cria
+            // se não existir registro no BD, cria o registro
             else {
+                // criando o registro
                 $model->thumbHalf()->create([
                     'path' => $thumbHalf->filePath(),
                     'type' => $thumbHalf->imageType()->value,
                 ]);
             }
         }
+        // se não estiver setado
+        else {
+            // se já existir registro no bd, apaga o registro
+            if ($thumbHalfBD) {
+                // apagando o registro
+                $thumbHalfBD->delete();
+            }
+        }
 
         // atualizando o bannerFile
+        // obtendo o bannerFile
         $bannerFile = $entity->bannerFile();
-        // se estiver setado
+        // obtendo o registro no bd
+        $bannerFileBD = $model->banner()->first();
+        // se estiver setado,
         if ($bannerFile) {
-            // se existir registro, atualiza
-            if ($model->banner()->first()) {
+            // se já existir registro no bd, atualiza o registro
+            if ($bannerFileBD) {
+                // atualizando o registro
                 $model->banner()->update([
                     'path' => $bannerFile->filePath(),
                     'type' => $bannerFile->imageType()->value,
                 ]);
             }
-            // senão, cria
+            // se não existir registro no BD, cria o registro
             else {
+                // criando o registro
                 $model->banner()->create([
                     'path' => $bannerFile->filePath(),
                     'type' => $bannerFile->imageType()->value,
                 ]);
+            }
+        }
+        // se não estiver setado
+        else {
+            // se já existir registro no bd, apaga o registro
+            if ($bannerFileBD) {
+                // apagando o registro
+                $bannerFileBD->delete();
             }
         }
 

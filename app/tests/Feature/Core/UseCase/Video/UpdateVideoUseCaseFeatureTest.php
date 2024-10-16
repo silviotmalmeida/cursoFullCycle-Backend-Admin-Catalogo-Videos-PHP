@@ -980,13 +980,12 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         // verificando se os arquivos foram armazenados
         Storage::assertExists($responseUseCase->trailerFile);
 
-        // apagando o arquivo armazenado
-        Storage::delete($responseUseCase->trailerFile);
-        Storage::deleteDirectory(explode('/', $responseUseCase->trailerFile)[0]);
+        // apagando o arquivo armazenado        
+        Storage::deleteDirectory($model->id);
     }
 
     // função que testa o método de execução com remoção do trailerFile
-    public function testExecuteWithRemoveTrailerFile()
+    public function testExecuteWithRemovingTrailerFile()
     {
         // inserindo um registro no bd
         $model = VideoModel::factory()->create();
@@ -1053,7 +1052,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         sleep(1);
         $inputDto = new UpdateVideoInputDto(
             id: $model->id,
-            trailerFile: null,
+            trailerFile: [],
         );
 
         // executando o usecase
@@ -1065,9 +1064,660 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         // verificando se os arquivos foram removidos
         Storage::assertMissing($responseUseCase->trailerFile);
 
+        // apagando o arquivo armazenado        
+        Storage::deleteDirectory($model->id);
+    }
+
+    // função que testa o método de execução com videoFile
+    public function testExecuteWithVideoFile()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados do videofile
+        $fakeVideoFile = UploadedFile::fake()->create('videofile.mp4', 1, 'videofile/mp4');
+        $videofile = [
+            'name' => $fakeVideoFile->getFilename(),
+            'type' => $fakeVideoFile->getMimeType(),
+            'tmp_name' => $fakeVideoFile->getPathname(),
+            'error' => $fakeVideoFile->getError(),
+            'size' => $fakeVideoFile->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            videoFile: $videofile,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManagerStub();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando os dados básicos
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
+        $this->assertSame($model->id, $responseUseCase->id);
+        $this->assertNotEmpty($responseUseCase->created_at);
+        $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertSame($responseUseCase->created_at, $responseUseCase->updated_at);
+
+        // verificando se os arquivos de media foram registrados no bd
+        $this->assertDatabaseCount('video_medias', 1);
+        $this->assertDatabaseHas('video_medias', [
+            'video_id' => $responseUseCase->id,
+            'file_path' => $responseUseCase->videoFile,
+        ]);
+
+        // verificando se os arquivos foram armazenados
+        Storage::assertExists($responseUseCase->videoFile);
+
         // apagando o arquivo armazenado
-        Storage::delete($responseUseCase->trailerFile);
-        Storage::deleteDirectory(explode('/', $responseUseCase->trailerFile)[0]);
+        Storage::deleteDirectory($model->id);
+    }
+
+    // função que testa o método de execução com remoção do videoFile
+    public function testExecuteWithRemovingVideoFile()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados do videoFile
+        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+        $videoFile = [
+            'name' => $fakeVideoFile->getFilename(),
+            'type' => $fakeVideoFile->getMimeType(),
+            'tmp_name' => $fakeVideoFile->getPathname(),
+            'error' => $fakeVideoFile->getError(),
+            'size' => $fakeVideoFile->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            videoFile: $videoFile,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManagerStub();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando registro
+        $this->assertDatabaseCount('video_medias', 1);
+
+        // verificando se os arquivos foram armazenados
+        Storage::assertExists($responseUseCase->videoFile);
+
+        // removendo o arquivo
+        sleep(1);
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            videoFile: [],
+        );
+
+        // executando o usecase
+        $useCase->execute($inputDto);
+
+        // verificando se os arquivos de media foram removidos no bd
+        $this->assertDatabaseCount('video_medias', 0);
+
+        // verificando se os arquivos foram removidos
+        Storage::assertMissing($responseUseCase->videoFile);
+
+        // apagando o arquivo armazenado
+        Storage::deleteDirectory($model->id);
+    }
+
+    // função que testa o método de execução com thumbFile
+    public function testExecuteWithThumbFile()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados do thumbFile
+        $fakeThumbFile = UploadedFile::fake()->create('thumbfile.mp4', 1, 'thumbfile/mp4');
+        $thumbfile = [
+            'name' => $fakeThumbFile->getFilename(),
+            'type' => $fakeThumbFile->getMimeType(),
+            'tmp_name' => $fakeThumbFile->getPathname(),
+            'error' => $fakeThumbFile->getError(),
+            'size' => $fakeThumbFile->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            thumbFile: $thumbfile,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManagerStub();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando os dados básicos
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
+        $this->assertSame($model->id, $responseUseCase->id);
+        $this->assertNotEmpty($responseUseCase->created_at);
+        $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertSame($responseUseCase->created_at, $responseUseCase->updated_at);
+
+        // verificando se os arquivos de image foram registrados no bd
+        $this->assertDatabaseCount('video_images', 1);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $responseUseCase->id,
+            'path' => $responseUseCase->thumbFile,
+        ]);
+
+        // verificando se os arquivos foram armazenados
+        Storage::assertExists($responseUseCase->thumbFile);
+
+        // apagando o arquivo armazenado
+        Storage::deleteDirectory($model->id);
+    }
+
+    // função que testa o método de execução com remoção do thumbFile
+    public function testExecuteWithRemovingThumbFile()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados do thumbFile
+        $fakeThumbFile = UploadedFile::fake()->create('thumbfile.mp4', 1, 'thumbfile/mp4');
+        $thumbfile = [
+            'name' => $fakeThumbFile->getFilename(),
+            'type' => $fakeThumbFile->getMimeType(),
+            'tmp_name' => $fakeThumbFile->getPathname(),
+            'error' => $fakeThumbFile->getError(),
+            'size' => $fakeThumbFile->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            thumbFile: $thumbfile,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManagerStub();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando registro
+        $this->assertDatabaseCount('video_images', 1);
+
+        // verificando se os arquivos foram armazenados
+        Storage::assertExists($responseUseCase->thumbFile);
+
+        // removendo o arquivo
+        sleep(1);
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            thumbFile: [],
+        );
+
+        // executando o usecase
+        $useCase->execute($inputDto);
+
+        // verificando se os arquivos de media foram removidos no bd
+        $this->assertDatabaseCount('video_images', 0);
+
+        // verificando se os arquivos foram removidos
+        Storage::assertMissing($responseUseCase->thumbFile);
+
+        // apagando o arquivo armazenado
+        Storage::deleteDirectory($model->id);
+    }
+
+    // função que testa o método de execução com thumbHalf
+    public function testExecuteWithThumbHalf()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados do thumbHalf
+        $fakeThumbHalf = UploadedFile::fake()->create('thumbhalf.mp4', 1, 'thumbhalf/mp4');
+        $thumbhalf = [
+            'name' => $fakeThumbHalf->getFilename(),
+            'type' => $fakeThumbHalf->getMimeType(),
+            'tmp_name' => $fakeThumbHalf->getPathname(),
+            'error' => $fakeThumbHalf->getError(),
+            'size' => $fakeThumbHalf->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            thumbHalf: $thumbhalf,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManagerStub();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando os dados básicos
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
+        $this->assertSame($model->id, $responseUseCase->id);
+        $this->assertNotEmpty($responseUseCase->created_at);
+        $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertSame($responseUseCase->created_at, $responseUseCase->updated_at);
+
+        // verificando se os arquivos de image foram registrados no bd
+        $this->assertDatabaseCount('video_images', 1);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $responseUseCase->id,
+            'path' => $responseUseCase->thumbHalf,
+        ]);
+
+        // verificando se os arquivos foram armazenados
+        Storage::assertExists($responseUseCase->thumbHalf);
+
+        // apagando o arquivo armazenado
+        Storage::deleteDirectory($model->id);
+    }
+
+    // função que testa o método de execução com remoção do thumbHalf
+    public function testExecuteWithRemovingThumbHalf()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados do thumbHalf
+        $fakeThumbHalf = UploadedFile::fake()->create('thumbhalf.mp4', 1, 'thumbhalf/mp4');
+        $thumbhalf = [
+            'name' => $fakeThumbHalf->getFilename(),
+            'type' => $fakeThumbHalf->getMimeType(),
+            'tmp_name' => $fakeThumbHalf->getPathname(),
+            'error' => $fakeThumbHalf->getError(),
+            'size' => $fakeThumbHalf->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            thumbHalf: $thumbhalf,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManagerStub();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando registro
+        $this->assertDatabaseCount('video_images', 1);
+
+        // verificando se os arquivos foram armazenados
+        Storage::assertExists($responseUseCase->thumbHalf);
+
+        // removendo o arquivo
+        sleep(1);
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            thumbHalf: [],
+        );
+
+        // executando o usecase
+        $useCase->execute($inputDto);
+
+        // verificando se os arquivos de media foram removidos no bd
+        $this->assertDatabaseCount('video_images', 0);
+
+        // verificando se os arquivos foram removidos
+        Storage::assertMissing($responseUseCase->thumbHalf);
+
+        // apagando o arquivo armazenado
+        Storage::deleteDirectory($model->id);
+    }
+
+    // função que testa o método de execução com bannerFile
+    public function testExecuteWithBannerFile()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados do bannerFile
+        $fakeBannerFile = UploadedFile::fake()->create('bannerfile.mp4', 1, 'bannerfile/mp4');
+        $bannerfile = [
+            'name' => $fakeBannerFile->getFilename(),
+            'type' => $fakeBannerFile->getMimeType(),
+            'tmp_name' => $fakeBannerFile->getPathname(),
+            'error' => $fakeBannerFile->getError(),
+            'size' => $fakeBannerFile->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            bannerFile: $bannerfile,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManagerStub();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando os dados básicos
+        $this->assertInstanceOf(UpdateVideoOutputDto::class, $responseUseCase);
+        $this->assertSame($model->id, $responseUseCase->id);
+        $this->assertNotEmpty($responseUseCase->created_at);
+        $this->assertNotEmpty($responseUseCase->updated_at);
+        $this->assertSame($responseUseCase->created_at, $responseUseCase->updated_at);
+
+        // verificando se os arquivos de image foram registrados no bd
+        $this->assertDatabaseCount('video_images', 1);
+        $this->assertDatabaseHas('video_images', [
+            'video_id' => $responseUseCase->id,
+            'path' => $responseUseCase->bannerFile,
+        ]);
+
+        // verificando se os arquivos foram armazenados
+        Storage::assertExists($responseUseCase->bannerFile);
+
+        // apagando o arquivo armazenado
+        Storage::deleteDirectory($model->id);
+    }
+
+    // função que testa o método de execução com remoção do bannerFile
+    public function testExecuteWithRemovingBannerFile()
+    {
+        // inserindo um registro no bd
+        $model = VideoModel::factory()->create();
+        sleep(1);
+
+        // dados do bannerFile
+        $fakeBannerFile = UploadedFile::fake()->create('bannerfile.mp4', 1, 'bannerfile/mp4');
+        $bannerfile = [
+            'name' => $fakeBannerFile->getFilename(),
+            'type' => $fakeBannerFile->getMimeType(),
+            'tmp_name' => $fakeBannerFile->getPathname(),
+            'error' => $fakeBannerFile->getError(),
+            'size' => $fakeBannerFile->getSize(),
+        ];
+
+        // criando o inputDto
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            bannerFile: $bannerfile,
+        );
+
+        // criando o repository
+        $repository = new VideoEloquentRepository(new VideoModel());
+
+        // criando o gerenciador de transações
+        $transactionDb = new TransactionDb();
+
+        // criando o gerenciador de storage
+        $fileStorage = new FileStorage();
+
+        // criando o gerenciador de eventos
+        $eventManager = new VideoEventManagerStub();
+
+        // criando o repository de Category
+        $categoryRepository = new CategoryEloquentRepository(new CategoryModel());
+
+        // criando o repository de Genre
+        $genreRepository = new GenreEloquentRepository(new GenreModel());
+
+        // criando o repository de CastMember
+        $castMemberRepository = new CastMemberEloquentRepository(new CastMemberModel());
+
+        // criando o usecase
+        $useCase = new UpdateVideoUseCase(
+            $repository,
+            $transactionDb,
+            $fileStorage,
+            $eventManager,
+            $categoryRepository,
+            $genreRepository,
+            $castMemberRepository,
+        );
+
+        // executando o usecase
+        $responseUseCase = $useCase->execute($inputDto);
+
+        // verificando registro
+        $this->assertDatabaseCount('video_images', 1);
+
+        // verificando se os arquivos foram armazenados
+        Storage::assertExists($responseUseCase->bannerFile);
+
+        // removendo o arquivo
+        sleep(1);
+        $inputDto = new UpdateVideoInputDto(
+            id: $model->id,
+            bannerFile: [],
+        );
+
+        // executando o usecase
+        $useCase->execute($inputDto);
+
+        // verificando se os arquivos de media foram removidos no bd
+        $this->assertDatabaseCount('video_images', 0);
+
+        // verificando se os arquivos foram removidos
+        Storage::assertMissing($responseUseCase->bannerFile);
+
+        // apagando o arquivo armazenado
+        Storage::deleteDirectory($model->id);
     }
 
     // função que testa o método de execução completo
@@ -1310,12 +1960,7 @@ class UpdateVideoUseCaseFeatureTest extends TestCase
         Event::assertDispatched(VideoEventManagerStub::class);
 
         // apagando os arquivos armazenados
-        Storage::delete($responseUseCase->thumbFile);
-        Storage::delete($responseUseCase->thumbHalf);
-        Storage::delete($responseUseCase->bannerFile);
-        Storage::delete($responseUseCase->trailerFile);
-        Storage::delete($responseUseCase->videoFile);
-        Storage::deleteDirectory(explode('/', $responseUseCase->videoFile)[0]);
+        Storage::deleteDirectory($responseUseCase->id);
     }
 
     // função que testa o método de execução completo e rollback

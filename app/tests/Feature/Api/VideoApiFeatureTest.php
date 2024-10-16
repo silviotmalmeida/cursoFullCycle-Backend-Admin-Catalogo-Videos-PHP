@@ -29,34 +29,89 @@ class VideoApiFeatureTest extends TestCase
         $response->assertJsonCount(0, 'data');
     }
 
-    // testando o método index
-    public function testIndex()
+    // provedor de dados do testIndex
+    public function dataProviderTestIndex(): array
     {
+        return [
+            [
+                'qtd' => 25,
+                'page' => 1,
+                'perPage' => 10,
+                'items' => 10
+            ],
+            [
+                'qtd' => 25,
+                'page' => 2,
+                'perPage' => 10,
+                'items' => 10
+            ],
+            [
+                'qtd' => 25,
+                'page' => 3,
+                'perPage' => 10,
+                'items' => 5
+            ],
+        ];
+    }
+
+    // testando o método index
+    // utiliza o dataProvider dataProviderTestIndex
+    /**
+     * @dataProvider dataProviderTestIndex
+     */
+    public function testIndex(
+        int $qtd,
+        int $page,
+        int $perPage,
+        int $items
+    ) {
         // definindo a quantidade de registros a serem criados
-        $total = 50;
-        $perPage = 8;
-        $lastPage = (int) (ceil($total / $perPage));
+        $lastPage = (int) (ceil($qtd / $perPage));
         $firstPage = 1;
-        $currentPage = 2;
-        $to = ($currentPage - 1) * ($perPage) + 1;
-        $from = $currentPage * $perPage;
+        $to = ($page - 1) * ($perPage) + 1;
+        $from = $qtd > ($page * $perPage) ? ($page * $perPage) : $qtd;
 
         // inserindo múltiplos registros no bd
-        VideoModel::factory()->count($total)->create();
+        VideoModel::factory()->count($qtd)->create();
+
+        
 
         // fazendo o request
-        $response = $this->getJson("$this->endpoint?page=$currentPage&per_page=$perPage");
+        $response = $this->getJson("$this->endpoint?page=$page&per_page=$perPage");
 
         // verificando os dados
         $response->assertStatus(Response::HTTP_OK);
-        $this->assertCount($perPage, $response['data']);
-        $this->assertSame($total, $response['meta']['total']);
+        $this->assertCount($items, $response['data']);
+        $this->assertSame($qtd, $response['meta']['total']);
         $this->assertSame($perPage, $response['meta']['per_page']);
         $this->assertSame($lastPage, $response['meta']['last_page']);
         $this->assertSame($firstPage, $response['meta']['first_page']);
-        $this->assertSame($currentPage, $response['meta']['current_page']);
+        $this->assertSame($page, $response['meta']['current_page']);
         $this->assertSame($to, $response['meta']['to']);
         $this->assertSame($from, $response['meta']['from']);
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'title',
+                    'description',
+                    'year_launched',
+                    'duration',
+                    'rating',
+                    'opened',
+                    'categories_id',
+                    'genres_id',
+                    'cast_members_id',
+                    'thumbfile',
+                    'thumbhalf',
+                    'bannerfile',
+                    'trailerfile',
+                    'videofile',
+                    'created_at',
+                    'updated_at',
+                ]
+            ]
+        ]);
     }
 
     // testando o método show com id inexistente
@@ -931,6 +986,13 @@ class VideoApiFeatureTest extends TestCase
         $genresCount = 0;
         $castMembersCount = 0;
 
+        // variáveis relacionadas aos arquivos obsoletos
+        $thumbfileOld = '';
+        $thumbhalfOld = '';
+        $bannerfileOld = '';
+        $trailerfileOld = '';
+        $videofileOld = '';
+
         // realizando a atualização duas vezes
         for ($i = 0; $i < 2; $i++) {
 
@@ -1150,13 +1212,19 @@ class VideoApiFeatureTest extends TestCase
             Storage::assertExists($response['data']['trailerfile']);
             Storage::assertExists($response['data']['videofile']);
 
-            // apagando os arquivos criados
-            Storage::delete($response['data']['thumbfile']);
-            Storage::delete($response['data']['thumbhalf']);
-            Storage::delete($response['data']['bannerfile']);
-            Storage::delete($response['data']['trailerfile']);
-            Storage::delete($response['data']['videofile']);
-            Storage::assertDirectoryEmpty($response['data']['id']);
+            // verificando se os arquivos obsoletos foram apagados
+            if ($thumbfileOld) Storage::assertMissing($thumbfileOld);
+            if ($thumbhalfOld) Storage::assertMissing($thumbhalfOld);
+            if ($bannerfileOld) Storage::assertMissing($bannerfileOld);
+            if ($trailerfileOld) Storage::assertMissing($trailerfileOld);
+            if ($videofileOld) Storage::assertMissing($videofileOld);
+
+            // armazenando os paths dos arquivos obsoletos
+            $thumbfileOld = $response['data']['thumbfile'];
+            $thumbhalfOld = $response['data']['thumbhalf'];
+            $bannerfileOld = $response['data']['bannerfile'];
+            $trailerfileOld = $response['data']['trailerfile'];
+            $videofileOld = $response['data']['videofile'];
         }
         // apagando a pasta de arquivos criada
         Storage::deleteDirectory($response['data']['id']);

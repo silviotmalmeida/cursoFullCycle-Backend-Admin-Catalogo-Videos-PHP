@@ -919,7 +919,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
 
         // removendo a media
         $entity->removeTrailerFile();
-       
+
         // atualizando no bd
         sleep(1);
         $this->repository->update($entity);
@@ -928,7 +928,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $this->assertDatabaseCount('video_medias', 0);
         // inserindo a media novamente para testar a cardinalidade do relacionamento
         $this->repository->updateMedia($entity);
-        $this->assertDatabaseCount('video_medias', 0);        
+        $this->assertDatabaseCount('video_medias', 0);
     }
 
     // testando a função de update no bd, com sucesso na busca
@@ -996,6 +996,53 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
     }
 
     // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithRemovingMediaVideo()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_video.mp4';
+        $mediaStatus = MediaStatus::PENDING;
+        $mediaType = MediaType::VIDEO;
+        $encodedPath = '';
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a media
+        $media = new Media(
+            filePath: $filePath,
+            mediaStatus: $mediaStatus,
+            mediaType: $mediaType,
+            encodedPath: $encodedPath,
+        );
+        // adicionando a media
+        $entity->setVideoFile($media);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a media
+        $this->repository->updateMedia($entity);
+        // evidenciando o cadastro no bd
+        $this->assertDatabaseCount('video_medias', 1);
+
+        // removendo a media
+        $entity->removeVideoFile();
+
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a media
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_medias', 0);
+        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_medias', 0);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
     public function testUpdateWithImageThumb()
     {
         // valores a serem considerados inicialmente
@@ -1019,7 +1066,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $entity->setThumbFile($image);
         // inserindo a entidade no bd
         $this->repository->insert($entity);
-        // inserindo a media
+        // inserindo a image
         $this->repository->updateMedia($entity);
 
         // valores a serem considerados na atualização
@@ -1036,10 +1083,10 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // atualizando no bd
         sleep(1);
         $this->repository->update($entity);
-        // atualizando a media
+        // atualizando a image
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
-        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        // inserindo a image novamente para testar a cardinalidade do relacionamento
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
@@ -1047,6 +1094,49 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             'path' => $image2->filePath(),
             'type' => $image2->imageType(),
         ]);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithRemovingImageThumb()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_thumb.mp4';
+        $imageType = ImageType::THUMB;
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a image
+        $image = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image
+        $entity->setThumbFile($image);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a image
+        $this->repository->updateMedia($entity);
+        // evidenciando o cadastro no bd
+        $this->assertDatabaseCount('video_images', 1);
+
+        // removendo a image
+        $entity->removeThumbFile();
+
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a image
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 0);
+        // inserindo a image novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 0);
     }
 
     // testando a função de update no bd, com sucesso na busca
@@ -1073,7 +1163,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $entity->setThumbHalf($image);
         // inserindo a entidade no bd
         $this->repository->insert($entity);
-        // inserindo a media
+        // inserindo a image
         $this->repository->updateMedia($entity);
 
         // valores a serem considerados na atualização
@@ -1090,10 +1180,10 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // atualizando no bd
         sleep(1);
         $this->repository->update($entity);
-        // atualizando a media
+        // atualizando a image
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
-        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        // inserindo a image novamente para testar a cardinalidade do relacionamento
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
@@ -1101,6 +1191,49 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             'path' => $image2->filePath(),
             'type' => $image2->imageType(),
         ]);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithRemovingImageThumbHalf()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_thumbHalf.mp4';
+        $imageType = ImageType::THUMB_HALF;
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a image
+        $image = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image
+        $entity->setThumbHalf($image);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a image
+        $this->repository->updateMedia($entity);
+        // evidenciando o cadastro no bd
+        $this->assertDatabaseCount('video_images', 1);
+
+        // removendo a image
+        $entity->removeThumbHalf();
+
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a image
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 0);
+        // inserindo a image novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 0);
     }
 
     // testando a função de update no bd, com sucesso na busca
@@ -1127,7 +1260,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $entity->setBannerFile($image);
         // inserindo a entidade no bd
         $this->repository->insert($entity);
-        // inserindo a media
+        // inserindo a image
         $this->repository->updateMedia($entity);
 
         // valores a serem considerados na atualização
@@ -1144,10 +1277,10 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         // atualizando no bd
         sleep(1);
         $this->repository->update($entity);
-        // atualizando a media
+        // atualizando a image
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
-        // inserindo a media novamente para testar a cardinalidade do relacionamento
+        // inserindo a image novamente para testar a cardinalidade do relacionamento
         $this->repository->updateMedia($entity);
         $this->assertDatabaseCount('video_images', 1);
         $this->assertDatabaseHas('video_images', [
@@ -1155,6 +1288,49 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
             'path' => $image2->filePath(),
             'type' => $image2->imageType(),
         ]);
+    }
+
+    // testando a função de update no bd, com sucesso na busca
+    public function testUpdateWithRemovingImageBanner()
+    {
+        // valores a serem considerados inicialmente
+        $filePath = 'path_do_banner.mp4';
+        $imageType = ImageType::BANNER;
+
+        // criando a entidade
+        $entity = new VideoEntity(
+            title: 'title',
+            description: 'description',
+            yearLaunched: 2024,
+            duration: 120,
+            rating: Rating::RATE10
+        );
+        // criando a image
+        $image = new Image(
+            filePath: $filePath,
+            imageType: $imageType,
+        );
+        // adicionando a image
+        $entity->setBannerFile($image);
+        // inserindo a entidade no bd
+        $this->repository->insert($entity);
+        // inserindo a image
+        $this->repository->updateMedia($entity);
+        // evidenciando o cadastro no bd
+        $this->assertDatabaseCount('video_images', 1);
+
+        // removendo a image
+        $entity->removeBannerFile();
+
+        // atualizando no bd
+        sleep(1);
+        $this->repository->update($entity);
+        // atualizando a image
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 0);
+        // inserindo a image novamente para testar a cardinalidade do relacionamento
+        $this->repository->updateMedia($entity);
+        $this->assertDatabaseCount('video_images', 0);
     }
 
     // testando a função de update no bd, sem sucesso na busca

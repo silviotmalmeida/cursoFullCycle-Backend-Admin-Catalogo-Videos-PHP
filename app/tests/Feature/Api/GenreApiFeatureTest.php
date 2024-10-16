@@ -34,7 +34,7 @@ class GenreApiFeatureTest extends TestCase
         $firstPage = 1;
         $currentPage = 2;
         $to = ($currentPage - 1) * ($perPage) + 1;
-        $from = $currentPage * $perPage;
+        $from = $total > ($currentPage * $perPage) ? ($currentPage * $perPage) : $total;
 
         // inserindo múltiplos registros no bd
         GenreModel::factory()->count($total)->create();
@@ -52,6 +52,17 @@ class GenreApiFeatureTest extends TestCase
         $this->assertSame($currentPage, $response['meta']['current_page']);
         $this->assertSame($to, $response['meta']['to']);
         $this->assertSame($from, $response['meta']['from']);
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'is_active',
+                    'created_at',
+                    'updated_at',
+                ]
+            ]
+        ]);
     }
 
     // testando o método show com id inexistente
@@ -398,10 +409,10 @@ class GenreApiFeatureTest extends TestCase
 
     // testando o método update passando valores vazios
     public function testUpdateEmptyValues()
-    {       
+    {
         // inserindo um registro no bd
         $genre = GenreModel::factory()->create();
-        
+
         // definindo os dados a serem passados no body
         $data = [
             'name' => '',

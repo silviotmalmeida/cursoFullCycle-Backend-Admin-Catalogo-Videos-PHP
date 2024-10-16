@@ -88,6 +88,15 @@ class CreateVideoBuilder implements VideoBuilderInterface
         return $this;
     }
 
+    // método de remoção do thumbFile
+    public function removeThumbFile(): CreateVideoBuilder
+    {
+        // atualizando a entidade
+        $this->entity->removeThumbFile();
+
+        return $this;
+    }
+
     // método de inclusão do thumbHalf
     public function addThumbHalf(string $path): CreateVideoBuilder
     {
@@ -102,6 +111,15 @@ class CreateVideoBuilder implements VideoBuilderInterface
         return $this;
     }
 
+    // método de remoção do thumbHalf
+    public function removeThumbHalf(): CreateVideoBuilder
+    {
+        // atualizando a entidade
+        $this->entity->removeThumbHalf();
+
+        return $this;
+    }
+
     // método de inclusão do bannerFile
     public function addBannerFile(string $path): CreateVideoBuilder
     {
@@ -112,6 +130,15 @@ class CreateVideoBuilder implements VideoBuilderInterface
         );
         // atualizando a entidade
         $this->entity->setBannerFile($bannerFile);
+
+        return $this;
+    }
+
+    // método de remoção do bannerFile
+    public function removeBannerFile(): CreateVideoBuilder
+    {
+        // atualizando a entidade
+        $this->entity->removeBannerFile();
 
         return $this;
     }
@@ -153,6 +180,15 @@ class CreateVideoBuilder implements VideoBuilderInterface
         );
         // atualizando a entidade
         $this->entity->setVideoFile($videoFile);
+
+        return $this;
+    }
+
+    // método de remoção do videoFile
+    public function removeVideoFile(): CreateVideoBuilder
+    {
+        // atualizando a entidade
+        $this->entity->removeVideoFile();
 
         return $this;
     }

@@ -34,7 +34,7 @@ class CastMemberApiFeatureTest extends TestCase
         $firstPage = 1;
         $currentPage = 2;
         $to = ($currentPage - 1) * ($perPage) + 1;
-        $from = $currentPage * $perPage;
+        $from = $total > ($currentPage * $perPage) ? ($currentPage * $perPage) : $total;
 
         // inserindo múltiplos registros no bd
         CastMemberModel::factory()->count($total)->create();
@@ -52,6 +52,17 @@ class CastMemberApiFeatureTest extends TestCase
         $this->assertSame($currentPage, $response['meta']['current_page']);
         $this->assertSame($to, $response['meta']['to']);
         $this->assertSame($from, $response['meta']['from']);
+        $response->assertJsonStructure([
+            'data' => [
+                '*' => [
+                    'id',
+                    'name',
+                    'type',
+                    'created_at',
+                    'updated_at',
+                ]
+            ]
+        ]);
     }
 
     // testando o método show com id inexistente

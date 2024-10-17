@@ -24,32 +24,95 @@ class GenreApiFeatureTest extends TestCase
         $response->assertJsonCount(0, 'data');
     }
 
-    // testando o método index
-    public function testIndex()
+    // provedor de dados do testIndex
+    public function dataProviderTestIndex(): array
     {
-        // definindo a quantidade de registros a serem criados
-        $total = 50;
-        $perPage = 8;
-        $lastPage = (int) (ceil($total / $perPage));
-        $firstPage = 1;
-        $currentPage = 2;
-        $to = ($currentPage - 1) * ($perPage) + 1;
-        $from = $total > ($currentPage * $perPage) ? ($currentPage * $perPage) : $total;
+        return [
+            [
+                'qtd' => 25,
+                'page' => 1,
+                'perPage' => 10,
+                'items' => 10,
+                'filter' => '',
+            ],
+            [
+                'qtd' => 25,
+                'page' => 2,
+                'perPage' => 10,
+                'items' => 10,
+                'filter' => '',
+            ],
+            [
+                'qtd' => 25,
+                'page' => 3,
+                'perPage' => 10,
+                'items' => 5,
+                'filter' => '',
+            ],
+            [
+                'qtd' => 26,
+                'page' => 1,
+                'perPage' => 10,
+                'items' => 10,
+                'filter' => 'filtro aplicado',
+            ],
+        ];
+    }
 
+    // testando o método index
+    // utiliza o dataProvider dataProviderTestIndex
+    /**
+     * @dataProvider dataProviderTestIndex
+     */
+    public function testIndex(
+        int $qtd,
+        int $page,
+        int $perPage,
+        int $items,
+        string $filter
+    ) {
         // inserindo múltiplos registros no bd
-        GenreModel::factory()->count($total)->create();
+        // se existirem filtros, metade dos registros serão filtrados
+        if ($filter) {
+            GenreModel::factory()->count($qtd / 2)->create();
+            GenreModel::factory()->count($qtd / 2)->create(
+                [
+                    'name' => $filter
+                ]
+            );
+            // ajustando a quantidade de registros retornados
+            $qtd = $qtd / 2;
+        }
+        // senão, cria registros aleatórios
+        else {
+            GenreModel::factory()->count($qtd)->create();
+        }
+
+        // definindo as métricas
+        $lastPage = (int) (ceil($qtd / $perPage));
+        $firstPage = 1;
+        $to = ($page - 1) * ($perPage) + 1;
+        $from = $qtd > ($page * $perPage) ? ($page * $perPage) : $qtd;
+
+        // organizando os parâmetros a serem considerados
+        $params = http_build_query([
+            'page' => $page,
+            'per_page' => $perPage,
+            'order'  => 'ASC',
+            'filter' => $filter
+        ]);
 
         // fazendo o request
-        $response = $this->getJson("$this->endpoint?page=$currentPage&per_page=$perPage");
+        $response = $this->getJson("$this->endpoint?$params");
 
         // verificando os dados
         $response->assertStatus(Response::HTTP_OK);
-        $this->assertCount($perPage, $response['data']);
-        $this->assertSame($total, $response['meta']['total']);
+        $this->assertCount($items, $response['data']);
+        $this->assertSame($qtd, $response['meta']['total']);
         $this->assertSame($perPage, $response['meta']['per_page']);
         $this->assertSame($lastPage, $response['meta']['last_page']);
         $this->assertSame($firstPage, $response['meta']['first_page']);
-        $this->assertSame($currentPage, $response['meta']['current_page']);
+        $this->assertSame($page, $response['meta']['current_page']);
         $this->assertSame($to, $response['meta']['to']);
         $this->assertSame($from, $response['meta']['from']);
         $response->assertJsonStructure([

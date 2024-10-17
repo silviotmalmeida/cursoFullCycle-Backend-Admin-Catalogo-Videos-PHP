@@ -151,7 +151,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
     }
 
     // função de busca geral
-    public function findAll(string $filter = '', string $order = 'DESC'): array
+    public function findAll(?string $filter = '', string $order = 'ASC'): array
     {
         // iniciando a busca
         $query = $this->model;
@@ -166,14 +166,14 @@ class VideoEloquentRepository implements VideoRepositoryInterface
     }
 
     // função de busca paginada
-    public function paginate(string $filter = '', string $order = 'DESC', int $page = 1, int $perPage = 15): PaginationInterface
+    public function paginate(?string $filter = '', string $order = 'ASC', int $page = 1, int $perPage = 15): PaginationInterface
     {
         // iniciando a busca
         $query = $this->model;
         // aplicando o filtro, se existir
         if ($filter) $query = $query->where('title', 'LIKE', "%{$filter}%");
         // ordenando
-        $query = $query->orderBy('id', $order);
+        $query = $query->orderBy('title', $order);
         // executando a busca paginada
         $paginator = $query->paginate($perPage, ['*'], 'page', $page);
 

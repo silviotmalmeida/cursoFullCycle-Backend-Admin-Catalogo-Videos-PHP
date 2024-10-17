@@ -32,7 +32,7 @@ class CategoryController extends Controller
         // definindo o inputDto com os dados a partir da url de request
         $inputDto = new PaginateCategoryInputDto(
             filter: $request->get('filter', ''),
-            order: $request->get('order', 'DESC'),
+            order: $request->get('order', 'ASC'),
             page: (int) $request->get('page', 1),
             perPage: (int) $request->get('per_page', 15),
         );

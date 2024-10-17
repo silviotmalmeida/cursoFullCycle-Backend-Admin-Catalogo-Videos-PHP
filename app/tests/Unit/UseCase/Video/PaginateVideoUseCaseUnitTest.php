@@ -28,7 +28,7 @@ class PaginateVideoUseCaseUnitTest extends TestCase
     {
         // definindo os atributos a serem utilizados nos mocks
         $filter = '';
-        $order = 'DESC';
+        $order = 'ASC';
         $startPage = 1;
         $perPage = 10;
         $items = [];
@@ -117,7 +117,7 @@ class PaginateVideoUseCaseUnitTest extends TestCase
 
         // definindo os atributos a serem utilizados nos mocks
         $filter = '';
-        $order = 'DESC';
+        $order = 'ASC';
         $startPage = 1;
         $perPage = 10;
         $items = [$initialVideo, $initialVideo];

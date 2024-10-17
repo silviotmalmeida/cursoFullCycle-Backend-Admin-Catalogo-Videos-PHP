@@ -23,7 +23,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
     {
         // definindo os atributos a serem utilizados nos mocks
         $filter = '';
-        $order = 'DESC';
+        $order = 'ASC';
         $startPage = 1;
         $perPage = 10;
         $items = [];
@@ -103,7 +103,7 @@ class PaginateCategoryUseCaseUnitTest extends TestCase
 
         // definindo os atributos a serem utilizados nos demais mocks
         $filter = '';
-        $order = 'DESC';
+        $order = 'ASC';
         $startPage = 1;
         $perPage = 10;
         $items = [$mockEntity, $mockEntity];

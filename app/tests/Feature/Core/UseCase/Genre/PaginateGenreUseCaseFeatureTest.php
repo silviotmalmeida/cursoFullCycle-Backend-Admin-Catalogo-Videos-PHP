@@ -16,7 +16,7 @@ class PaginateGenreUseCaseFeatureTest extends TestCase
     {
         // definindo os atributos a serem utilizados no inputDto
         $filter = '';
-        $order = 'DESC';
+        $order = 'ASC';
         $startPage = 1;
         $perPage = 10;
 
@@ -54,7 +54,7 @@ class PaginateGenreUseCaseFeatureTest extends TestCase
 
         // definindo os atributos a serem utilizados no inputDto
         $filter = '';
-        $order = 'DESC';
+        $order = 'ASC';
         $startPage = 1;
         $perPage = 10;
 

@@ -37,19 +37,29 @@ class VideoApiFeatureTest extends TestCase
                 'qtd' => 25,
                 'page' => 1,
                 'perPage' => 10,
-                'items' => 10
+                'items' => 10,
+                'filter' => '',
             ],
             [
                 'qtd' => 25,
                 'page' => 2,
                 'perPage' => 10,
-                'items' => 10
+                'items' => 10,
+                'filter' => '',
             ],
             [
                 'qtd' => 25,
                 'page' => 3,
                 'perPage' => 10,
-                'items' => 5
+                'items' => 5,
+                'filter' => '',
+            ],
+            [
+                'qtd' => 26,
+                'page' => 1,
+                'perPage' => 10,
+                'items' => 10,
+                'filter' => 'filtro aplicado',
             ],
         ];
     }
@@ -63,21 +73,42 @@ class VideoApiFeatureTest extends TestCase
         int $qtd,
         int $page,
         int $perPage,
-        int $items
+        int $items,
+        string $filter
     ) {
-        // definindo a quantidade de registros a serem criados
+        // inserindo múltiplos registros no bd
+        // se existirem filtros, metade dos registros serão filtrados
+        if ($filter) {
+            VideoModel::factory()->count($qtd / 2)->create();
+            VideoModel::factory()->count($qtd / 2)->create(
+                [
+                    'title' => $filter
+                ]
+            );
+            // ajustando a quantidade de registros retornados
+            $qtd = $qtd / 2;
+        }
+        // senão, cria registros aleatórios
+        else {
+            VideoModel::factory()->count($qtd)->create();
+        }
+
+        // definindo as métricas
         $lastPage = (int) (ceil($qtd / $perPage));
         $firstPage = 1;
         $to = ($page - 1) * ($perPage) + 1;
         $from = $qtd > ($page * $perPage) ? ($page * $perPage) : $qtd;
 
-        // inserindo múltiplos registros no bd
-        VideoModel::factory()->count($qtd)->create();
-
-        
+        // organizando os parâmetros a serem considerados
+        $params = http_build_query([
+            'page' => $page,
+            'per_page' => $perPage,
+            'order'  => 'ASC',
+            'filter' => $filter
+        ]);
 
         // fazendo o request
-        $response = $this->getJson("$this->endpoint?page=$page&per_page=$perPage");
+        $response = $this->getJson("$this->endpoint?$params");
 
         // verificando os dados
         $response->assertStatus(Response::HTTP_OK);

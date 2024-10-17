@@ -69,23 +69,18 @@ class StoreVideoRequest extends FormRequest
             ],
             'thumbfile' => [
                 'nullable',
-                'array',
             ],
             'thumbhalf' => [
                 'nullable',
-                'array',
             ],
             'bannerfile' => [
                 'nullable',
-                'array',
             ],
             'trailerfile' => [
                 'nullable',
-                'array',
             ],
             'videofile' => [
                 'nullable',
-                'array',
             ],
         ];
     }

@@ -208,55 +208,20 @@ class VideoControllerFeatureTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // dados do thumbFile
-        $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
-        $thumbFile = [
-            'name' => $fakeThumbFile->getFilename(),
-            'type' => $fakeThumbFile->getMimeType(),
-            'tmp_name' => $fakeThumbFile->getPathname(),
-            'error' => $fakeThumbFile->getError(),
-            'size' => $fakeThumbFile->getSize(),
-        ];
-
+        $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
+        
         // dados do thumbHalf
-        $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
-        $thumbHalf = [
-            'name' => $fakeThumbHalf->getFilename(),
-            'type' => $fakeThumbHalf->getMimeType(),
-            'tmp_name' => $fakeThumbHalf->getPathname(),
-            'error' => $fakeThumbHalf->getError(),
-            'size' => $fakeThumbHalf->getSize(),
-        ];
-
+        $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
+        
         // dados do bannerFile
-        $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
-        $bannerFile = [
-            'name' => $fakeBannerFile->getFilename(),
-            'type' => $fakeBannerFile->getMimeType(),
-            'tmp_name' => $fakeBannerFile->getPathname(),
-            'error' => $fakeBannerFile->getError(),
-            'size' => $fakeBannerFile->getSize(),
-        ];
-
+        $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
+        
         // dados do trailerFile
-        $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
-        $trailerFile = [
-            'name' => $fakeTrailerFile->getFilename(),
-            'type' => $fakeTrailerFile->getMimeType(),
-            'tmp_name' => $fakeTrailerFile->getPathname(),
-            'error' => $fakeTrailerFile->getError(),
-            'size' => $fakeTrailerFile->getSize(),
-        ];
-
+        $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
+        
         // dados do videoFile
-        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
-        $videoFile = [
-            'name' => $fakeVideoFile->getFilename(),
-            'type' => $fakeVideoFile->getMimeType(),
-            'tmp_name' => $fakeVideoFile->getPathname(),
-            'error' => $fakeVideoFile->getError(),
-            'size' => $fakeVideoFile->getSize(),
-        ];
-
+        $videoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+        
         // dados básicos de entrada
         $title = 'title';
         $description = 'description';
@@ -512,55 +477,20 @@ class VideoControllerFeatureTest extends TestCase
             $this->assertDatabaseCount('cast_members', $castMembersCount);
 
             // dados do thumbFile
-            $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
-            $thumbFile = [
-                'name' => $fakeThumbFile->getFilename(),
-                'type' => $fakeThumbFile->getMimeType(),
-                'tmp_name' => $fakeThumbFile->getPathname(),
-                'error' => $fakeThumbFile->getError(),
-                'size' => $fakeThumbFile->getSize(),
-            ];
-
+            $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
+            
             // dados do thumbHalf
-            $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
-            $thumbHalf = [
-                'name' => $fakeThumbHalf->getFilename(),
-                'type' => $fakeThumbHalf->getMimeType(),
-                'tmp_name' => $fakeThumbHalf->getPathname(),
-                'error' => $fakeThumbHalf->getError(),
-                'size' => $fakeThumbHalf->getSize(),
-            ];
-
+            $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
+            
             // dados do bannerFile
-            $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
-            $bannerFile = [
-                'name' => $fakeBannerFile->getFilename(),
-                'type' => $fakeBannerFile->getMimeType(),
-                'tmp_name' => $fakeBannerFile->getPathname(),
-                'error' => $fakeBannerFile->getError(),
-                'size' => $fakeBannerFile->getSize(),
-            ];
-
+            $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
+            
             // dados do trailerFile
-            $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
-            $trailerFile = [
-                'name' => $fakeTrailerFile->getFilename(),
-                'type' => $fakeTrailerFile->getMimeType(),
-                'tmp_name' => $fakeTrailerFile->getPathname(),
-                'error' => $fakeTrailerFile->getError(),
-                'size' => $fakeTrailerFile->getSize(),
-            ];
-
+            $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
+            
             // dados do videoFile
-            $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
-            $videoFile = [
-                'name' => $fakeVideoFile->getFilename(),
-                'type' => $fakeVideoFile->getMimeType(),
-                'tmp_name' => $fakeVideoFile->getPathname(),
-                'error' => $fakeVideoFile->getError(),
-                'size' => $fakeVideoFile->getSize(),
-            ];
-
+            $videoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+            
             // dados básicos de entrada
             $title = 'title';
             $description = 'description';

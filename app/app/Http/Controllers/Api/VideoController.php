@@ -78,6 +78,57 @@ class VideoController extends Controller
     // função responsável pela criação das categorias
     public function store(StoreVideoRequest $request, InsertVideoUseCase $usecase): JsonResponse
     {
+        // montando os arrays dos arquivos para a estrutura esperada pelo FileStorage
+        //  * name
+        //  * type
+        //  * tmp_name
+        //  * error
+        //  * size 
+        if (isset($request->thumbfile->name)) {
+            $thumbfile = [
+                'name' => $request->thumbfile->getFilename(),
+                'type' => $request->thumbfile->getMimeType(),
+                'tmp_name' => $request->thumbfile->getPathname(),
+                'error' => $request->thumbfile->getError(),
+                'size' => $request->thumbfile->getSize(),
+            ];
+        }
+        if (isset($request->thumbhalf->name)) {
+            $thumbhalf = [
+                'name' => $request->thumbhalf->getFilename(),
+                'type' => $request->thumbhalf->getMimeType(),
+                'tmp_name' => $request->thumbhalf->getPathname(),
+                'error' => $request->thumbhalf->getError(),
+                'size' => $request->thumbhalf->getSize(),
+            ];
+        }
+        if (isset($request->bannerfile->name)) {
+            $bannerfile = [
+                'name' => $request->bannerfile->getFilename(),
+                'type' => $request->bannerfile->getMimeType(),
+                'tmp_name' => $request->bannerfile->getPathname(),
+                'error' => $request->bannerfile->getError(),
+                'size' => $request->bannerfile->getSize(),
+            ];
+        }
+        if (isset($request->trailerfile->name)) {
+            $trailerfile = [
+                'name' => $request->trailerfile->getFilename(),
+                'type' => $request->trailerfile->getMimeType(),
+                'tmp_name' => $request->trailerfile->getPathname(),
+                'error' => $request->trailerfile->getError(),
+                'size' => $request->trailerfile->getSize(),
+            ];
+        }
+        if (isset($request->videofile->name)) {
+            $videofile = [
+                'name' => $request->videofile->getFilename(),
+                'type' => $request->videofile->getMimeType(),
+                'tmp_name' => $request->videofile->getPathname(),
+                'error' => $request->videofile->getError(),
+                'size' => $request->videofile->getSize(),
+            ];
+        }
 
         // definindo o inputDto
         $inputDto = new InsertVideoInputDto(
@@ -90,11 +141,11 @@ class VideoController extends Controller
             categoriesId: $request->categories_id ?? [],
             genresId: $request->genres_id ?? [],
             castMembersId: $request->cast_members_id ?? [],
-            thumbFile: $request->thumbfile ?? null,
-            thumbHalf: $request->thumbhalf ?? null,
-            bannerFile: $request->bannerfile ?? null,
-            trailerFile: $request->trailerfile ?? null,
-            videoFile: $request->videofile ?? null,
+            thumbFile: $thumbfile ?? null,
+            thumbHalf: $thumbhalf ?? null,
+            bannerFile: $bannerfile ?? null,
+            trailerFile: $trailerfile ?? null,
+            videoFile: $videofile ?? null,
         );
 
         // executando o usecase
@@ -111,6 +162,58 @@ class VideoController extends Controller
     // função responsável pela atualização das categorias
     public function update(string $id, UpdateVideoRequest $request, UpdateVideoUseCase $usecase): JsonResponse
     {
+        // montando os arrays dos arquivos para a estrutura esperada pelo FileStorage
+        //  * name
+        //  * type
+        //  * tmp_name
+        //  * error
+        //  * size 
+        if ($request->thumbfile) {
+            $thumbfile = [
+                'name' => $request->thumbfile->getFilename(),
+                'type' => $request->thumbfile->getMimeType(),
+                'tmp_name' => $request->thumbfile->getPathname(),
+                'error' => $request->thumbfile->getError(),
+                'size' => $request->thumbfile->getSize(),
+            ];
+        }
+        if ($request->thumbhalf) {
+            $thumbhalf = [
+                'name' => $request->thumbhalf->getFilename(),
+                'type' => $request->thumbhalf->getMimeType(),
+                'tmp_name' => $request->thumbhalf->getPathname(),
+                'error' => $request->thumbhalf->getError(),
+                'size' => $request->thumbhalf->getSize(),
+            ];
+        }
+        if ($request->bannerfile) {
+            $bannerfile = [
+                'name' => $request->bannerfile->getFilename(),
+                'type' => $request->bannerfile->getMimeType(),
+                'tmp_name' => $request->bannerfile->getPathname(),
+                'error' => $request->bannerfile->getError(),
+                'size' => $request->bannerfile->getSize(),
+            ];
+        }
+        if ($request->trailerfile) {
+            $trailerfile = [
+                'name' => $request->trailerfile->getFilename(),
+                'type' => $request->trailerfile->getMimeType(),
+                'tmp_name' => $request->trailerfile->getPathname(),
+                'error' => $request->trailerfile->getError(),
+                'size' => $request->trailerfile->getSize(),
+            ];
+        }
+        if ($request->videofile) {
+            $videofile = [
+                'name' => $request->videofile->getFilename(),
+                'type' => $request->videofile->getMimeType(),
+                'tmp_name' => $request->videofile->getPathname(),
+                'error' => $request->videofile->getError(),
+                'size' => $request->videofile->getSize(),
+            ];
+        }
+
         // definindo o inputDto
         $inputDto = new UpdateVideoInputDto(
             id: $id,
@@ -123,11 +226,11 @@ class VideoController extends Controller
             categoriesId: $request->categories_id ?? [],
             genresId: $request->genres_id ?? [],
             castMembersId: $request->cast_members_id ?? [],
-            thumbFile: $request->thumbfile ?? null,
-            thumbHalf: $request->thumbhalf ?? null,
-            bannerFile: $request->bannerfile ?? null,
-            trailerFile: $request->trailerfile ?? null,
-            videoFile: $request->videofile ?? null,
+            thumbFile: $thumbfile ?? null,
+            thumbHalf: $thumbhalf ?? null,
+            bannerFile: $bannerfile ?? null,
+            trailerFile: $trailerfile ?? null,
+            videoFile: $videofile ?? null,
         );
 
         // executando o usecase

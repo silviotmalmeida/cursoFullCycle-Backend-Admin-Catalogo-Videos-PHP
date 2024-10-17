@@ -39,9 +39,9 @@ class FileStorage implements FileStorageInterface
     protected function convertFileToLaravelFile(array $file): UploadedFile
     {
         return new UploadedFile(
-            path: $file['tmp_name'],
             originalName: $file['name'],
             mimeType: $file['type'],
+            path: $file['tmp_name'],
             error: $file['error']
         );
     }

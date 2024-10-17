@@ -309,55 +309,20 @@ class VideoApiFeatureTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // dados do thumbFile
-        $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
-        $thumbFile = [
-            'name' => $fakeThumbFile->getFilename(),
-            'type' => $fakeThumbFile->getMimeType(),
-            'tmp_name' => $fakeThumbFile->getPathname(),
-            'error' => $fakeThumbFile->getError(),
-            'size' => $fakeThumbFile->getSize(),
-        ];
-
+        $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
+        
         // dados do thumbHalf
-        $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
-        $thumbHalf = [
-            'name' => $fakeThumbHalf->getFilename(),
-            'type' => $fakeThumbHalf->getMimeType(),
-            'tmp_name' => $fakeThumbHalf->getPathname(),
-            'error' => $fakeThumbHalf->getError(),
-            'size' => $fakeThumbHalf->getSize(),
-        ];
-
+        $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
+        
         // dados do bannerFile
-        $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
-        $bannerFile = [
-            'name' => $fakeBannerFile->getFilename(),
-            'type' => $fakeBannerFile->getMimeType(),
-            'tmp_name' => $fakeBannerFile->getPathname(),
-            'error' => $fakeBannerFile->getError(),
-            'size' => $fakeBannerFile->getSize(),
-        ];
-
+        $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
+        
         // dados do trailerFile
-        $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
-        $trailerFile = [
-            'name' => $fakeTrailerFile->getFilename(),
-            'type' => $fakeTrailerFile->getMimeType(),
-            'tmp_name' => $fakeTrailerFile->getPathname(),
-            'error' => $fakeTrailerFile->getError(),
-            'size' => $fakeTrailerFile->getSize(),
-        ];
-
+        $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
+        
         // dados do videoFile
-        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
-        $videoFile = [
-            'name' => $fakeVideoFile->getFilename(),
-            'type' => $fakeVideoFile->getMimeType(),
-            'tmp_name' => $fakeVideoFile->getPathname(),
-            'error' => $fakeVideoFile->getError(),
-            'size' => $fakeVideoFile->getSize(),
-        ];
-
+        $videoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+        
         // definindo os dados a serem passados no body
         $title = 'title';
         $description = 'description';
@@ -746,127 +711,7 @@ class VideoApiFeatureTest extends TestCase
                 'cast_members_id',
             ]
         ]);
-
-        // validando o atributo thumbfile
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'thumbfile' => 'fake'
-        ];
-
-        // fazendo o request
-        $response = $this->postJson($this->endpoint, $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'thumbfile',
-            ]
-        ]);
-
-        // validando o atributo thumbhalf
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'thumbhalf' => 'fake'
-        ];
-
-        // fazendo o request
-        $response = $this->postJson($this->endpoint, $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'thumbhalf',
-            ]
-        ]);
-
-        // validando o atributo bannerfile
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'bannerfile' => 'fake'
-        ];
-
-        // fazendo o request
-        $response = $this->postJson($this->endpoint, $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'bannerfile',
-            ]
-        ]);
-
-        // validando o atributo trailerfile
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'trailerfile' => 'fake'
-        ];
-
-        // fazendo o request
-        $response = $this->postJson($this->endpoint, $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'trailerfile',
-            ]
-        ]);
-
-        // validando o atributo videofile
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'videofile' => 'fake'
-        ];
-
-        // fazendo o request
-        $response = $this->postJson($this->endpoint, $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'videofile',
-            ]
-        ]);
-
+        
         // validando todos os atributos
         // definindo os dados a serem passados no body
         $data = [
@@ -879,10 +724,6 @@ class VideoApiFeatureTest extends TestCase
             'categories_id' => ['fake'],
             'genres_id' => ['fake'],
             'cast_members_id' => ['fake'],
-            'thumbfile' => 'fake',
-            'thumbhalf' => 'fake',
-            'bannerfile' => 'fake',
-            'trailerfile' => 'fake',
         ];
 
         // fazendo o request
@@ -902,10 +743,6 @@ class VideoApiFeatureTest extends TestCase
                 'categories_id',
                 'genres_id',
                 'cast_members_id',
-                'thumbfile',
-                'thumbhalf',
-                'bannerfile',
-                'trailerfile',
             ]
         ]);
     }
@@ -1050,55 +887,20 @@ class VideoApiFeatureTest extends TestCase
             $this->assertDatabaseCount('cast_members', $castMembersCount);
 
             // dados do thumbFile
-            $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
-            $thumbFile = [
-                'name' => $fakeThumbFile->getFilename(),
-                'type' => $fakeThumbFile->getMimeType(),
-                'tmp_name' => $fakeThumbFile->getPathname(),
-                'error' => $fakeThumbFile->getError(),
-                'size' => $fakeThumbFile->getSize(),
-            ];
-
+            $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
+            
             // dados do thumbHalf
-            $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
-            $thumbHalf = [
-                'name' => $fakeThumbHalf->getFilename(),
-                'type' => $fakeThumbHalf->getMimeType(),
-                'tmp_name' => $fakeThumbHalf->getPathname(),
-                'error' => $fakeThumbHalf->getError(),
-                'size' => $fakeThumbHalf->getSize(),
-            ];
-
+            $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
+            
             // dados do bannerFile
-            $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
-            $bannerFile = [
-                'name' => $fakeBannerFile->getFilename(),
-                'type' => $fakeBannerFile->getMimeType(),
-                'tmp_name' => $fakeBannerFile->getPathname(),
-                'error' => $fakeBannerFile->getError(),
-                'size' => $fakeBannerFile->getSize(),
-            ];
-
+            $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
+            
             // dados do trailerFile
-            $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
-            $trailerFile = [
-                'name' => $fakeTrailerFile->getFilename(),
-                'type' => $fakeTrailerFile->getMimeType(),
-                'tmp_name' => $fakeTrailerFile->getPathname(),
-                'error' => $fakeTrailerFile->getError(),
-                'size' => $fakeTrailerFile->getSize(),
-            ];
-
+            $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
+            
             // dados do videoFile
-            $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
-            $videoFile = [
-                'name' => $fakeVideoFile->getFilename(),
-                'type' => $fakeVideoFile->getMimeType(),
-                'tmp_name' => $fakeVideoFile->getPathname(),
-                'error' => $fakeVideoFile->getError(),
-                'size' => $fakeVideoFile->getSize(),
-            ];
-
+            $videoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+            
             // definindo os dados a serem passados no body
             $title = 'title';
             $description = 'description';
@@ -1518,131 +1320,6 @@ class VideoApiFeatureTest extends TestCase
             ]
         ]);
 
-        // validando o atributo thumbfile
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'thumbfile' => 'fake'
-        ];
-
-        // fazendo o request
-        sleep(1);
-        $response = $this->putJson("{$this->endpoint}/{$video->id}", $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'thumbfile',
-            ]
-        ]);
-
-        // validando o atributo thumbhalf
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'thumbhalf' => 'fake'
-        ];
-
-        // fazendo o request
-        sleep(1);
-        $response = $this->putJson("{$this->endpoint}/{$video->id}", $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'thumbhalf',
-            ]
-        ]);
-
-        // validando o atributo bannerfile
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'bannerfile' => 'fake'
-        ];
-
-        // fazendo o request
-        sleep(1);
-        $response = $this->putJson("{$this->endpoint}/{$video->id}", $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'bannerfile',
-            ]
-        ]);
-
-        // validando o atributo trailerfile
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'trailerfile' => 'fake'
-        ];
-
-        // fazendo o request
-        sleep(1);
-        $response = $this->putJson("{$this->endpoint}/{$video->id}", $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'trailerfile',
-            ]
-        ]);
-
-        // validando o atributo videofile
-        // definindo os dados a serem passados no body
-        $data = [
-            'title' => $title,
-            'description' => $description,
-            'year_launched' => $yearLaunched,
-            'duration' => $duration,
-            'opened' => $opened,
-            'rating' => $rating,
-            'videofile' => 'fake'
-        ];
-
-        // fazendo o request
-        sleep(1);
-        $response = $this->putJson("{$this->endpoint}/{$video->id}", $data);
-
-        // verificando os dados
-        $response->assertStatus(Response::HTTP_UNPROCESSABLE_ENTITY);
-        $response->assertJsonStructure([
-            'message',
-            'errors' => [
-                'videofile',
-            ]
-        ]);
-
         // validando todos os atributos
         // definindo os dados a serem passados no body
         $data = [
@@ -1655,10 +1332,6 @@ class VideoApiFeatureTest extends TestCase
             'categories_id' => ['fake'],
             'genres_id' => ['fake'],
             'cast_members_id' => ['fake'],
-            'thumbfile' => 'fake',
-            'thumbhalf' => 'fake',
-            'bannerfile' => 'fake',
-            'trailerfile' => 'fake',
         ];
 
         // fazendo o request
@@ -1679,10 +1352,6 @@ class VideoApiFeatureTest extends TestCase
                 'categories_id',
                 'genres_id',
                 'cast_members_id',
-                'thumbfile',
-                'thumbhalf',
-                'bannerfile',
-                'trailerfile',
             ]
         ]);
     }

@@ -112,14 +112,15 @@ class VideoApiFeatureTest extends TestCase
 
         // verificando os dados
         $response->assertStatus(Response::HTTP_OK);
-        $this->assertCount($items, $response['data']);
-        $this->assertSame($qtd, $response['meta']['total']);
-        $this->assertSame($perPage, $response['meta']['per_page']);
-        $this->assertSame($lastPage, $response['meta']['last_page']);
-        $this->assertSame($firstPage, $response['meta']['first_page']);
-        $this->assertSame($page, $response['meta']['current_page']);
-        $this->assertSame($to, $response['meta']['to']);
-        $this->assertSame($from, $response['meta']['from']);
+        $this->assertCount($items, $response->json('data'));
+
+        $this->assertSame($qtd, $response->json('meta.total'));
+        $this->assertSame($perPage, $response->json('meta.per_page'));
+        $this->assertSame($lastPage, $response->json('meta.last_page'));
+        $this->assertSame($firstPage, $response->json('meta.first_page'));
+        $this->assertSame($page, $response->json('meta.current_page'));
+        $this->assertSame($to, $response->json('meta.to'));
+        $this->assertSame($from, $response->json('meta.from'));
         $response->assertJsonStructure([
             'data' => [
                 '*' => [
@@ -188,15 +189,15 @@ class VideoApiFeatureTest extends TestCase
             ]
         ]);
 
-        $this->assertSame($video->id, $response['data']['id']);
-        $this->assertSame($video->title, $response['data']['title']);
-        $this->assertSame($video->description, $response['data']['description']);
-        $this->assertSame($video->year_launched, $response['data']['year_launched']);
-        $this->assertSame($video->duration, $response['data']['duration']);
-        $this->assertSame($video->rating, $response['data']['rating']);
-        $this->assertSame($video->opened, $response['data']['opened']);
-        $this->assertSame(Carbon::make($video->created_at)->format('Y-m-d H:i:s'), $response['data']['created_at']);
-        $this->assertSame(Carbon::make($video->updated_at)->format('Y-m-d H:i:s'), $response['data']['updated_at']);
+        $this->assertSame($video->id, $response->json('data.id'));
+        $this->assertSame($video->title, $response->json('data.title'));
+        $this->assertSame($video->description, $response->json('data.description'));
+        $this->assertSame($video->year_launched, $response->json('data.year_launched'));
+        $this->assertSame($video->duration, $response->json('data.duration'));
+        $this->assertSame($video->rating, $response->json('data.rating'));
+        $this->assertSame($video->opened, $response->json('data.opened'));
+        $this->assertSame(Carbon::make($video->created_at)->format('Y-m-d H:i:s'), $response->json('data.created_at'));
+        $this->assertSame(Carbon::make($video->updated_at)->format('Y-m-d H:i:s'), $response->json('data.updated_at'));
     }
 
     // testando o método store sem passagem dos atributos para criação
@@ -266,15 +267,15 @@ class VideoApiFeatureTest extends TestCase
                 'updated_at',
             ]
         ]);
-        $this->assertNotEmpty($response['data']['id']);
-        $this->assertSame($title, $response['data']['title']);
-        $this->assertSame($description, $response['data']['description']);
-        $this->assertSame($yearLaunched, $response['data']['year_launched']);
-        $this->assertSame($duration, $response['data']['duration']);
-        $this->assertSame($rating->value, $response['data']['rating']);
-        $this->assertSame($opened, $response['data']['opened']);
-        $this->assertNotEmpty($response['data']['created_at']);
-        $this->assertNotEmpty($response['data']['updated_at']);
+        $this->assertNotEmpty($response->json('data.id'));
+        $this->assertSame($title, $response->json('data.title'));
+        $this->assertSame($description, $response->json('data.description'));
+        $this->assertSame($yearLaunched, $response->json('data.year_launched'));
+        $this->assertSame($duration, $response->json('data.duration'));
+        $this->assertSame($rating->value, $response->json('data.rating'));
+        $this->assertSame($opened, $response->json('data.opened'));
+        $this->assertNotEmpty($response->json('data.created_at'));
+        $this->assertNotEmpty($response->json('data.updated_at'));
 
         $this->assertDatabaseHas('videos', [
             'title' => $title,
@@ -309,20 +310,20 @@ class VideoApiFeatureTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // dados do thumbFile
-        $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
-        
+        $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'image/png');
+
         // dados do thumbHalf
-        $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
-        
+        $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'image/png');
+
         // dados do bannerFile
-        $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
-        
+        $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'image/png');
+
         // dados do trailerFile
-        $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
-        
+        $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'video/mp4');
+
         // dados do videoFile
-        $videoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
-        
+        $videoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'video/mp4');
+
         // definindo os dados a serem passados no body
         $title = 'title';
         $description = 'description';
@@ -374,15 +375,15 @@ class VideoApiFeatureTest extends TestCase
             ]
         ]);
 
-        $this->assertNotEmpty($response['data']['id']);
-        $this->assertSame($title, $response['data']['title']);
-        $this->assertSame($description, $response['data']['description']);
-        $this->assertSame($yearLaunched, $response['data']['year_launched']);
-        $this->assertSame($duration, $response['data']['duration']);
-        $this->assertSame($rating->value, $response['data']['rating']);
-        $this->assertSame($opened, $response['data']['opened']);
-        $this->assertNotEmpty($response['data']['created_at']);
-        $this->assertNotEmpty($response['data']['updated_at']);
+        $this->assertNotEmpty($response->json('data.id'));
+        $this->assertSame($title, $response->json('data.title'));
+        $this->assertSame($description, $response->json('data.description'));
+        $this->assertSame($yearLaunched, $response->json('data.year_launched'));
+        $this->assertSame($duration, $response->json('data.duration'));
+        $this->assertSame($rating->value, $response->json('data.rating'));
+        $this->assertSame($opened, $response->json('data.opened'));
+        $this->assertNotEmpty($response->json('data.created_at'));
+        $this->assertNotEmpty($response->json('data.updated_at'));
 
         $this->assertDatabaseHas('videos', [
             'title' => $title,
@@ -397,17 +398,17 @@ class VideoApiFeatureTest extends TestCase
         $this->assertDatabaseCount('video_category', $nCategories);
         $this->assertDatabaseCount('video_genre', $nGenres);
         $this->assertDatabaseCount('video_cast_member', $nCastMembers);
-        $this->assertCount($nCategories, $response['data']['categories_id']);
-        $this->assertCount($nGenres, $response['data']['genres_id']);
-        $this->assertCount($nCastMembers, $response['data']['cast_members_id']);
-        $this->assertEquals($categoriesIds, $response['data']['categories_id']);
-        $this->assertEquals($genresIds, $response['data']['genres_id']);
-        $this->assertEquals($castMembersIds, $response['data']['cast_members_id']);
+        $this->assertCount($nCategories, $response->json('data.categories_id'));
+        $this->assertCount($nGenres, $response->json('data.genres_id'));
+        $this->assertCount($nCastMembers, $response->json('data.cast_members_id'));
+        $this->assertEquals($categoriesIds, $response->json('data.categories_id'));
+        $this->assertEquals($genresIds, $response->json('data.genres_id'));
+        $this->assertEquals($castMembersIds, $response->json('data.cast_members_id'));
 
         // verificando o relacionamento a partir de category
         foreach ($categoriesIds as $categoryId) {
             $this->assertDatabaseHas('video_category', [
-                'video_id' => $response['data']['id'],
+                'video_id' => $response->json('data.id'),
                 'category_id' => $categoryId,
             ]);
             $categoryModel = CategoryModel::find($categoryId);
@@ -416,7 +417,7 @@ class VideoApiFeatureTest extends TestCase
         // verificando o relacionamento a partir de genre
         foreach ($genresIds as $genreId) {
             $this->assertDatabaseHas('video_genre', [
-                'video_id' => $response['data']['id'],
+                'video_id' => $response->json('data.id'),
                 'genre_id' => $genreId,
             ]);
             $genreModel = GenreModel::find($genreId);
@@ -425,7 +426,7 @@ class VideoApiFeatureTest extends TestCase
         // verificando o relacionamento a partir de castMember
         foreach ($castMembersIds as $castMemberId) {
             $this->assertDatabaseHas('video_cast_member', [
-                'video_id' => $response['data']['id'],
+                'video_id' => $response->json('data.id'),
                 'cast_member_id' => $castMemberId,
             ]);
             $castMemberModel = CastMemberModel::find($castMemberId);
@@ -435,38 +436,38 @@ class VideoApiFeatureTest extends TestCase
         // verificando se os arquivos de image foram registrados no bd
         $this->assertDatabaseCount('video_images', 3);
         $this->assertDatabaseHas('video_images', [
-            'video_id' => $response['data']['id'],
-            'path' => $response['data']['thumbfile'],
+            'video_id' => $response->json('data.id'),
+            'path' => $response->json('data.thumbfile'),
         ]);
         $this->assertDatabaseHas('video_images', [
-            'video_id' => $response['data']['id'],
-            'path' => $response['data']['thumbhalf'],
+            'video_id' => $response->json('data.id'),
+            'path' => $response->json('data.thumbhalf'),
         ]);
         $this->assertDatabaseHas('video_images', [
-            'video_id' => $response['data']['id'],
-            'path' => $response['data']['bannerfile'],
+            'video_id' => $response->json('data.id'),
+            'path' => $response->json('data.bannerfile'),
         ]);
 
         // verificando se os arquivos de media foram registrados no bd
         $this->assertDatabaseCount('video_medias', 2);
         $this->assertDatabaseHas('video_medias', [
-            'video_id' => $response['data']['id'],
-            'file_path' => $response['data']['trailerfile'],
+            'video_id' => $response->json('data.id'),
+            'file_path' => $response->json('data.trailerfile'),
         ]);
         $this->assertDatabaseHas('video_medias', [
-            'video_id' => $response['data']['id'],
-            'file_path' => $response['data']['videofile'],
+            'video_id' => $response->json('data.id'),
+            'file_path' => $response->json('data.videofile'),
         ]);
 
         // verificando se os arquivos foram armazenados
-        Storage::assertExists($response['data']['thumbfile']);
-        Storage::assertExists($response['data']['thumbhalf']);
-        Storage::assertExists($response['data']['bannerfile']);
-        Storage::assertExists($response['data']['trailerfile']);
-        Storage::assertExists($response['data']['videofile']);
+        Storage::assertExists($response->json('data.thumbfile'));
+        Storage::assertExists($response->json('data.thumbhalf'));
+        Storage::assertExists($response->json('data.bannerfile'));
+        Storage::assertExists($response->json('data.trailerfile'));
+        Storage::assertExists($response->json('data.videofile'));
 
         // apagando a pasta com os arquivos criados
-        Storage::deleteDirectory($response['data']['id']);
+        Storage::deleteDirectory($response->json('data.id'));
     }
 
     // testando o método store, com falhas na validação
@@ -711,7 +712,7 @@ class VideoApiFeatureTest extends TestCase
                 'cast_members_id',
             ]
         ]);
-        
+
         // validando todos os atributos
         // definindo os dados a serem passados no body
         $data = [
@@ -822,15 +823,16 @@ class VideoApiFeatureTest extends TestCase
                 'updated_at',
             ]
         ]);
-        $this->assertSame($video->id, $response['data']['id']);
-        $this->assertSame($title, $response['data']['title']);
-        $this->assertSame($description, $response['data']['description']);
-        $this->assertSame($yearLaunched, $response['data']['year_launched']);
-        $this->assertSame($duration, $response['data']['duration']);
-        $this->assertSame($rating->value, $response['data']['rating']);
-        $this->assertSame($opened, $response['data']['opened']);
-        $this->assertSame(Carbon::make($video->created_at)->format('Y-m-d H:i:s'), $response['data']['created_at']);
-        $this->assertNotSame(Carbon::make($video->updated_at)->format('Y-m-d H:i:s'), $response['data']['updated_at']);
+        $this->assertSame($video->id, $response->json('data.id'));
+        $this->assertSame($title, $response->json('data.title'));
+        $this->assertSame($description, $response->json('data.description'));
+        $this->assertSame($yearLaunched, $response->json('data.year_launched'));
+        $this->assertSame($duration, $response->json('data.duration'));
+        $this->assertSame($rating->value, $response->json('data.rating'));
+        $this->assertSame($opened, $response->json('data.opened'));
+        $this->assertSame(Carbon::make($video->created_at)->format('Y-m-d H:i:s'), $response->json('data.created_at'));
+        $this->assertNotSame(Carbon::make($video->updated_at)->format('Y-m-d H:i:s'), $response->json('data.updated_at'));
+        $this->assertNotSame($response->json('data.created_at'), $response->json('data.updated_at'));
 
         $this->assertDatabaseHas('videos', [
             'id' => $video->id,
@@ -887,20 +889,20 @@ class VideoApiFeatureTest extends TestCase
             $this->assertDatabaseCount('cast_members', $castMembersCount);
 
             // dados do thumbFile
-            $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
-            
+            $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'image/png');
+
             // dados do thumbHalf
-            $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
-            
+            $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'image/png');
+
             // dados do bannerFile
-            $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
-            
+            $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'image/png');
+
             // dados do trailerFile
-            $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
-            
+            $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'video/mp4');
+
             // dados do videoFile
-            $videoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
-            
+            $videoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'video/mp4');
+
             // definindo os dados a serem passados no body
             $title = 'title';
             $description = 'description';
@@ -953,15 +955,16 @@ class VideoApiFeatureTest extends TestCase
                 ]
             ]);
 
-            $this->assertSame($video->id, $response['data']['id']);
-            $this->assertSame($title, $response['data']['title']);
-            $this->assertSame($description, $response['data']['description']);
-            $this->assertSame($yearLaunched, $response['data']['year_launched']);
-            $this->assertSame($duration, $response['data']['duration']);
-            $this->assertSame($rating->value, $response['data']['rating']);
-            $this->assertSame($opened, $response['data']['opened']);
-            $this->assertSame(Carbon::make($video->created_at)->format('Y-m-d H:i:s'), $response['data']['created_at']);
-            $this->assertNotSame(Carbon::make($video->updated_at)->format('Y-m-d H:i:s'), $response['data']['updated_at']);
+            $this->assertSame($video->id, $response->json('data.id'));
+            $this->assertSame($title, $response->json('data.title'));
+            $this->assertSame($description, $response->json('data.description'));
+            $this->assertSame($yearLaunched, $response->json('data.year_launched'));
+            $this->assertSame($duration, $response->json('data.duration'));
+            $this->assertSame($rating->value, $response->json('data.rating'));
+            $this->assertSame($opened, $response->json('data.opened'));
+            $this->assertSame(Carbon::make($video->created_at)->format('Y-m-d H:i:s'), $response->json('data.created_at'));
+            $this->assertNotSame(Carbon::make($video->updated_at)->format('Y-m-d H:i:s'), $response->json('data.updated_at'));
+            $this->assertNotSame($response->json('data.created_at'), $response->json('data.updated_at'));
 
             $this->assertDatabaseHas('videos', [
                 'id' => $video->id,
@@ -977,17 +980,17 @@ class VideoApiFeatureTest extends TestCase
             $this->assertDatabaseCount('video_category', $nCategories);
             $this->assertDatabaseCount('video_genre', $nGenres);
             $this->assertDatabaseCount('video_cast_member', $nCastMembers);
-            $this->assertCount($nCategories, $response['data']['categories_id']);
-            $this->assertCount($nGenres, $response['data']['genres_id']);
-            $this->assertCount($nCastMembers, $response['data']['cast_members_id']);
-            $this->assertEquals($categoriesIds, $response['data']['categories_id']);
-            $this->assertEquals($genresIds, $response['data']['genres_id']);
-            $this->assertEquals($castMembersIds, $response['data']['cast_members_id']);
+            $this->assertCount($nCategories, $response->json('data.categories_id'));
+            $this->assertCount($nGenres, $response->json('data.genres_id'));
+            $this->assertCount($nCastMembers, $response->json('data.cast_members_id'));
+            $this->assertEquals($categoriesIds, $response->json('data.categories_id'));
+            $this->assertEquals($genresIds, $response->json('data.genres_id'));
+            $this->assertEquals($castMembersIds, $response->json('data.cast_members_id'));
 
             // verificando o relacionamento a partir de category
             foreach ($categoriesIds as $categoryId) {
                 $this->assertDatabaseHas('video_category', [
-                    'video_id' => $response['data']['id'],
+                    'video_id' => $response->json('data.id'),
                     'category_id' => $categoryId,
                 ]);
                 $categoryModel = CategoryModel::find($categoryId);
@@ -996,7 +999,7 @@ class VideoApiFeatureTest extends TestCase
             // verificando o relacionamento a partir de genre
             foreach ($genresIds as $genreId) {
                 $this->assertDatabaseHas('video_genre', [
-                    'video_id' => $response['data']['id'],
+                    'video_id' => $response->json('data.id'),
                     'genre_id' => $genreId,
                 ]);
                 $genreModel = GenreModel::find($genreId);
@@ -1005,7 +1008,7 @@ class VideoApiFeatureTest extends TestCase
             // verificando o relacionamento a partir de castMember
             foreach ($castMembersIds as $castMemberId) {
                 $this->assertDatabaseHas('video_cast_member', [
-                    'video_id' => $response['data']['id'],
+                    'video_id' => $response->json('data.id'),
                     'cast_member_id' => $castMemberId,
                 ]);
                 $castMemberModel = CastMemberModel::find($castMemberId);
@@ -1015,35 +1018,35 @@ class VideoApiFeatureTest extends TestCase
             // verificando se os arquivos de image foram registrados no bd
             $this->assertDatabaseCount('video_images', 3);
             $this->assertDatabaseHas('video_images', [
-                'video_id' => $response['data']['id'],
-                'path' => $response['data']['thumbfile'],
+                'video_id' => $response->json('data.id'),
+                'path' => $response->json('data.thumbfile'),
             ]);
             $this->assertDatabaseHas('video_images', [
-                'video_id' => $response['data']['id'],
-                'path' => $response['data']['thumbhalf'],
+                'video_id' => $response->json('data.id'),
+                'path' => $response->json('data.thumbhalf'),
             ]);
             $this->assertDatabaseHas('video_images', [
-                'video_id' => $response['data']['id'],
-                'path' => $response['data']['bannerfile'],
+                'video_id' => $response->json('data.id'),
+                'path' => $response->json('data.bannerfile'),
             ]);
 
             // verificando se os arquivos de media foram registrados no bd
             $this->assertDatabaseCount('video_medias', 2);
             $this->assertDatabaseHas('video_medias', [
-                'video_id' => $response['data']['id'],
-                'file_path' => $response['data']['trailerfile'],
+                'video_id' => $response->json('data.id'),
+                'file_path' => $response->json('data.trailerfile'),
             ]);
             $this->assertDatabaseHas('video_medias', [
-                'video_id' => $response['data']['id'],
-                'file_path' => $response['data']['videofile'],
+                'video_id' => $response->json('data.id'),
+                'file_path' => $response->json('data.videofile'),
             ]);
 
             // verificando se os arquivos foram armazenados
-            Storage::assertExists($response['data']['thumbfile']);
-            Storage::assertExists($response['data']['thumbhalf']);
-            Storage::assertExists($response['data']['bannerfile']);
-            Storage::assertExists($response['data']['trailerfile']);
-            Storage::assertExists($response['data']['videofile']);
+            Storage::assertExists($response->json('data.thumbfile'));
+            Storage::assertExists($response->json('data.thumbhalf'));
+            Storage::assertExists($response->json('data.bannerfile'));
+            Storage::assertExists($response->json('data.trailerfile'));
+            Storage::assertExists($response->json('data.videofile'));
 
             // verificando se os arquivos obsoletos foram apagados
             if ($thumbfileOld) Storage::assertMissing($thumbfileOld);
@@ -1053,14 +1056,14 @@ class VideoApiFeatureTest extends TestCase
             if ($videofileOld) Storage::assertMissing($videofileOld);
 
             // armazenando os paths dos arquivos obsoletos
-            $thumbfileOld = $response['data']['thumbfile'];
-            $thumbhalfOld = $response['data']['thumbhalf'];
-            $bannerfileOld = $response['data']['bannerfile'];
-            $trailerfileOld = $response['data']['trailerfile'];
-            $videofileOld = $response['data']['videofile'];
+            $thumbfileOld = $response->json('data.thumbfile');
+            $thumbhalfOld = $response->json('data.thumbhalf');
+            $bannerfileOld = $response->json('data.bannerfile');
+            $trailerfileOld = $response->json('data.trailerfile');
+            $videofileOld = $response->json('data.videofile');
         }
         // apagando a pasta de arquivos criada
-        Storage::deleteDirectory($response['data']['id']);
+        Storage::deleteDirectory($response->json('data.id'));
     }
 
     // testando o método update, com falhas na validação

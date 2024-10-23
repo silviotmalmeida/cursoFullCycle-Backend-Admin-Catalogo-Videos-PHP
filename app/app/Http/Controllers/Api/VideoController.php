@@ -85,6 +85,7 @@ class VideoController extends Controller
         //  * error
         //  * size 
         if (isset($request->thumbfile->name)) {
+
             $thumbfile = [
                 'name' => $request->thumbfile->getFilename(),
                 'type' => $request->thumbfile->getMimeType(),

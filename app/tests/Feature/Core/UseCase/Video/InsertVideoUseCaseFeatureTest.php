@@ -890,7 +890,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // dados do thumbFile
-        $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
+        $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'image/png');
         $thumbFile = [
             'name' => $fakeThumbFile->getFilename(),
             'type' => $fakeThumbFile->getMimeType(),
@@ -900,7 +900,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         ];
 
         // dados do thumbHalf
-        $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
+        $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'image/png');
         $thumbHalf = [
             'name' => $fakeThumbHalf->getFilename(),
             'type' => $fakeThumbHalf->getMimeType(),
@@ -910,7 +910,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         ];
 
         // dados do bannerFile
-        $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
+        $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'image/png');
         $bannerFile = [
             'name' => $fakeBannerFile->getFilename(),
             'type' => $fakeBannerFile->getMimeType(),
@@ -920,7 +920,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         ];
 
         // dados do trailerFile
-        $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
+        $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'video/mp4');
         $trailerFile = [
             'name' => $fakeTrailerFile->getFilename(),
             'type' => $fakeTrailerFile->getMimeType(),
@@ -930,7 +930,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         ];
 
         // dados do videoFile
-        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'video/mp4');
         $videoFile = [
             'name' => $fakeVideoFile->getFilename(),
             'type' => $fakeVideoFile->getMimeType(),
@@ -1097,7 +1097,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // dados do thumbFile
-        $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'thumbFile/png');
+        $fakeThumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'image/png');
         $thumbFile = [
             'name' => $fakeThumbFile->getFilename(),
             'type' => $fakeThumbFile->getMimeType(),
@@ -1107,7 +1107,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         ];
 
         // dados do thumbHalf
-        $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'thumbHalf/png');
+        $fakeThumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'image/png');
         $thumbHalf = [
             'name' => $fakeThumbHalf->getFilename(),
             'type' => $fakeThumbHalf->getMimeType(),
@@ -1117,7 +1117,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         ];
 
         // dados do bannerFile
-        $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'bannerFile/png');
+        $fakeBannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'image/png');
         $bannerFile = [
             'name' => $fakeBannerFile->getFilename(),
             'type' => $fakeBannerFile->getMimeType(),
@@ -1127,7 +1127,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         ];
 
         // dados do trailerFile
-        $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'trailerFile/mp4');
+        $fakeTrailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'video/mp4');
         $trailerFile = [
             'name' => $fakeTrailerFile->getFilename(),
             'type' => $fakeTrailerFile->getMimeType(),
@@ -1137,7 +1137,7 @@ class InsertVideoUseCaseFeatureTest extends TestCase
         ];
 
         // dados do videoFile
-        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'videoFile/mp4');
+        $fakeVideoFile = UploadedFile::fake()->create('videoFile.mp4', 1, 'video/mp4');
         $videoFile = [
             'name' => $fakeVideoFile->getFilename(),
             'type' => $fakeVideoFile->getMimeType(),

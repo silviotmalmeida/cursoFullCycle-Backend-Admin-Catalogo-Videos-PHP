@@ -37,8 +37,7 @@ class UpdateVideoRequest extends FormRequest
             ],
             'year_launched' => [
                 'required',
-                'min:1',
-                'integer',
+                'date_format:Y',
             ],
             'duration' => [
                 'required',

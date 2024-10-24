@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Core\Domain\Enum\Rating;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Enum;
 
 class StoreVideoRequest extends FormRequest
 {
@@ -50,7 +52,8 @@ class StoreVideoRequest extends FormRequest
             ],
             'rating' => [
                 'required',
-            ],            
+                new Enum(Rating::class)
+            ],             
             'categories_id' => [
                 'nullable',
                 'array',
@@ -68,18 +71,23 @@ class StoreVideoRequest extends FormRequest
             ],
             'thumbfile' => [
                 'nullable',
+                'image'
             ],
             'thumbhalf' => [
                 'nullable',
+                'image'
             ],
             'bannerfile' => [
                 'nullable',
+                'image'
             ],
             'trailerfile' => [
                 'nullable',
+                'mimetypes:video/mp4'
             ],
             'videofile' => [
                 'nullable',
+                'mimetypes:video/mp4'
             ],
         ];
     }

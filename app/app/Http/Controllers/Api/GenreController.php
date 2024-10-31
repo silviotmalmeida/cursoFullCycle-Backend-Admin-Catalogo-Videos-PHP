@@ -101,9 +101,9 @@ class GenreController extends Controller
         // definindo o inputDto
         $inputDto = new UpdateGenreInputDto(
             id: $id,
-            name: $request->name ?? '',
-            isActive: $request->is_active ?? '',
-            categoriesId: $request->categories_id ?? []
+            name: $request->name ?? null,
+            isActive: $request->is_active ?? null,
+            categoriesId: $request->categories_id ?? null
         );
 
         // executando o usecase

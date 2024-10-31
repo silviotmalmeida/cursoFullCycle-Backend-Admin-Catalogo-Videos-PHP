@@ -103,6 +103,57 @@ class GenreControllerFeatureTest extends TestCase
         ]);
     }
 
+    // testando o método store
+    public function testStoreWithCategories()
+    {
+        // criando as categorias
+        $qtd = random_int(10, 20);
+        $categories = CategoryModel::factory()->count($qtd)->create();
+        // obtendo o array de id das categorias
+        $categoriesIds = $categories->pluck('id')->toArray();
+
+        // instanciando o usecase
+        $usecase = new InsertGenreUseCase($this->repository, $this->transactionDb, $this->categoryRepository);
+
+        // instanciando o controller
+        $controller = new GenreController();
+        // configurando o request com validação específica
+        $storeRequest = new StoreGenreRequest();
+        $storeRequest->headers->set('content-type', 'application/json');
+        $storeRequest->setJson(new ParameterBag([
+            'name' => 'name test',
+            'is_active' => false,
+            'categories_id' => $categoriesIds
+        ]));
+
+        // executando o store
+        $response = $controller->store($storeRequest, $usecase);
+
+        // verificando os dados
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame(Response::HTTP_CREATED, $response->status());
+
+        $this->assertDatabaseHas('genres', [
+            'name' => 'name test',
+            'is_active' => false
+        ]);
+
+        // verificando relacionamentos
+        $this->assertDatabaseCount('category_genre', $qtd);
+        $this->assertCount($qtd, $response->getData()->data->categories_id);
+        $this->assertEquals($categoriesIds, $response->getData()->data->categories_id);
+
+        // verificando o relacionamento a partir de category
+        foreach ($categoriesIds as $categoryId) {
+            $this->assertDatabaseHas('category_genre', [
+                'genre_id' => $response->getData()->data->id,
+                'category_id' => $categoryId,
+            ]);
+            $categoryModel = CategoryModel::find($categoryId);
+            $this->assertCount(1, $categoryModel->genres);
+        }
+    }
+
     // testando o método show
     public function testShow()
     {

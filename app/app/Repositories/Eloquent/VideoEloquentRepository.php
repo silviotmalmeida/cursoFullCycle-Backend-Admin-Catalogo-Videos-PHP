@@ -28,7 +28,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         // obtendo o array de id das categorias, genres e castMembers
         $categoriesIds = $model->categories->pluck('id')->toArray();
         $genresIds = $model->genres->pluck('id')->toArray();
-        $castMembersIds = $model->castMembers->pluck('id')->toArray();
+        $castMembersIds = $model->cast_members->pluck('id')->toArray();
 
         $this->videoBuilder->createEntity(
             (object) array(
@@ -60,7 +60,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
             $this->videoBuilder->addThumbFile($thumb->path);
         }
         // adicionando o thumbHalf
-        if ($thumbHalf = $model->thumbHalf()->first()) {
+        if ($thumbHalf = $model->thumb_half()->first()) {
             $this->videoBuilder->addThumbHalf($thumbHalf->path);
         }
         // adicionando o banner
@@ -97,7 +97,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         for ($i = 0; $i < count($entity->castMembersId); $i++) {
             array_push($arraySync, strval($entity->castMembersId[$i]));
         }
-        $model->castMembers()->sync($arraySync);
+        $model->cast_members()->sync($arraySync);
     }
 
     // função de inserção no bd
@@ -172,6 +172,17 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         $query = $this->model;
         // aplicando o filtro, se existir
         if ($filter) $query = $query->where('title', 'LIKE', "%{$filter}%");
+        // incluindo os relacionamentos
+        $query = $query->with([
+            'categories',
+            'genres',
+            'cast_members',
+            'video',
+            'trailer',
+            'thumb',
+            'thumb_half',
+            'banner'
+        ]);
         // ordenando
         $query = $query->orderBy('title', $order);
         // executando a busca paginada
@@ -339,13 +350,13 @@ class VideoEloquentRepository implements VideoRepositoryInterface
         // obtendo o thumbHalf
         $thumbHalf = $entity->thumbHalf();
         // obtendo o registro no bd
-        $thumbHalfBD = $model->thumbHalf()->first();
+        $thumbHalfBD = $model->thumb_half()->first();
         // se estiver setado,
         if ($thumbHalf) {
             // se já existir registro no bd, atualiza o registro
             if ($thumbHalfBD) {
                 // atualizando o registro
-                $model->thumbHalf()->update([
+                $model->thumb_half()->update([
                     'path' => $thumbHalf->filePath(),
                     'type' => $thumbHalf->imageType()->value,
                 ]);
@@ -353,7 +364,7 @@ class VideoEloquentRepository implements VideoRepositoryInterface
             // se não existir registro no BD, cria o registro
             else {
                 // criando o registro
-                $model->thumbHalf()->create([
+                $model->thumb_half()->create([
                     'path' => $thumbHalf->filePath(),
                     'type' => $thumbHalf->imageType()->value,
                 ]);

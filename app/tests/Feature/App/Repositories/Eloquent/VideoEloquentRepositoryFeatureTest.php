@@ -177,7 +177,7 @@ class VideoEloquentRepositoryFeatureTest extends TestCase
         $videoModel = VideoModel::find($entity->id());
         $this->assertCount($nCategories, $videoModel->categories);
         $this->assertCount($nGenres, $videoModel->genres);
-        $this->assertCount($nCastMembers, $videoModel->castMembers);
+        $this->assertCount($nCastMembers, $videoModel->cast_members);
 
         // verificando o relacionamento a partir de category
         foreach ($categories as $category) {

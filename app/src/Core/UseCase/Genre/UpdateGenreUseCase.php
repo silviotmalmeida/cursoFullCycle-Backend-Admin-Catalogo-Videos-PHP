@@ -42,7 +42,7 @@ class UpdateGenreUseCase
                 categoriesId: $input->categoriesId
             );
             // validando as categorias informadas
-            $this->validateCategoriesIds($input->categoriesId);
+            if($input->categoriesId and is_array($input->categoriesId)) $this->validateCategoriesIds($input->categoriesId);
             // atualizando a entidade no BD utilizando o repository
             $updatedGenre = $this->repository->update($genre);
 

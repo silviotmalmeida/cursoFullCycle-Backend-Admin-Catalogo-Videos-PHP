@@ -100,8 +100,8 @@ class CastMemberController extends Controller
         // definindo o inputDto
         $inputDto = new UpdateCastMemberInputDto(
             id: $id,
-            name: $request->name ?? '',
-            type: $request->type ?? '',
+            name: $request->name ?? null,
+            type: $request->type ?? null,
         );
 
         // executando o usecase

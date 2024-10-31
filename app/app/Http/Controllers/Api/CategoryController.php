@@ -101,9 +101,9 @@ class CategoryController extends Controller
         // definindo o inputDto
         $inputDto = new UpdateCategoryInputDto(
             id: $id,
-            name: $request->name ?? '',
-            description: $request->description ?? '',
-            isActive: $request->is_active ?? '',
+            name: $request->name ?? null,
+            description: $request->description ?? null,
+            isActive: $request->is_active ?? null,
         );
 
         // executando o usecase

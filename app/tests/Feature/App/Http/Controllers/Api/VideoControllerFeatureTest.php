@@ -209,13 +209,13 @@ class VideoControllerFeatureTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // dados do thumbFile
-        $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'image/png');
+        $thumbFile = UploadedFile::fake()->image('thumbFile.png');
 
         // dados do thumbHalf
-        $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'image/png');
+        $thumbHalf = UploadedFile::fake()->image('thumbHalf.png');
 
         // dados do bannerFile
-        $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'image/png');
+        $bannerFile = UploadedFile::fake()->image('bannerFile.png');
 
         // dados do trailerFile
         $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'video/mp4');
@@ -247,6 +247,13 @@ class VideoControllerFeatureTest extends TestCase
         // configurando o request com validação específica
         $storeRequest = new StoreVideoRequest();
         $storeRequest->headers->set('content-type', 'application/json');
+        $storeRequest->files->add([
+            'thumbfile' => $thumbFile,
+            'thumbhalf' => $thumbHalf,
+            'bannerfile' => $bannerFile,
+            'trailerfile' => $trailerFile,
+            'videofile' => $videoFile,
+        ]);
         $storeRequest->setJson(new ParameterBag([
             'title' => $title,
             'description' => $description,
@@ -256,12 +263,7 @@ class VideoControllerFeatureTest extends TestCase
             'opened' => $opened,
             'categories_id' => $categoriesIds,
             'genres_id' => $genresIds,
-            'cast_members_id' => $castMembersIds,
-            'thumbfile' => $thumbFile,
-            'thumbhalf' => $thumbHalf,
-            'bannerfile' => $bannerFile,
-            'trailerfile' => $trailerFile,
-            'videofile' => $videoFile,
+            'cast_members_id' => $castMembersIds,            
         ]));
 
         // executando o store
@@ -474,13 +476,13 @@ class VideoControllerFeatureTest extends TestCase
             $this->assertDatabaseCount('cast_members', $castMembersCount);
 
             // dados do thumbFile
-            $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'image/png');
+            $thumbFile = UploadedFile::fake()->image('thumbFile.png');
 
             // dados do thumbHalf
-            $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'image/png');
+            $thumbHalf = UploadedFile::fake()->image('thumbHalf.png');
 
             // dados do bannerFile
-            $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'image/png');
+            $bannerFile = UploadedFile::fake()->image('bannerFile.png');
 
             // dados do trailerFile
             $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'video/mp4');
@@ -512,6 +514,13 @@ class VideoControllerFeatureTest extends TestCase
             // configurando o request com validação específica
             $updateRequest = new UpdateVideoRequest();
             $updateRequest->headers->set('content-type', 'application/json');
+            $updateRequest->files->add([
+                'thumbfile' => $thumbFile,
+                'thumbhalf' => $thumbHalf,
+                'bannerfile' => $bannerFile,
+                'trailerfile' => $trailerFile,
+                'videofile' => $videoFile,
+            ]);
             $updateRequest->setJson(new ParameterBag([
                 'title' => $title,
                 'description' => $description,
@@ -521,12 +530,7 @@ class VideoControllerFeatureTest extends TestCase
                 'opened' => $opened,
                 'categories_id' => $categoriesIds,
                 'genres_id' => $genresIds,
-                'cast_members_id' => $castMembersIds,
-                'thumbfile' => $thumbFile,
-                'thumbhalf' => $thumbHalf,
-                'bannerfile' => $bannerFile,
-                'trailerfile' => $trailerFile,
-                'videofile' => $videoFile,
+                'cast_members_id' => $castMembersIds,                
             ]));
 
             // executando o update

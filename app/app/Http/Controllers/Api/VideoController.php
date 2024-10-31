@@ -83,51 +83,51 @@ class VideoController extends Controller
         //  * type
         //  * tmp_name
         //  * error
-        //  * size 
-        if (isset($request->thumbfile->name)) {
-
+        //  * size
+        if ($file = $request->file('thumbfile')) {
             $thumbfile = [
-                'name' => $request->thumbfile->getFilename(),
-                'type' => $request->thumbfile->getMimeType(),
-                'tmp_name' => $request->thumbfile->getPathname(),
-                'error' => $request->thumbfile->getError(),
-                'size' => $request->thumbfile->getSize(),
+                'name' => $file->getFilename(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getPathname(),
+                'error' => $file->getError(),
+                'size' => $file->getSize(),
             ];
         }
-        if (isset($request->thumbhalf->name)) {
+        if ($file = $request->file('thumbhalf')) {
             $thumbhalf = [
-                'name' => $request->thumbhalf->getFilename(),
-                'type' => $request->thumbhalf->getMimeType(),
-                'tmp_name' => $request->thumbhalf->getPathname(),
-                'error' => $request->thumbhalf->getError(),
-                'size' => $request->thumbhalf->getSize(),
+                'name' => $file->getFilename(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getPathname(),
+                'error' => $file->getError(),
+                'size' => $file->getSize(),
             ];
         }
-        if (isset($request->bannerfile->name)) {
+        if ($file = $request->file('bannerfile')) {
             $bannerfile = [
-                'name' => $request->bannerfile->getFilename(),
-                'type' => $request->bannerfile->getMimeType(),
-                'tmp_name' => $request->bannerfile->getPathname(),
-                'error' => $request->bannerfile->getError(),
-                'size' => $request->bannerfile->getSize(),
+                'name' => $file->getFilename(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getPathname(),
+                'error' => $file->getError(),
+                'size' => $file->getSize(),
             ];
         }
-        if (isset($request->trailerfile->name)) {
+        
+        if ($file = $request->file('trailerfile')) {
             $trailerfile = [
-                'name' => $request->trailerfile->getFilename(),
-                'type' => $request->trailerfile->getMimeType(),
-                'tmp_name' => $request->trailerfile->getPathname(),
-                'error' => $request->trailerfile->getError(),
-                'size' => $request->trailerfile->getSize(),
+                'name' => $file->getFilename(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getPathname(),
+                'error' => $file->getError(),
+                'size' => $file->getSize(),
             ];
         }
-        if (isset($request->videofile->name)) {
+        if ($file = $request->file('videofile')) {
             $videofile = [
-                'name' => $request->videofile->getFilename(),
-                'type' => $request->videofile->getMimeType(),
-                'tmp_name' => $request->videofile->getPathname(),
-                'error' => $request->videofile->getError(),
-                'size' => $request->videofile->getSize(),
+                'name' => $file->getFilename(),
+                'type' => $file->getMimeType(),
+                'tmp_name' => $file->getPathname(),
+                'error' => $file->getError(),
+                'size' => $file->getSize(),
             ];
         }
 
@@ -218,15 +218,15 @@ class VideoController extends Controller
         // definindo o inputDto
         $inputDto = new UpdateVideoInputDto(
             id: $id,
-            title: $request->title,
-            description: $request->description,
-            yearLaunched: $request->year_launched,
-            duration: $request->duration,
-            opened: (bool) $request->opened ?? false,
-            rating: $request->rating,
-            categoriesId: $request->categories_id ?? [],
-            genresId: $request->genres_id ?? [],
-            castMembersId: $request->cast_members_id ?? [],
+            title: $request->title ?? null,
+            description: $request->description ?? null,
+            yearLaunched: $request->year_launched ?? null,
+            duration: $request->duration ?? null,
+            opened: (bool) $request->opened ?? null,
+            rating: $request->rating ?? null,
+            categoriesId: $request->categories_id ?? null,
+            genresId: $request->genres_id ?? null,
+            castMembersId: $request->cast_members_id ?? null,
             thumbFile: $thumbfile ?? null,
             thumbHalf: $thumbhalf ?? null,
             bannerFile: $bannerfile ?? null,

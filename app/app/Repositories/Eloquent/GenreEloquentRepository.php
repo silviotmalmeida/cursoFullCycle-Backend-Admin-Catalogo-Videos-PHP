@@ -25,9 +25,14 @@ class GenreEloquentRepository implements GenreRepositoryInterface
     // função para conversão do objeto de retorno do Eloquent para a referida entidade
     private function toGenre(GenreModel $model): Entity
     {
+        // obtendo o array de id das categorias
+        $categoriesIds = $model->categories->pluck('id')->toArray();
+
+        // criando a entidade
         $entity = new GenreEntity(
             id: $model->id,
             name: $model->name,
+            categoriesId: $categoriesIds,
             createdAt: $model->created_at,
             updatedAt: $model->updated_at
         );
@@ -125,6 +130,8 @@ class GenreEloquentRepository implements GenreRepositoryInterface
         $query = $this->model;
         // aplicando o filtro, se existir
         if ($filter) $query = $query->where('name', 'LIKE', "%{$filter}%");
+        // incluindo os relacionamentos
+        $query = $query->with(['categories']);
         // ordenando
         $query = $query->orderBy('name', $order);
         // executando a busca paginada

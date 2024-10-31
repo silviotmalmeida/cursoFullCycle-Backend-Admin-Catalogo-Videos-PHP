@@ -61,7 +61,7 @@ class Video extends Model
     }
 
     // definindo o relacionamento muitos-para-muitos com castMember
-    public function castMembers()
+    public function cast_members()
     {
         return $this->belongsToMany(CastMember::class, 'video_cast_member', 'video_id', 'cast_member_id');
     }
@@ -85,7 +85,7 @@ class Video extends Model
     }
 
     // definindo o relacionamento um-para-um com videoImage
-    public function thumbHalf()
+    public function thumb_half()
     {
         return $this->hasOne(VideoImage::class, 'video_id', 'id')->where('type', ImageType::THUMB_HALF->value);
     }

@@ -121,6 +121,7 @@ class GenreApiFeatureTest extends TestCase
                     'id',
                     'name',
                     'is_active',
+                    'categories_id',
                     'created_at',
                     'updated_at',
                 ]
@@ -154,6 +155,7 @@ class GenreApiFeatureTest extends TestCase
                 'id',
                 'name',
                 'is_active',
+                'categories_id',
                 'created_at',
                 'updated_at',
             ]
@@ -205,6 +207,7 @@ class GenreApiFeatureTest extends TestCase
                 'id',
                 'name',
                 'is_active',
+                'categories_id',
                 'created_at',
                 'updated_at',
             ]
@@ -249,6 +252,7 @@ class GenreApiFeatureTest extends TestCase
                 'id',
                 'name',
                 'is_active',
+                'categories_id',
                 'created_at',
                 'updated_at',
             ]
@@ -264,7 +268,23 @@ class GenreApiFeatureTest extends TestCase
             'is_active' => $isActive,
         ]);
 
+        // print_r($categoriesIds);
+        // dd($response['data']);
+
+        // verificando relacionamentos
         $this->assertDatabaseCount('category_genre', $qtd);
+        $this->assertCount($qtd, $response['data']['categories_id']);
+        $this->assertEquals($categoriesIds, $response['data']['categories_id']);
+
+        // verificando o relacionamento a partir de category
+        foreach ($categoriesIds as $categoryId) {
+            $this->assertDatabaseHas('category_genre', [
+                'genre_id' => $response['data']['id'],
+                'category_id' => $categoryId,
+            ]);
+            $categoryModel = CategoryModel::find($categoryId);
+            $this->assertCount(1, $categoryModel->genres);
+        }
     }
 
     // testando o método store, com falhas na validação
@@ -398,6 +418,7 @@ class GenreApiFeatureTest extends TestCase
                 'id',
                 'name',
                 'is_active',
+                'categories_id',
                 'created_at',
                 'updated_at',
             ]
@@ -451,6 +472,7 @@ class GenreApiFeatureTest extends TestCase
                 'id',
                 'name',
                 'is_active',
+                'categories_id',
                 'created_at',
                 'updated_at',
             ]

@@ -310,13 +310,13 @@ class VideoApiFeatureTest extends TestCase
         $this->assertDatabaseCount('cast_members', $nCastMembers);
 
         // dados do thumbFile
-        $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'image/png');
+        $thumbFile = UploadedFile::fake()->image('thumbFile.png');
 
         // dados do thumbHalf
-        $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'image/png');
+        $thumbHalf = UploadedFile::fake()->image('thumbHalf.png');
 
         // dados do bannerFile
-        $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'image/png');
+        $bannerFile = UploadedFile::fake()->image('bannerFile.png');
 
         // dados do trailerFile
         $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'video/mp4');
@@ -889,13 +889,13 @@ class VideoApiFeatureTest extends TestCase
             $this->assertDatabaseCount('cast_members', $castMembersCount);
 
             // dados do thumbFile
-            $thumbFile = UploadedFile::fake()->create('thumbFile.png', 1, 'image/png');
+            $thumbFile = UploadedFile::fake()->image('thumbFile.png');
 
             // dados do thumbHalf
-            $thumbHalf = UploadedFile::fake()->create('thumbHalf.png', 1, 'image/png');
+            $thumbHalf = UploadedFile::fake()->image('thumbHalf.png');
 
             // dados do bannerFile
-            $bannerFile = UploadedFile::fake()->create('bannerFile.png', 1, 'image/png');
+            $bannerFile = UploadedFile::fake()->image('bannerFile.png');
 
             // dados do trailerFile
             $trailerFile = UploadedFile::fake()->create('trailerFile.mp4', 1, 'video/mp4');

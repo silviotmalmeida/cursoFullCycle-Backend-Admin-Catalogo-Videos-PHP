@@ -28,21 +28,17 @@ class UpdateVideoRequest extends FormRequest
         return [
             // definindo as validações dos atributos
             'title' => [
-                'required',
                 'min:3',
                 'max:255',
             ],
             'description' => [
-                'required',
                 'min:3',
                 'max:255',
             ],
             'year_launched' => [
-                'required',
                 'date_format:Y',
             ],
             'duration' => [
-                'required',
                 'min:1',
                 'integer',
             ],
@@ -51,7 +47,6 @@ class UpdateVideoRequest extends FormRequest
                 'boolean',
             ],
             'rating' => [
-                'required',
                 new Enum(Rating::class)
             ],             
             'categories_id' => [

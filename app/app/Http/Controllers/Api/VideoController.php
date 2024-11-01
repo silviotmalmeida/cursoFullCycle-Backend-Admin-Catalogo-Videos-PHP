@@ -169,7 +169,7 @@ class VideoController extends Controller
         //  * tmp_name
         //  * error
         //  * size 
-        if ($request->thumbfile) {
+        if ($request->thumbfile and $request->thumbfile->getFilename()) {
             $thumbfile = [
                 'name' => $request->thumbfile->getFilename(),
                 'type' => $request->thumbfile->getMimeType(),
@@ -178,7 +178,9 @@ class VideoController extends Controller
                 'size' => $request->thumbfile->getSize(),
             ];
         }
-        if ($request->thumbhalf) {
+        else if ($request->thumbfile === []) $thumbfile = [];
+
+        if ($request->thumbhalf and $request->thumbhalf->getFilename()) {
             $thumbhalf = [
                 'name' => $request->thumbhalf->getFilename(),
                 'type' => $request->thumbhalf->getMimeType(),
@@ -187,7 +189,9 @@ class VideoController extends Controller
                 'size' => $request->thumbhalf->getSize(),
             ];
         }
-        if ($request->bannerfile) {
+        else if ($request->thumbhalf === []) $thumbhalf = [];
+
+        if ($request->bannerfile and $request->bannerfile->getFilename()) {
             $bannerfile = [
                 'name' => $request->bannerfile->getFilename(),
                 'type' => $request->bannerfile->getMimeType(),
@@ -196,7 +200,9 @@ class VideoController extends Controller
                 'size' => $request->bannerfile->getSize(),
             ];
         }
-        if ($request->trailerfile) {
+        else if ($request->bannerfile === []) $bannerfile = [];
+
+        if ($request->trailerfile and $request->trailerfile->getFilename()) {
             $trailerfile = [
                 'name' => $request->trailerfile->getFilename(),
                 'type' => $request->trailerfile->getMimeType(),
@@ -205,7 +211,9 @@ class VideoController extends Controller
                 'size' => $request->trailerfile->getSize(),
             ];
         }
-        if ($request->videofile) {
+        else if ($request->trailerfile === []) $trailerfile = [];
+
+        if ($request->videofile and $request->videofile->getFilename()) {
             $videofile = [
                 'name' => $request->videofile->getFilename(),
                 'type' => $request->videofile->getMimeType(),
@@ -214,6 +222,7 @@ class VideoController extends Controller
                 'size' => $request->videofile->getSize(),
             ];
         }
+        else if ($request->videofile === []) $videofile = [];
 
         // definindo o inputDto
         $inputDto = new UpdateVideoInputDto(

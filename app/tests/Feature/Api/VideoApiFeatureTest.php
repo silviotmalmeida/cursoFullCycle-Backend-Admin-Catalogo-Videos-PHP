@@ -1062,6 +1062,88 @@ class VideoApiFeatureTest extends TestCase
             $trailerfileOld = $response->json('data.trailerfile');
             $videofileOld = $response->json('data.videofile');
         }
+
+        // executando atualização de remoção de relacionamentos e arquivos
+        $data = [
+            'categories_id' => [],
+            'genres_id' => [],
+            'cast_members_id' => [],
+            'thumbfile' => [],
+            'thumbhalf' => [],
+            'bannerfile' => [],
+            'trailerfile' => [],
+            'videofile' => [],
+        ];
+
+        // fazendo o request
+        sleep(1);
+        $response = $this->putJson("{$this->endpoint}/{$video->id}", $data);
+
+        // verificando os dados
+        $response->assertStatus(Response::HTTP_OK);
+        $response->assertJsonStructure([
+            'data' => [
+                'id',
+                'title',
+                'description',
+                'year_launched',
+                'duration',
+                'rating',
+                'opened',
+                'categories_id',
+                'genres_id',
+                'cast_members_id',
+                'thumbfile',
+                'thumbhalf',
+                'bannerfile',
+                'trailerfile',
+                'videofile',
+                'created_at',
+                'updated_at',
+            ]
+        ]);
+
+        $this->assertSame($video->id, $response->json('data.id'));
+        $this->assertSame($title, $response->json('data.title'));
+        $this->assertSame($description, $response->json('data.description'));
+        $this->assertSame($yearLaunched, $response->json('data.year_launched'));
+        $this->assertSame($duration, $response->json('data.duration'));
+        $this->assertSame($rating->value, $response->json('data.rating'));
+        $this->assertSame($opened, $response->json('data.opened'));
+        $this->assertSame(Carbon::make($video->created_at)->format('Y-m-d H:i:s'), $response->json('data.created_at'));
+        $this->assertNotSame(Carbon::make($video->updated_at)->format('Y-m-d H:i:s'), $response->json('data.updated_at'));
+        $this->assertNotSame($response->json('data.created_at'), $response->json('data.updated_at'));
+
+        $this->assertDatabaseHas('videos', [
+            'id' => $video->id,
+            'title' => $title,
+            'description' => $description,
+            'year_launched' => $yearLaunched,
+            'duration' => $duration,
+            'rating' => $rating,
+            'opened' => $opened,
+        ]);
+
+        // verificando relacionamentos
+        $this->assertDatabaseCount('video_category', 0);
+        $this->assertDatabaseCount('video_genre', 0);
+        $this->assertDatabaseCount('video_cast_member', 0);
+        $this->assertCount(0, $response->json('data.categories_id'));
+        $this->assertCount(0, $response->json('data.genres_id'));
+        $this->assertCount(0, $response->json('data.cast_members_id'));
+        $this->assertEquals([], $response->json('data.categories_id'));
+        $this->assertEquals([], $response->json('data.genres_id'));
+        $this->assertEquals([], $response->json('data.cast_members_id'));
+
+        // verificando se os arquivos de image foram removidos no bd
+        $this->assertDatabaseCount('video_images', 0);        
+
+        // verificando se os arquivos de media foram removidos no bd
+        $this->assertDatabaseCount('video_medias', 0);
+
+        // confirmando que os arquivos foram removidos do storage
+        Storage::assertDirectoryEmpty($response->json('data.id'));
+        
         // apagando a pasta de arquivos criada
         Storage::deleteDirectory($response->json('data.id'));
     }

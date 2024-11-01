@@ -651,6 +651,72 @@ class VideoControllerFeatureTest extends TestCase
             // verificando que o evento de armazenamento do videoFile foi disparado
             Event::assertDispatched(VideoEventManagerStub::class);
         }
+
+        // executando atualização de remoção de relacionamentos e arquivos
+        $updateRequest = new UpdateVideoRequest();
+        $updateRequest->headers->set('content-type', 'application/json');
+        $updateRequest->files->add([
+            'thumbfile' => [],
+            'thumbhalf' => [],
+            'bannerfile' => [],
+            'trailerfile' => [],
+            'videofile' => [],
+        ]);
+        $updateRequest->setJson(new ParameterBag([
+            'categories_id' => [],
+            'genres_id' => [],
+            'cast_members_id' => [],                
+        ]));
+        
+        // fazendo o request
+        sleep(1);
+        $response = $controller->update($video->id, $updateRequest, $usecase);
+
+        // verificando os dados
+        $this->assertInstanceOf(JsonResponse::class, $response);
+        $this->assertSame(Response::HTTP_OK, $response->status());
+
+        $this->assertSame($video->id, $response->getData()->data->id);
+        $this->assertSame($title, $response->getData()->data->title);
+        $this->assertSame($description, $response->getData()->data->description);
+        $this->assertSame($yearLaunched, $response->getData()->data->year_launched);
+        $this->assertSame($duration, $response->getData()->data->duration);
+        $this->assertSame($rating->value, $response->getData()->data->rating);
+        $this->assertSame($opened, $response->getData()->data->opened);
+        $this->assertSame(Carbon::make($video->created_at)->format('Y-m-d H:i:s'), $response->getData()->data->created_at);
+        $this->assertNotSame(Carbon::make($video->updated_at)->format('Y-m-d H:i:s'), $response->getData()->data->updated_at);
+        $this->assertNotSame($response->getData()->data->created_at, $response->getData()->data->updated_at);
+
+        $this->assertDatabaseHas('videos', [
+            'id' => $video->id,
+            'title' => $title,
+            'description' => $description,
+            'year_launched' => $yearLaunched,
+            'duration' => $duration,
+            'rating' => $rating,
+            'opened' => $opened,
+        ]);
+
+        // verificando relacionamentos
+        $this->assertDatabaseCount('video_category', 0);
+        $this->assertDatabaseCount('video_genre', 0);
+        $this->assertDatabaseCount('video_cast_member', 0);
+        $this->assertCount(0, $response->getData()->data->categories_id);
+        $this->assertCount(0, $response->getData()->data->genres_id);
+        $this->assertCount(0, $response->getData()->data->cast_members_id);
+        $this->assertEquals([], $response->getData()->data->categories_id);
+        $this->assertEquals([], $response->getData()->data->genres_id);
+        $this->assertEquals([], $response->getData()->data->cast_members_id);
+
+        // verificando se os arquivos de image foram removidos no bd
+        $this->assertDatabaseCount('video_images', 0);
+        
+        // verificando se os arquivos de media foram removidos no bd
+        $this->assertDatabaseCount('video_medias', 0);
+        
+        // confirmando que os arquivos foram removidos do storage
+        Storage::assertDirectoryEmpty($response->getData()->data->id);
+
         // apagando a pasta de arquivos criada
         Storage::deleteDirectory($response->getData()->data->id);
     }

@@ -66,23 +66,28 @@ class UpdateVideoRequest extends FormRequest
             ],
             'thumbfile' => [
                 'nullable',
-                'image'
+                // 'array',
+                // 'image'
             ],
             'thumbhalf' => [
                 'nullable',
-                'image'
+                // 'array',
+                // 'image'
             ],
             'bannerfile' => [
                 'nullable',
-                'image'
+                // 'array',
+                // 'image'
             ],
             'trailerfile' => [
                 'nullable',
-                'mimetypes:video/mp4'
+                // 'array',
+                // 'mimetypes:video/mp4'
             ],
             'videofile' => [
                 'nullable',
-                'mimetypes:video/mp4'
+                // 'array',
+                // 'mimetypes:video/mp4'
             ],
         ];
     }

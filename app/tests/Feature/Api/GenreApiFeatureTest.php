@@ -268,9 +268,6 @@ class GenreApiFeatureTest extends TestCase
             'is_active' => $isActive,
         ]);
 
-        // print_r($categoriesIds);
-        // dd($response['data']);
-
         // verificando relacionamentos
         $this->assertDatabaseCount('category_genre', $qtd);
         $this->assertCount($qtd, $response['data']['categories_id']);

@@ -150,9 +150,9 @@ class UpdateVideoUseCaseUnitTest extends TestCase
 
         // criando o mock do repository
         $mockRepository = Mockery::mock(VideoRepositoryInterface::class);
-        $mockRepository->shouldReceive('findById')->times(1)->andReturn($initialVideo); //definindo o retorno do insert()
-        $mockRepository->shouldReceive('update')->times(1)->andReturn($entity); //definindo o retorno do insert()
-        $mockRepository->shouldReceive('updateMedia')->times(1)->andReturn($entity); //definindo o retorno do insert()
+        $mockRepository->shouldReceive('findById')->times(1)->andReturn($initialVideo); //definindo o retorno do findById()
+        $mockRepository->shouldReceive('update')->times(1)->andReturn($entity); //definindo o retorno do update()
+        $mockRepository->shouldReceive('updateMedia')->times(1)->andReturn($entity); //definindo o retorno do updateMedia()
 
         // criando o mock do transactionDb
         $mockTransactionDb = Mockery::mock(TransactionDbInterface::class);

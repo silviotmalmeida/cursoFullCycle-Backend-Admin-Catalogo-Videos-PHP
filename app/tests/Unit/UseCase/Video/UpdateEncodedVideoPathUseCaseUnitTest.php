@@ -4,34 +4,17 @@
 namespace Tests\Unit\UseCase\Video;
 
 // importações
-use Core\Domain\Builder\Video\CreateVideoBuilder;
 use Core\Domain\Entity\Video;
-use Core\Domain\Enum\CastMemberType;
 use Core\Domain\Enum\MediaStatus;
 use Core\Domain\Enum\MediaType;
 use Core\Domain\Enum\Rating;
-use Core\Domain\Exception\NotFoundException;
-use Core\Domain\Repository\CastMemberRepositoryInterface;
-use Core\Domain\Repository\CategoryRepositoryInterface;
-use Core\Domain\Repository\GenreRepositoryInterface;
 use Core\Domain\Repository\VideoRepositoryInterface;
 use Core\Domain\ValueObject\Media;
-use Core\UseCase\Interfaces\FileStorageInterface;
-use Core\UseCase\Interfaces\TransactionDbInterface;
-use Core\UseCase\Video\Insert\DTO\InsertVideoInputDto;
-use Core\UseCase\Video\Interfaces\VideoEventManagerInterface;
-use Core\UseCase\Video\Update\DTO\UpdateVideoInputDto;
-use Core\UseCase\Video\Update\DTO\UpdateVideoOutputDto;
-use Core\UseCase\Video\Update\UpdateVideoUseCase;
 use Core\UseCase\Video\UpdateEncodedVideoPath\DTO\UpdateEncodedVideoPathInputDto;
 use Core\UseCase\Video\UpdateEncodedVideoPath\DTO\UpdateEncodedVideoPathOutputDto;
 use Core\UseCase\Video\UpdateEncodedVideoPath\UpdateEncodedVideoPathUseCase;
-use DateTime;
-use Exception;
 use Mockery;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\Uuid;
-use Tests\MocksFactory;
 
 // definindo a classe de teste, que estende a TestCase do PHPUnit
 class UpdateEncodedVideoPathUseCaseUnitTest extends TestCase
@@ -58,8 +41,7 @@ class UpdateEncodedVideoPathUseCaseUnitTest extends TestCase
         );
         // setando o videoFile
         $video->setVideoFile($videoFile);
-        sleep(1);
-
+        
         // criando o inputDto
         $inputDto = new UpdateEncodedVideoPathInputDto(
             $video->id(),

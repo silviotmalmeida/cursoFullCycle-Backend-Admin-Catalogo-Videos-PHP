@@ -9,7 +9,7 @@ class UpdateEncodedVideoPathOutputDto
     // construtor e atributos
     public function __construct(
         public string $id,
-        public ?string $encodedPath,        
+        public string $encodedPath,        
     ) {
     }
 }

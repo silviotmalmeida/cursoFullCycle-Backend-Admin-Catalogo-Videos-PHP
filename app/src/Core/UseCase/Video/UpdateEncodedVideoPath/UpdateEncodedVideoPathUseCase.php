@@ -7,15 +7,10 @@ namespace Core\UseCase\Video\UpdateEncodedVideoPath;
 use Core\Domain\Builder\Video\CreateVideoBuilder;
 use Core\Domain\Builder\Video\VideoBuilderInterface;
 use Core\Domain\Enum\MediaStatus;
-use Core\Domain\Events\VideoCreatedEvent;
+use Core\Domain\Exception\NotFoundException;
 use Core\Domain\Repository\VideoRepositoryInterface;
-use Core\UseCase\Interfaces\FileStorageInterface;
-use Core\UseCase\Video\BaseVideoUseCase;
-use Core\UseCase\Video\Update\DTO\UpdateVideoInputDto;
-use Core\UseCase\Video\Update\DTO\UpdateVideoOutputDto;
 use Core\UseCase\Video\UpdateEncodedVideoPath\DTO\UpdateEncodedVideoPathInputDto;
 use Core\UseCase\Video\UpdateEncodedVideoPath\DTO\UpdateEncodedVideoPathOutputDto;
-use Exception;
 
 // definindo o usecase
 class UpdateEncodedVideoPathUseCase
@@ -42,20 +37,23 @@ class UpdateEncodedVideoPathUseCase
         $this->videoBuilder->setEntity($video);
 
         // se estiver setado encodedPath,
-        if ($input->encodedPath) {
+        if ($input->encodedPath != '') {
             // se existir video na entidade
             if ($video->videoFile()) {
                 // atualizando a entidade
                 $this->videoBuilder->addVideoFile($video->videoFile()->filePath(), MediaStatus::COMPLETE, $input->encodedPath);
                 // atualizando o BD
                 $this->repository->updateMedia($this->videoBuilder->getEntity());
+            } else {
+                // senão, lança uma exceção
+                throw new NotFoundException("Não existe arquivo de video associado ao vídeo de id {$input->id}");
             }
         }
 
         // retornando os dados
         return new UpdateEncodedVideoPathOutputDto(
             id: $video->id(),
-            encodedPath: $video->videoFile() ? $video->videoFile()->encodedPath() : null,
+            encodedPath: $video->videoFile()->encodedPath(),
         );
     }
 

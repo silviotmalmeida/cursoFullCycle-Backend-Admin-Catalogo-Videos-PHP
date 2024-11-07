@@ -1,1 +1,2 @@
+CREATE DATABASE IF NOT EXISTS keycloak;
 CREATE DATABASE IF NOT EXISTS backend-admin-video-catalog;

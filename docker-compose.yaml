@@ -56,6 +56,29 @@ services:
         networks:
             - backend-admin-video-catalog-network
 
+    keycloak:
+        build:
+            context: ./docker/keycloak
+            dockerfile: Dockerfile
+        container_name: backend-admin-video-catalog-keycloak
+        ports:
+            - "8081:8080"
+        environment:
+            - KEYCLOAK_ADMIN=admin
+            - KEYCLOAK_ADMIN_PASSWORD=admin
+            - KC_DB=mysql            
+            - KC_DB_USERNAME=root
+            - KC_DB_PASSWORD=root
+            - KC_DB_URL_HOST=db
+            - KC_DB_URL_PORT=3306
+            - KC_DB_SCHEMA=keycloak
+        command:
+            [ "start-dev"]
+        networks:
+            - backend-admin-video-catalog-network
+        depends_on:
+            - db
+
 networks:
     backend-admin-video-catalog-network:
         driver: bridge

@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libxml2-dev \
     zip \
-    unzip
+    unzip \
+    iputils-ping
 
 RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd sockets
 

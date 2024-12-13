@@ -12,6 +12,15 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return response()->json(['message' => 'success']);
 });
+
+// rotas acessíveis após autenticação
+// os usuários devem ter a role admin-catalog
+Route::middleware(['auth:api', 'can:admin-catalog'])->group(function () {
+    Route::get('/me', function () {
+        return true;
+    });    
+});
+
 // definindo rotas de categories
 Route::apiResource('/categories', CategoryController::class);
 // definindo rotas de genres

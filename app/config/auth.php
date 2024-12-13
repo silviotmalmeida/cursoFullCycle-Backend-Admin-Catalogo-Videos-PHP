@@ -14,7 +14,9 @@ return [
     */
 
     'defaults' => [
-        'guard' => 'web',
+        // foi alterado de web para api
+        // 'guard' => 'web',
+        'guard' => 'api',
         'passwords' => 'users',
     ],
 
@@ -38,6 +40,11 @@ return [
     'guards' => [
         'web' => [
             'driver' => 'session',
+            'provider' => 'users',
+        ],
+        // foi criado para permitir a validação pelo keycloak
+        'api' => [
+            'driver' => 'keycloak',
             'provider' => 'users',
         ],
     ],

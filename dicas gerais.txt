@@ -10,6 +10,7 @@
     para instalar o phpunit: composer require --dev phpunit/phpunit ^9.5
     para instalar o mockery: composer require --dev mockery/mockery
     para instalar o ramsey-uuid: composer require ramsey/uuid
+    para instalar o guard do keycloak: composer require robsontenorio/laravel-keycloak-guard
 
 - comandos do laravel
     para criar uma key: php artisan key:generate
@@ -23,7 +24,8 @@
     para criar uma migration: php artisan make:migration <nome-da-migration>
     para criar um provider: php artisan make:provider <nome-do-provider>
     para criar um listener: php artisan make:listener <nome-do-listener>
-    para testar uma factory com o tinker: php artisan tinker; <path-da-model(ex. \App\Models\Video)>::factory->count(10)->create();
+    para testar uma factory com o tinker: php artisan tinker <path-da-model(ex. \App\Models\Video)>::factory->count(10)->create();
+    para publicar um recurso externo: php artisan vendor:publish --provider=<nome-do-recurso (ex. "KeycloakGuard\KeycloakGuardServiceProvider")>
 
 - ordem de implementação das classes
     - core

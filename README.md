@@ -11,7 +11,7 @@ Curso FullCycle - Backend da Administração do Catálogo de Vídeos em PHP
 
 - A tela inicial do keycloak está disponível na url: http://0.0.0.0:8081/;
 
-    - As credenciais de administrador são username:admin e password:admin;
+    - Abra o 'Administration Console'. As credenciais de administrador são username:admin e password:admin;
     - Para criar um novo realm(fullcycle) selecione a opção: 'Create Realm';
     - Para exibir os endpoints de funcionalidades do keycloak selecione a opção: 'Realm settings'->'Aba General'->'Endpoints'->'OpenID Endpoint Configuration';
     - Para obter a chave pública que será utilizada no .env(KEYCLOAK_REALM_PUBLIC_KEY) da aplicação de backend selecione a opção: 'Realm settings'->'Aba Keys'->'Algorithm RS256'->'Public key';

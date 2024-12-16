@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\CastMemberController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\GenreController;
 use App\Http\Controllers\Api\VideoController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // definindo rota de healthcheck
@@ -13,12 +14,14 @@ Route::get('/', function () {
     return response()->json(['message' => 'success']);
 });
 
-// rotas acessíveis após autenticação
+// rotas acessíveis somente após autenticação
 // os usuários devem ter a role admin-catalog
-Route::middleware(['auth:api', 'can:admin-catalog'])->group(function () {
+// esta autorização foi inplementada com um gate na AuthServiceProvider
+Route::middleware(['auth:api', 'can:admin-catalogo'])->group(function () {
+
     Route::get('/me', function () {
         return true;
-    });    
+    });
 });
 
 // definindo rotas de categories

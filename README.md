@@ -19,4 +19,10 @@ Curso FullCycle - Backend da Administração do Catálogo de Vídeos em PHP
     - Para criar uma nova role(admin-catalogo) selecione a opção: 'Realm roles'->'Create role';
     - Para criar um novo user(silvio) selecione a opção: 'Users'->'Create new user'. Associe este à role  'admin-catalogo' na aba 'Role mapping'. Crie uma senha (123456) na aba 'Credentials';
 
+- Para obter o token de autorização deve-se realizar uma requisição POST para o token_endpoint do keycloak com os seguintes parâmetros:
+    - headers: Accept -> application/json;
+    - body: grant_type -> password, client_id -> backend-admin-catalogo-videos, client_secret -> (dado disponível no keycloack->client credentials->client secret), username -> silvio, password -> 123456;
+
+- Para visualizar o conteúdo do token pode-se utilizar o site jwt.io;
+    
 - Para encerrar os microsserviços deve-se executar o script stopCompose.sh;

@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider
@@ -25,6 +26,12 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        // criado um novo gate para permitir a avaliação do role do usuário
+        Gate::define('admin-catalogo', function () {
+            $payload = json_decode(Auth::token());
+            $realmAccess = $payload->realm_access ?? null;
+            $roles = $realmAccess->roles ?? [];
+            return in_array('admin-catalogo', $roles);
+        });
     }
 }

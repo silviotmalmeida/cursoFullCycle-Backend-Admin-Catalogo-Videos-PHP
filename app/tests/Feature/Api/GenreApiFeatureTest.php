@@ -4,6 +4,7 @@ namespace Tests\Feature\Api;
 
 use App\Models\Category as CategoryModel;
 use App\Models\Genre as GenreModel;
+use Tests\Traits\DisableAuthMiddlewareTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Tests\TestCase;
@@ -12,6 +13,9 @@ class GenreApiFeatureTest extends TestCase
 {
     // atributos
     private $endpoint = '/api/genres';
+
+    // aplicando a trait para desativar os middlewares de autenticação nos testes
+    use DisableAuthMiddlewareTrait;
 
     // testando o método index com retorno vazio
     public function testIndexWithNoGenres()

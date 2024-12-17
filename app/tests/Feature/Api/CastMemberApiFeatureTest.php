@@ -3,6 +3,7 @@
 namespace Tests\Feature\Api;
 
 use App\Models\CastMember as CastMemberModel;
+use Tests\Traits\DisableAuthMiddlewareTrait;
 use Carbon\Carbon;
 use Core\Domain\Enum\CastMemberType;
 use Illuminate\Http\Response;
@@ -12,6 +13,9 @@ class CastMemberApiFeatureTest extends TestCase
 {
     // atributos
     private $endpoint = '/api/cast_members';
+
+    // aplicando a trait para desativar os middlewares de autenticação nos testes
+    use DisableAuthMiddlewareTrait;
 
     // testando o método index com retorno vazio
     public function testIndexWithNoCastMembers()

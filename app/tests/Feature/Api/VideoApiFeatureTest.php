@@ -6,6 +6,7 @@ use App\Models\CastMember as CastMemberModel;
 use App\Models\Category as CategoryModel;
 use App\Models\Genre as GenreModel;
 use App\Models\Video as VideoModel;
+use Tests\Traits\DisableAuthMiddlewareTrait;
 use Carbon\Carbon;
 use Core\Domain\Enum\Rating;
 use Illuminate\Http\Response;
@@ -17,6 +18,9 @@ class VideoApiFeatureTest extends TestCase
 {
     // atributos
     private $endpoint = '/api/videos';
+
+    // aplicando a trait para desativar os middlewares de autenticação nos testes
+    use DisableAuthMiddlewareTrait;
 
     // testando o método index com retorno vazio
     public function testIndexWithNoVideos()

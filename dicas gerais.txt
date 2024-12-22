@@ -29,6 +29,7 @@
     para criar um listener: php artisan make:listener <nome-do-listener>
     para testar uma factory com o tinker: php artisan tinker <path-da-model(ex. \App\Models\Video)>::factory->count(10)->create();
     para publicar um recurso externo: php artisan vendor:publish --provider=<nome-do-recurso (ex. "KeycloakGuard\KeycloakGuardServiceProvider")>
+    para limpar o cache do laravel: php artisan config:clear
 
 - comandos logstash
     - para testar a comunicação udp pelo terminal: echo "test" | nc -u -w0 127.0.0.1 <port>(ex. 4718)

@@ -31,5 +31,6 @@
          consideradas para a execução dos testes, sobreescrevendo
          as variáveis setadas no .env -->
         <env name="FILESYSTEM_DISK" value="local"/>
+        <env name="LOG_CHANNEL" value="single"/>
     </php>
 </phpunit>

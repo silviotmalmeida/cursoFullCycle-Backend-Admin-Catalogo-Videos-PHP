@@ -50,8 +50,18 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            // alterado para habilitar o envio de logs para o logstash
+            // 'channels' => ['single'],
+            'channels' => ['daily', 'logstash'],
             'ignore_exceptions' => false,
+        ],
+
+        // habilitando o channel do logstash
+        'logstash' => [
+            'driver' => 'custom',
+            'via' => \App\Services\Logging\LogstashLogger::class,
+            'host' => env('LOGSTASH_HOST'),
+            'port' => env('LOGSTASH_PORT'),
         ],
 
         'single' => [

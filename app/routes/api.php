@@ -5,11 +5,19 @@ use App\Http\Controllers\Api\CastMemberController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\GenreController;
 use App\Http\Controllers\Api\VideoController;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 // definindo rota de healthcheck
 Route::get('/', function () {
     return response()->json(['message' => 'success']);
+});
+
+// definindo rota para teste do logstash
+Route::get('/logstash', function () {
+    Log::warning("testLaravelToLogstash");
+
+    return 'ok';
 });
 
 // rotas acessíveis somente após autenticação
